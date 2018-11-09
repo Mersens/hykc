@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    >
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:background="@drawable/dialog_bg"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            >
+        <com.tuoying.hykc.view.LoadingView
+            android:id="@+id/loadView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
+            app:view_color="#00c07d"
+            app:view_size="24dp"
+            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/colorAccent"
+                android:text="正在加载,请勿操作！"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_below="@+id/loadView"
+                />
+
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.tuoying.hykc">
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <!-- 这个权限用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 这个权限用于访问GPS定位 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 用于读取手机当前的状态 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" />
+    <uses-permission android:name="android.permission.ACCES_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
+    <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <!-- 来电消音 -->
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- 摄影机 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+
+    <application
+        android:name=".app.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/kc_logo_driver"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon, android:theme"
+        >
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="npaTmqqiYC953GxAUhqde5zskr25Os6c" />
+
+        <activity
+            android:name=".activity.SpalshActivity"
+            android:label="@string/app_name"
+            android:theme="@style/WelcomeTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
+            />
+        <activity
+            android:name=".activity.GuideActivity"
+            android:label="@string/app_name"
+            android:theme="@style/WelcomeTheme"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.FindPsdActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
+        <activity
+            android:name=".activity.UpdatePsdActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.BalanceDetailActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.MyCardActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.RzTextActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.CZInputMoneyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.TXInputMoneyActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.MyMsgActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.MyInfoActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.CarInfoActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
+        <activity
+            android:name=".activity.RzImgActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
+        <activity
+            android:name=".activity.TXHistoryActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
+        <activity
+            android:name=".activity.SetWalletPsdActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.ResetWalletPsdActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.GoodsListDetailActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.OrderActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".activity.UpLoadImgActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+
+        <activity
+            android:name=".activity.XYActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name=".activity.MyWalletActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.SettingActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.LXKFActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.SYBZActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name=".activity.SCActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name=".activity.FWActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.CheckRzTextActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+            android:name=".activity.CheckRzImgActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name=".activity.BXActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx9e92b64666bcd9cb"/>
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".service.AppRegister">
+            <intent-filter>
+                <action android:name="com.tencent.mm.plugin.openapi.Intent.ACTION_REFRESH_WXAPP" />
+            </intent-filter>
+        </receiver>
+
+
+
+
+        <!-- MQTTSERVER -->
+        <service
+            android:name=".service.MQTTService"
+            android:enabled="true" />
+        <!-- 验证码倒计时服务 -->
+        <service
+            android:name=".service.RegisterCodeTimerService"
+            android:enabled="true" />
+        <!-- 声明service组件 -->
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote"></service>
+
+        <!-- 安联service组件 -->
+        <service
+            android:name="com.alct.mdp.MDPLocationService"
+            android:exported="true"
+            android:process=":mdpLocation_v1" />
+        <service
+            android:name="com.alct.mdp.job.LocationUploadJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+
+        <service
+            android:name="com.alct.mdp.job.LogUploadJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+
+        <service
+            android:name="com.alct.mdp.job.AppRunningStatusUploadJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" >
+        </service>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="@color/base_color_text_white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/actionbar_color">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="钱包密码"
+                android:textColor="@color/base_color_text_white"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/img_close"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_action_close" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlaccount"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+
+            <TextView
+                android:id="@+id/tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="输入密码:"
+                android:textSize="14sp" />
+
+
+            <EditText
+                android:id="@+id/editpsd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/tips"
+                android:background="@null"
+                android:hint="钱包支付密码"
+                android:inputType="textPassword"
+                android:maxLength="11"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="#0f2536"
+                android:textColorHint="#CECECE"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/gray_line" />
+        <TextView
+            android:id="@+id/tv_tips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            android:text="钱包余额不足，请到钱包进行充值!"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            />
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_cz_bg"
+            android:text="确定"
+            android:textColor="@color/base_color_text_white" />
+    </LinearLayout>
+</LinearLayout>

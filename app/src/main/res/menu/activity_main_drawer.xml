@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/goods_msg"
+            android:icon="@drawable/ic_action_goods"
+            android:title="货源信息" />
+        <item
+            android:id="@+id/my_wallet"
+            android:icon="@drawable/ic_action_wallet"
+            android:title="我的钱包" />
+        <item
+            android:id="@+id/my_waybill"
+            android:icon="@drawable/ic_action_bill"
+            android:title="我的运单" />
+        <item
+            android:id="@+id/my_msg"
+            android:icon="@drawable/ic_action_about"
+            android:title="我的消息" />
+        <item
+            android:id="@+id/setting"
+            android:icon="@drawable/ic_action_setting"
+            android:title="系统设置" />
+        <item
+            android:id="@+id/contact"
+            android:icon="@drawable/ic_action_connect"
+            android:title="联系客服" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/ic_action_about"
+            android:title="关于我们" />
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/ic_action_help"
+            android:title="使用帮助" />
+        <item
+            android:id="@+id/shop"
+            android:icon="@drawable/ic_action_shop"
+            android:title="商城" />
+        <item
+            android:id="@+id/netservice"
+            android:icon="@drawable/ic_action_service"
+            android:title="互联网金融服务" />
+        <item
+            android:id="@+id/mysupport"
+            android:icon="@drawable/ic_action_support"
+            android:title="我要报险" />
+    </group>
+
+</menu>

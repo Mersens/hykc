@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_color_text_white"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        >
+
+        <TextView
+            android:id="@+id/allservice_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="货运快车全国统一服务电话:"
+            android:textSize="@dimen/text_size_normal" />
+
+        <TextView
+            android:id="@+id/tv_allservice_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/allservice_num"
+            android:text="4009962611"
+            android:textColor="@color/actionbar_color"
+            android:textSize="@dimen/text_size_normal" />
+
+    </RelativeLayout>
+    <View
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:background="@color/color_line_text"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="如您在使用过程中遇到问题，请及时联系客服"
+            android:textSize="@dimen/text_size_normal" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        >
+        <TextView
+            android:id="@+id/service_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="客服电话:"
+            android:textSize="@dimen/text_size_normal" />
+
+        <TextView
+            android:id="@+id/tv_service_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/service_num"
+            android:text="0371-65826280"
+            android:textColor="@color/actionbar_color"
+            android:textSize="@dimen/text_size_normal" />
+
+    </RelativeLayout>
+
+</LinearLayout>

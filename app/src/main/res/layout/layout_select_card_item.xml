@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_color_text_white"
+    >
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@color/base_color_text_white"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        >
+    <RelativeLayout
+        android:id="@+id/layout_type"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
+
+        <ImageView
+            android:id="@+id/img_type"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:src="@mipmap/ic_launcher"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_type"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="14sp"
+            android:text="支付宝"
+
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@+id/img_type"
+            />
+        <TextView
+            android:id="@+id/tv_zh"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="14sp"
+            android:text="15738800385"
+
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@+id/img_type"
+            android:layout_below="@+id/tv_type"
+            />
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/checkbox_selector_circle"
+            android:button="@null"
+            android:enabled="false"
+            android:clickable="false"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_line" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="clpp">
+        <item>一汽解放</item>
+        <item>青岛解放</item>
+        <item>东风商用</item>
+        <item>福田欧曼</item>
+        <item>中国重汽</item>
+        <item>陕汽重卡</item>
+        <item>江淮重卡</item>
+        <item>上汽红岩</item>
+        <item>大运重卡</item>
+        <item>安徽华菱</item>
+        <item>其它</item>
+    </string-array>
+
+    <string-array name="cx">
+        <item>不限车型</item>
+        <item>平板</item>
+        <item>高栏</item>
+        <item>厢式</item>
+        <item>高低板</item>
+        <item>保温冷藏</item>
+    </string-array>
+
+    <string-array name="cc">
+        <item>4.2米</item>
+        <item>4.5米</item>
+        <item>5米</item>
+        <item>6.2米</item>
+        <item>6.8米</item>
+        <item>7.2米</item>
+        <item>7.7米</item>
+        <item>7.8米</item>
+        <item>8.2米</item>
+        <item>8.6米</item>
+        <item>8.7米</item>
+        <item>9.6米</item>
+        <item>11.7米</item>
+        <item>12.5米</item>
+        <item>13米</item>
+        <item>13.5米</item>
+        <item>14米</item>
+        <item>16米</item>
+        <item>17米</item>
+        <item>17.5米</item>
+        <item>18米</item>
+    </string-array>
+
+    <string-array name="cplx">
+        <item>大型汽车号牌(黄底黑字)</item>
+        <item>小型汽车号牌(蓝底白字)</item>
+        <item>其他号牌</item>
+    </string-array>
+    <string-array name="jszlx">
+        <item>A1</item>
+        <item>A2</item>
+        <item>B1</item>
+        <item>B2</item>
+    </string-array>
+    <string-array name="clfl">
+        <item>重型半挂牵引车</item>
+        <item>重型普通货车</item>
+        <item>轻型仓栅式货车</item>
+        <item>重型仓栅式货车</item>
+        <item>普通货车</item>
+        <item>厢式货车</item>
+        <item>罐式货车</item>
+        <item>牵引车</item>
+        <item>普通挂车</item>
+        <item>罐式挂车</item>
+        <item>集装箱挂车</item>
+        <item>仓栅式货车</item>
+        <item>封闭货车</item>
+        <item>平板货车</item>
+        <item>集装箱车</item>
+        <item>自卸货车</item>
+        <item>特殊结构货车</item>
+        <item>专项作业车</item>
+        <item>厢式挂车</item>
+        <item>仓栅式挂车</item>
+        <item>平板挂车</item>
+        <item>自卸挂车</item>
+        <item>专项作业挂车</item>
+        <item>车辆运输车</item>
+        <item>车辆运输车(单排)</item>
+    </string-array>
+    <string-array name="web_urls">
+        <item>http://tuoying.huoyunkuaiche.com/exts/about.jsp</item>
+        <item>http://tuoying.huoyunkuaiche.com/exts/shopping.jsp</item>
+        <item>http://tuoying.huoyunkuaiche.com/exts/hlwfuwu.jsp</item>
+        <item>http://tuoying.huoyunkuaiche.com/exts/bx.jsp</item>
+    </string-array>
+
+    <string-array name="rzimgs">
+        <item>personal1.jpg</item>
+        <item>personal2.jpg</item>
+        <item>personal3.jpg</item>
+        <item>vehicle0.jpg</item>
+        <item>vehicle2.jpg</item>
+        <item>vehicle3.jpg</item>
+        <item>personal5.jpg</item>
+        <item>personal6.jpg</item>
+        <item>personal7.jpg</item>
+        <item>personal8.jpg</item>
+        <item>personal9.jpg</item>
+    </string-array>
+
+</resources>
