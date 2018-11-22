@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="actionbar_color"> #ff48b7ef</color>
+    <color name="base_color_text_white">#FFFFFF</color>
+    <color name="color_transparent">#00000000</color>
+    <color name="color_line_text">#e1e1e2</color>
+    <color name="gray_line">#e1e1e2</color>
+    <color name="press_button">#00c07d</color>
+    <color name="normal_button">#00d389</color>
+    <color name="text_color">#888c97</color>
+    <color name="text_color_black">#0f2536</color>
+    <color name="blue">#33b5e5</color>
+    <color name="qmui_config_color_gray_1">#353C46</color>
+    <color name="qmui_config_color_gray_5">#858C96</color>
+    <color name="bottom_select_color">#33b5e5</color>
+    <color name="bottom_normal_color">#9a9a9a</color>
+</resources>

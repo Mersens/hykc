@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_color_text_white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:background="@color/base_color_text_white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/actionbar_color">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="评价"
+                android:textColor="@color/base_color_text_white"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/img_close"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_action_close" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="评价星级"
+                    android:textSize="14sp"
+                    />
+
+                <com.cb.ratingbar.CBRatingBar
+                    android:id="@+id/rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="5dp"
+                    app:starCanTouch="true"
+                    app:starCount="5"
+                    app:starCoverColor="#ff48b7ef"
+                    app:starEndColor="#ff48b7ef"
+                    app:starFillColor="#ffffff"
+                    app:starMaxProgress="5"
+                    app:starPointCount="5"
+                    app:starProgress="0"
+                    app:starShowStroke="true"
+                    app:starSize="22dp"
+                    app:starSpace="10dp"
+                    app:starStartColor="#ff48b7ef"
+                    app:starStrokeColor="#858C96"
+                    app:starStrokeWidth="1dp"
+                    />
+            </RelativeLayout>
+
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/color_line_text"
+                />
+            <com.tuoying.hykc.view.ContainsEmojiEditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_margin="8dp"
+                android:background="@null"
+                android:gravity="top"
+                android:hint="请输入评价内容"
+                android:maxLines="10"
+                android:textColorHint="#e1e1e2"
+                android:textCursorDrawable="@null"
+                android:textSize="@dimen/text_size_medium" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                >
+                <Button
+                    android:id="@+id/btn_ok"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/btn_cz_bg"
+                    android:gravity="center"
+                    android:text="确定"
+                    android:textColor="@color/base_color_text_white" />
+
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_color_text_white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/actionbar_color">
+
+        <TextView
+            android:id="@+id/yue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="30dp"
+            android:text="余额（元）"
+            android:textColor="@color/base_color_text_white"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/myCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="32dp"
+            android:layout_marginRight="16dp"
+            android:text="卡包"
+            android:textColor="@color/base_color_text_white"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/tv_yue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/yue"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="20dp"
+            android:text="0.00"
+            android:textColor="@color/base_color_text_white"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_cz"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="88dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/btn_cz_bg"
+        android:gravity="center"
+        android:text="充值"
+        android:textColor="@color/base_color_text_white" />
+
+    <Button
+        android:id="@+id/btn_tx"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/btn_tx_bg"
+        android:gravity="center"
+        android:text="提现"
+        android:textColor="@color/actionbar_color" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_mx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:text="余额明细"
+            android:textColor="@color/actionbar_color"
+            android:textSize="@dimen/text_size_medium">
+        </TextView>
+
+    </RelativeLayout>
+    >
+
+</LinearLayout>

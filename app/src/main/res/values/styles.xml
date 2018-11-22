@@ -1,0 +1,55 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/actionbar_color</item>
+        <item name="colorPrimaryDark">@color/actionbar_color</item>
+        <item name="colorAccent">@color/color_line_text</item>
+        <item name="colorControlNormal">@color/color_line_text</item>
+        <item name="colorControlActivated">@color/color_line_text</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="WelcomeTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen"/>
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+    <style name="Theme.Timetodo" parent="AppBaseTheme">
+        <!--   <item name="android:windowTranslucentNavigation" >true</item>
+          <item name="android:windowTranslucentStatus">true</item> -->
+        <item name="colorAccent">@color/color_line_text</item>
+        <item name="colorControlNormal">@color/color_line_text</item>
+        <item name="colorControlActivated">@color/color_line_text</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="dot_style">
+        <item name="android:layout_width">6dip</item>
+        <item name="android:layout_height">6dip</item>
+        <item name="android:background">@drawable/drawable_point_indicator</item>
+        <item name="android:layout_marginLeft">1.5dip</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_marginRight">1.5dip</item>
+    </style>
+    <style name="CustomTabLayoutTextAppearance" parent="TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    <style name="main_menu_animstyle">
+        <item name="android:windowEnterAnimation">@anim/photo_dialog_in_anim</item>
+        <item name="android:windowExitAnimation">@anim/photo_dialog_out_anim</item>
+    </style>
+
+    <style name="transparentFrameWindowStyle" parent="android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/photo_choose_bg</item>
+    </style>
+</resources>

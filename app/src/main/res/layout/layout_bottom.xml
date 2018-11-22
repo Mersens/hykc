@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/base_color_text_white"
+    android:orientation="vertical"
+    >
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_line_text"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="@color/base_color_text_white"
+        android:orientation="horizontal"
+        >
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <RelativeLayout
+                android:id="@+id/layout_yd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                >
+                <ImageView
+                    android:id="@+id/img_yd"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_yd_select"
+                    />
+                <TextView
+                    android:id="@+id/tv_yd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/img_yd"
+                    android:layout_centerHorizontal="true"
+                    android:text="我的运单"
+                    android:textColor="@color/bottom_select_color"
+                    android:textSize="12sp"
+                    />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <RelativeLayout
+                android:id="@+id/layout_hy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                >
+                <ImageView
+                    android:id="@+id/img_hy"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                     android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_hy_normal"
+                    />
+                <TextView
+                    android:id="@+id/tv_hy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/img_hy"
+                    android:layout_centerHorizontal="true"
+                    android:text="货源信息"
+                    android:textColor="@color/bottom_normal_color"
+                    android:textSize="12sp"
+                    />
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <RelativeLayout
+                android:id="@+id/layout_others"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                >
+                <ImageView
+                    android:id="@+id/img_others"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_others_normal"
+                    />
+                <TextView
+                    android:id="@+id/tv_others"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/img_others"
+                    android:layout_centerHorizontal="true"
+                    android:text="其他"
+                    android:textColor="@color/bottom_normal_color"
+                    android:textSize="12sp"
+                    />
+            </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
