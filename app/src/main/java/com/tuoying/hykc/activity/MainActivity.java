@@ -66,6 +66,7 @@ import com.tuoying.hykc.fragment.SettingFragment;
 import com.tuoying.hykc.service.MQTTService;
 import com.tuoying.hykc.utils.APKVersionCodeUtils;
 import com.tuoying.hykc.utils.DateUtils;
+import com.tuoying.hykc.utils.NfcDao;
 import com.tuoying.hykc.utils.NotificationUtils;
 import com.tuoying.hykc.utils.Questions;
 import com.tuoying.hykc.utils.RequestManager;
@@ -79,7 +80,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -93,6 +97,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity
         implements View.OnClickListener {
+    boolean isStartNfc=false;
     private static final int MY_WAYBILL = 0;//我的运单
     private static final int GOODS_MSG_LIST = 1; //货源列表
     private static final int OTHERS = 2; //其他
@@ -129,11 +134,13 @@ public class MainActivity extends BaseActivity
     private ImageView mImgYD;
     private ImageView mImgOTHERS;
     private FrameLayout mLayoutMsg;
+    private NfcDao nfcDao ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dao = new DBDaoImpl(this);
+        nfcDao= new NfcDao(this);
         getPersimmions();
         init();
     }
@@ -173,6 +180,53 @@ public class MainActivity extends BaseActivity
             if (permissions.size() > 0) {
                 requestPermissions(permissions.toArray(new String[permissions.size()]), SDK_PERMISSION_REQUEST);
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startCheckNfc();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCheckNfc();
+    }
+
+    public void startCheckNfc(){
+        //开启前台调度系统
+        if(NfcDao.mNfcAdapter!=null){
+            NfcDao.mNfcAdapter.enableForegroundDispatch(this, NfcDao.mPendingIntent, NfcDao.mIntentFilter, NfcDao.mTechList);
+        }
+
+    }
+
+    public void stopCheckNfc(){
+        //关闭前台调度系统
+        if(NfcDao.mNfcAdapter!=null) {
+            NfcDao.mNfcAdapter.disableForegroundDispatch(this);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //当该Activity接收到NFC标签时，运行该方法
+        //调用工具方法，读取到的NFC数据
+        if(intent==null){
+            return;
+        }
+        try {
+            String nfcid=nfcDao.readIdFromTag(intent);
+            Log.e("nfcid","nfcid=="+nfcid);
+            if(!TextUtils.isEmpty(nfcid)){
+            RxBus.getInstance().send(new EventEntity("nfc",nfcid));
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 
@@ -676,6 +730,18 @@ public class MainActivity extends BaseActivity
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
+                        //step:5
+                        //tel:157****0385
+                        //msg:登录获取用户信息成功
+                        //time:2018-12-18:11:11:10
+                        //rowid:
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","5");
+                        map.put("tel",id);
+                        map.put("msg","MainActivity页面获取用户信息成功");
+                        map.put("time",getNowtime());
+                        map.put("rowid","");
+                        upLoadUserLog(map);
                         Log.e("getRzInfo onSuccess", msg);
                         if(TextUtils.isEmpty(msg)){
                             return;
@@ -684,7 +750,7 @@ public class MainActivity extends BaseActivity
                         try {
                             String alct=SharePreferenceUtil.getInstance(MainActivity.this).getALCTMsg();
                             if(!TextUtils.isEmpty(alct)){
-                                doRegisterAlct(alct,msg);
+                                doRegisterAlct(alct,msg,id);
                             }
                             JSONObject jsonObject = new JSONObject(msg.replaceAll("\r", "").replaceAll("\n", ""));
                             User locUser = user;
@@ -723,11 +789,23 @@ public class MainActivity extends BaseActivity
 
                     @Override
                     public void onError(String msg) {
+                        //step:6
+                        //tel:157****0385
+                        //msg:登录获取用户信息成功
+                        //time:2018-12-18:11:11:10
+                        //rowid:
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","6");
+                        map.put("tel",id);
+                        map.put("msg","MainActivity页面获取用户信息失败，失败原因："+msg);
+                        map.put("time",getNowtime());
+                        map.put("rowid","");
+                        upLoadUserLog(map);
                     }
                 }));
     }
 
-    private void doRegisterAlct(String alct, String json) {
+    private void doRegisterAlct(String alct, String json,final String id) {
         User user=null;
         String userid=SharePreferenceUtil.getInstance(this).getUserId();
         if(!TextUtils.isEmpty(userid)){
@@ -746,15 +824,20 @@ public class MainActivity extends BaseActivity
                     }
                 }
             }
-
             JSONArray array=new JSONArray(alct);
             List<EnterpriseIdentity> mList=new ArrayList<>();
             for (int i=0;i<array.length();i++){
                 JSONObject object=array.getJSONObject(i);
                 EnterpriseIdentity enterpriseIdentity=new EnterpriseIdentity();
+                String alctid= object.getString("alctid");
+                if(TextUtils.isEmpty(alctid)){
+                    continue;
+                }
                 enterpriseIdentity.setAppIdentity(object.getString("alctid"));
                 enterpriseIdentity.setAppKey(object.getString("alctkey"));
                 enterpriseIdentity.setEnterpriseCode(object.getString("alctcode"));
+                String string="alctid="+object.getString("alctid")+";alctkey="+object.getString("alctkey")+";alctcode=="+object.getString("alctcode");
+                Log.e("Identity",string);
                 mList.add(enterpriseIdentity);
             }
             //总公司
@@ -765,7 +848,6 @@ public class MainActivity extends BaseActivity
             mList.add(enterpriseIdentity);
             mMultiIdentity.setEnterpriseIdentities(mList);
             mMultiIdentity.setDriverIdentity(mySO.getString("rz#sfzh"));
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -773,19 +855,44 @@ public class MainActivity extends BaseActivity
         MDPLocationCollectionManager.register(MainActivity.this, mMultiIdentity, new OnResultListener() {
             @Override
             public void onSuccess() {
+                Log.e("Main register","register success");
+                //step:7
+                //tel:157****0385
+                //msg:登录获取用户信息成功
+                //time:2018-12-18:11:11:10
+                //rowid:
                 //Toast.makeText(MainActivity.this, "安联注册成功！", Toast.LENGTH_SHORT).show();
+                Map<String,String> map=new HashMap<>();
+                map.put("step","7");
+                map.put("tel",id);
+                map.put("msg","MainActivity页面安联登录成功");
+                map.put("time",getNowtime());
+                map.put("rowid","");
+                upLoadUserLog(map);
                 getInvoices(mMultiIdentity);
                 SharePreferenceUtil.getInstance(MainActivity.this).setSDMsg("0");
             }
 
             @Override
             public void onFailure(String s, String s1) {
+                Log.e("Main register","register onFailure");
+                //step:8
+                //tel:157****0385
+                //msg:登录获取用户信息成功
+                //time:2018-12-18:11:11:10
+                //rowid:
+                Map<String,String> map=new HashMap<>();
+                map.put("step","8");
+                map.put("tel",id);
+                map.put("msg","MainActivity页面安联登录失败，失败原因："+"s="+s+":s1="+s1);
+                map.put("time",getNowtime());
+                map.put("rowid","");
+                upLoadUserLog(map);
                 Log.e("ssss===","s="+s+":s1="+s1);
                 SharePreferenceUtil.getInstance(MainActivity.this).setSDMsg("1");
-                confirmTips("联系客服,是否税登");
+                confirmTips("登录错误:"+s1+"\n"+"联系客服！！！");
             }
         });
-
     }
 
     private void getInvoices(final MultiIdentity mMultiIdentity){
@@ -801,9 +908,7 @@ public class MainActivity extends BaseActivity
                             confirmInvoice(invoice);
                         }
                     }
-
                 }
-
                 @Override
                 public void onFailure(String s, String s1) {
 
@@ -992,6 +1097,31 @@ public class MainActivity extends BaseActivity
         public void onServiceDisconnected(ComponentName componentName) {
 
         }
+    }
+    private void upLoadUserLog(Map<String, String> params){
+        RequestManager.getInstance()
+                .mServiceStore
+                .uplog(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+
+                    }
+                }));
+
+    }
+
+    private String getNowtime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String time = sdf.format(new Date());
+        return time;
     }
 
 }

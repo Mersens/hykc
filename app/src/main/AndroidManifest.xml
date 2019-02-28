@@ -2,10 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tuoying.hykc">
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.NFC" />
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
@@ -45,19 +51,20 @@
         android:theme="@style/AppTheme"
         tools:replace="android:icon, android:theme"
         >
-        <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="npaTmqqiYC953GxAUhqde5zskr25Os6c" />
-
+        <!---->
+        <!--@drawable/ic_hukc_01-->
         <activity
             android:name=".activity.SpalshActivity"
             android:label="@string/app_name"
-            android:theme="@style/WelcomeTheme">
+            android:theme="@style/SpalshTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="npaTmqqiYC953GxAUhqde5zskr25Os6c" />
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -70,7 +77,16 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
-            />
+            >
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".activity.GuideActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -86,8 +102,9 @@
         <activity
             android:name=".activity.RegisterActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/app_name"
+
             />
 
         <activity
@@ -108,12 +125,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             />
-        <activity
-            android:name=".activity.RzTextActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
+
         <activity
             android:name=".activity.CZInputMoneyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -145,12 +157,6 @@
             android:theme="@style/AppTheme.NoActionBar"
             />
 
-        <activity
-            android:name=".activity.RzImgActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
 
         <activity
             android:name=".activity.TXHistoryActivity"
@@ -247,6 +253,18 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".activity.RzTextActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
+            android:name=".activity.RzImgActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
             android:name=".activity.BXActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
@@ -268,9 +286,6 @@
                 <action android:name="com.tencent.mm.plugin.openapi.Intent.ACTION_REFRESH_WXAPP" />
             </intent-filter>
         </receiver>
-
-
-
 
         <!-- MQTTSERVER -->
         <service
@@ -305,7 +320,15 @@
             android:name="com.alct.mdp.job.AppRunningStatusUploadJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" >
         </service>
+        <service
+            android:name="com.alct.mdp.processprotection.SDKServiceMonitor"
+            android:exported="true"
+            android:process=":sdkServiceMonitor_v1" />
 
+        <service
+            android:name=".processprotection.PlayerMusicService"
+            android:exported="true"
+            android:process=":music_v1" />
     </application>
 
 </manifest>

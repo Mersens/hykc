@@ -66,6 +66,7 @@ public class GoodsListDetailActivity extends BaseActivity {
     private RelativeLayout mLayoutHSHC;
     private TextView mTextHSHC;
     private TextView mTextJSYFBZ;
+    private TextView mTextSid;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -117,6 +118,7 @@ public class GoodsListDetailActivity extends BaseActivity {
         mLayoutHSHC.setVisibility(View.GONE);
         mTextHSHC=findViewById(R.id.tv_hshc);
         mTextJSYFBZ=findViewById(R.id.tv_jsyfbz);
+        mTextSid=findViewById(R.id.tv_sid);
         if(type==100){
             mBtnOrder.setText("接单");
             mBtnOrder.setVisibility(View.VISIBLE);
@@ -255,6 +257,11 @@ public class GoodsListDetailActivity extends BaseActivity {
 
             String hwmc = object.getString("hwmc");
             mTextHwmc.setText(hwmc);
+
+            if(object.has("sid")){
+                String sid=object.getString("sid");
+                mTextSid.setText(sid);
+            }
             String fhrTel = object.getString("fhrdh");
             mTextFhrTel.setText(fhrTel);
             String zl = object.getString("hwzl");
@@ -405,7 +412,6 @@ public class GoodsListDetailActivity extends BaseActivity {
                                 submit_order(orderno,tokenid,entity.getRowid(),loadingDialogFragment);
                             }else {
                                 String error=jsonObject.getString("message");
-
                                 RxBus.getInstance().send(new EventEntity("刷新","刷新"));
                                 loadingDialogFragment.dismiss();
                                 Toast.makeText(GoodsListDetailActivity.this, error, Toast.LENGTH_SHORT).show();

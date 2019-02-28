@@ -5,9 +5,10 @@
     android:layout_height="match_parent"
     android:background="@color/base_color_text_white"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:orientation="vertical">
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

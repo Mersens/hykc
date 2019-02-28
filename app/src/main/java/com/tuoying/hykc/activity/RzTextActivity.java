@@ -167,10 +167,7 @@ public class RzTextActivity extends BaseActivity {
         initTimePicker();
         initAccessToken();
         initEvent();
-        if(type==1){
-            downLoadRzMsg();
-
-        }
+        downLoadRzMsg();
     }
 
     private boolean checkTokenStatus() {

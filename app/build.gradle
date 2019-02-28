@@ -7,10 +7,9 @@ android {
         applicationId "com.tuoying.hykc"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 5
-        versionName "2.6"
+        versionCode 11
+        versionName "3.1"
         multiDexEnabled true
-
         javaCompileOptions {
             annotationProcessorOptions {
                 includeCompileClasspath = true
@@ -80,7 +79,6 @@ dependencies {
     compile 'liji.library.dev:citypickerview:3.1.8'
     implementation files('libs/alipaySdk-20180403.jar')
     implementation files('libs/mqtt-client-0_4_1-20140602_040113-100.jar')
-    implementation files('libs/mdp_sdk.jar')
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.loopj.android:android-async-http:1.4.9'
@@ -93,4 +91,5 @@ dependencies {
     compile project(path: ':ocr_ui')
     implementation files('libs/personalmqtt-20180814.jar')
     compile 'com.lzy.widget:imagepicker:0.6.1'
+    implementation files('libs/mdp_sdk.jar')
 }

@@ -251,6 +251,7 @@ public class GoodsListFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void initEvent() {
+
         mLayoutCity.setOnClickListener(this);
         mLayoutArea.setOnClickListener(this);
         mLayoutLength.setOnClickListener(this);
@@ -332,7 +333,11 @@ public class GoodsListFragment extends BaseFragment implements View.OnClickListe
             confirmFind("用户信息为空，请重新登录！");
             return;
         }
-        list.clear();
+
+        if(adapter!=null){
+            list.clear();
+            adapter.setList(list);
+        }
         mLayoutLoading.setVisibility(View.VISIBLE);
         sbf.setLength(0);
         if (!TextUtils.isEmpty(sCity) && !TextUtils.isEmpty(sDistrict)) {
@@ -694,6 +699,7 @@ public class GoodsListFragment extends BaseFragment implements View.OnClickListe
                             if(jsonObject.getBoolean("success")){
                                 String orderno=jsonObject.getString("order_no");
                                 String tokenid=jsonObject.getString("tokenid");
+                                SharePreferenceUtil.getInstance(getActivity()).setPayPwd(psd);
                                 submit_order(orderno,tokenid,entity.getRowid(),loadingDialogFragment);
                             }else {
                                 String error=jsonObject.getString("message");

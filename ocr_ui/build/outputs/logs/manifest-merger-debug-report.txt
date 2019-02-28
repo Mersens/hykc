@@ -50,15 +50,15 @@ ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:14:5-25:19
 	android:supportsRtl
 		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:17:18-44
 	android:label
-		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:15:18-50
+		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:16:18-50
 	android:vmSafeMode
-		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:18:18-43
+		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:19:18-43
 	android:icon
-		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:16:18-52
+		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:15:18-52
 	android:allowBackup
 		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:14:18-44
 	android:theme
-		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:19:18-49
+		ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:18:18-49
 activity#com.baidu.ocr.ui.camera.CameraActivity
 ADDED from D:\hykc_loc\hykc\ocr_ui\src\main\AndroidManifest.xml:21:9-23:85
 	android:configChanges

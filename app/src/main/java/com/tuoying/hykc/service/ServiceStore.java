@@ -30,7 +30,6 @@ public interface ServiceStore {
     @GET("ds/opers.execResetPwdNew")
     Observable<ResponseBody> resetPsd(@Query("mobile") String mobile, @Query("newpwd") String newpwd, @Query("sms") String sms, @Query("app") String app);
 
-
     @FormUrlEncoded
     @POST("files/load_info_new.jsp")
     Observable<ResponseBody> findMyRz(@Field("token") String token, @Field("mobile") String mobile, @Field("app") String app);
@@ -48,7 +47,7 @@ public interface ServiceStore {
     Observable<ResponseBody> findOrderInfo(@FieldMap Map<String, String> params);
 
     @FormUrlEncoded
-    @POST("ds/opers.deleteAccount_new")
+    @POST("ds/opers.deleteAccountNew")
     Observable<ResponseBody> deleteAccount(@FieldMap Map<String, String> params);
 
     @FormUrlEncoded
@@ -148,6 +147,11 @@ public interface ServiceStore {
     @FormUrlEncoded
     @POST("files/findphoto_new.jsp")
     Observable<ResponseBody> findphoto(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("showdata/alct/log/uplog2.jsp")
+    Observable<ResponseBody> uplog(@FieldMap Map<String, String> params);
+
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

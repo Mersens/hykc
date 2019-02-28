@@ -28,7 +28,6 @@ public class MyCardAdapter extends BaseAdapter {
         this.mList=list;
         mInflater=LayoutInflater.from(context);
         initDatas();
-
     }
 
     private void initDatas() {
@@ -39,6 +38,7 @@ public class MyCardAdapter extends BaseAdapter {
 
     public void setList(List<CardEntity> list){
         this.mList=list;
+        initDatas();
         notifyDataSetChanged();
 
     }

@@ -194,7 +194,28 @@
                             android:singleLine="true"
                             android:textSize="14sp" />
                     </RelativeLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp">
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:text="sid"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tv_sid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:singleLine="true"
+                            android:layout_marginLeft="5dp"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="32dp">

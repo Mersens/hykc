@@ -15,6 +15,9 @@
         <item name="windowNoTitle">true</item>
     </style>
     <style name="WelcomeTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen"/>
+    <style name="SpalshTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@mipmap/splash</item>
+    </style>
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in

@@ -6,11 +6,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
 
 import com.tuoying.hykc.R;
 
@@ -19,10 +21,8 @@ import com.tuoying.hykc.R;
  */
 
 public class LoadingDialogFragment extends DialogFragment {
-    public static LoadingDialogFragment getInstance(){
-
-        return new LoadingDialogFragment();
-    }
+    private TextView mTextTips;
+    private String tips;
 
     @Nullable
     @Override
@@ -45,15 +45,33 @@ public class LoadingDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        tips=getArguments().getString("tips");
         initView(view);
     }
 
     private void initView(View view) {
+        mTextTips=view.findViewById(R.id.tv_tips);
+        if(!TextUtils.isEmpty(tips)){
+            mTextTips.setText(tips);
+        }
+
     }
 
     public void showF(FragmentManager manager, String tag) {
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    public static LoadingDialogFragment getInstance(){
+
+        return getInstance("");
+    }
+    public static LoadingDialogFragment getInstance(String msg){
+        LoadingDialogFragment fragment=  new LoadingDialogFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("tips",msg);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 }

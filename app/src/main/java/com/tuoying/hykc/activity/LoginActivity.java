@@ -44,8 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.dom.DOMResult;
 
@@ -61,7 +65,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends BaseActivity {
     private static final String TYPE = "driver";
-   final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
+    final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
     private EditText mEditPhone;
     private EditText mEditPsd;
     private TextView mTextFind;
@@ -228,7 +232,7 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    private void doRegisterAlct(String alct, String json) {
+    private void doRegisterAlct(String alct, String json,final String id) {
         User user=null;
         String userid=SharePreferenceUtil.getInstance(this).getUserId();
         if(!TextUtils.isEmpty(userid)){
@@ -261,6 +265,10 @@ public class LoginActivity extends BaseActivity {
             for (int i=0;i<array.length();i++){
                 JSONObject object=array.getJSONObject(i);
                 EnterpriseIdentity enterpriseIdentity=new EnterpriseIdentity();
+                String alctid= object.getString("alctid");
+                if(TextUtils.isEmpty(alctid)){
+                    continue;
+                }
                 enterpriseIdentity.setAppIdentity(object.getString("alctid"));
                 enterpriseIdentity.setAppKey(object.getString("alctkey"));
                 enterpriseIdentity.setEnterpriseCode(object.getString("alctcode"));
@@ -282,6 +290,19 @@ public class LoginActivity extends BaseActivity {
         MDPLocationCollectionManager.register(LoginActivity.this, mMultiIdentity, new OnResultListener() {
             @Override
             public void onSuccess() {
+                //step:3
+                //tel:157****0385
+                //msg:登录获取用户信息成功
+                //time:2018-12-18:11:11:10
+                //rowid:
+                Log.e("login register","register success");
+                Map<String,String> map=new HashMap<>();
+                map.put("step","3");
+                map.put("tel",id);
+                map.put("msg","登录页面安联register成功");
+                map.put("time",getNowtime());
+                map.put("rowid","");
+                upLoadUserLog(map);
                 if(loadingDialogFragment!=null){
                     loadingDialogFragment.dismiss();
                 }
@@ -293,6 +314,19 @@ public class LoginActivity extends BaseActivity {
 
             @Override
             public void onFailure(String s, String s1) {
+                Log.e("login register","register onFailure");
+                //step:4
+                //tel:157****0385
+                //msg:登录获取用户信息成功
+                //time:2018-12-18:11:11:10
+                //rowid:
+                Map<String,String> map=new HashMap<>();
+                map.put("step","4");
+                map.put("tel",id);
+                map.put("msg","登录页面安联register失败，失败原因："+"s="+s+":s1="+s1);
+                map.put("time",getNowtime());
+                map.put("rowid","");
+                upLoadUserLog(map);
                 Log.e("ssss===","s="+s+":s1="+s1);
                 if(loadingDialogFragment!=null){
                     loadingDialogFragment.dismiss();
@@ -301,7 +335,6 @@ public class LoginActivity extends BaseActivity {
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
                // confirmTips("联系客服,是否税登");
-
             }
         });
 
@@ -354,9 +387,21 @@ public class LoginActivity extends BaseActivity {
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
+                        //step:1
+                        //tel:157****0385
+                        //msg:登录获取用户信息成功
+                        //time:2018-12-18:11:11:10
+                        //rowid:
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","1");
+                        map.put("tel",id);
+                        map.put("msg","登录页面获取用户信息成功");
+                        map.put("time",getNowtime());
+                        map.put("rowid","");
+                        upLoadUserLog(map);
                         Log.e("loaduserinfo onSuccess", msg);
                         String str=msg.replaceAll("\r", "").replaceAll("\n", "");
-                        doRegisterAlct(alct,str);
+                        doRegisterAlct(alct,str,id);
                     }
 
                     @Override
@@ -364,6 +409,21 @@ public class LoginActivity extends BaseActivity {
                         if(loadingDialogFragment!=null){
                             loadingDialogFragment.dismiss();
                         }
+                        //step:2
+                        //tel:157****0385
+                        //msg:登录获取用户信息成功
+                        //time:2018-12-18:11:11:10
+                        //rowid:
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","2");
+                        map.put("tel",id);
+                        map.put("msg","登录页面获取用户信息失败，失败原因："+msg);
+                        map.put("time",getNowtime());
+                        map.put("rowid","");
+                        upLoadUserLog(map);
+                        Log.e("loaduserinfo onSuccess", msg);
+                        String str=msg.replaceAll("\r", "").replaceAll("\n", "");
+                        doRegisterAlct(alct,str,id);
                     }
                 }));
     }
@@ -427,4 +487,33 @@ public class LoginActivity extends BaseActivity {
         compositeDisposable.clear();
         handler.removeCallbacksAndMessages(null);
     }
+
+
+    private void upLoadUserLog(Map<String, String> params){
+        RequestManager.getInstance()
+                .mServiceStore
+                .uplog(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+
+                    }
+                }));
+
+    }
+
+    private String getNowtime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String time = sdf.format(new Date());
+        return time;
+    }
+
+
 }

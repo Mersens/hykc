@@ -18,7 +18,6 @@
         android:text="提示"
         android:textSize="@dimen/text_size_normal"
 
-
         />
     <TextView
         android:id="@+id/tv_msg"

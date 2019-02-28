@@ -67,6 +67,7 @@ public class PayMoneyDialog extends DialogFragment {
     private User user;
     private boolean isOfwlgsinfo;
     private GoodsEntity entity;
+    private CheckBox checkBox_rem_paypwd;
 
     public static PayMoneyDialog getInstance(String price, double bl,String sid,String name,GoodsEntity entity) {
         PayMoneyDialog dialog = new PayMoneyDialog();
@@ -127,6 +128,8 @@ public class PayMoneyDialog extends DialogFragment {
         name=getArguments().getString("name");
         sid=getArguments().getString("sid");
         entity=(GoodsEntity)getArguments().getSerializable("entity");
+        checkBox_rem_paypwd=view.findViewById(R.id.checkBox_rem_paypwd);
+
         checkBox=view.findViewById(R.id.checkBox);
         checkBox1=view.findViewById(R.id.checkBox1);
         mImageClose = view.findViewById(R.id.img_close);
@@ -135,6 +138,13 @@ public class PayMoneyDialog extends DialogFragment {
         mBtn = view.findViewById(R.id.btn_ok);
         mTextTips = view.findViewById(R.id.tv_tips);
         mEditPsd = view.findViewById(R.id.editpsd);
+        String paypwd=SharePreferenceUtil.getInstance(getActivity()).getPayPwd();
+        if(!TextUtils.isEmpty(paypwd)){
+            if(checkBox_rem_paypwd.isChecked()){
+                mEditPsd.setText(paypwd);
+            }
+
+        }
         mTextXY=view.findViewById(R.id.tv_xy);
         mTextXY1=view.findViewById(R.id.tv_xy1);
         mTextXY1.getPaint().setFlags(Paint. UNDERLINE_TEXT_FLAG );
@@ -217,6 +227,22 @@ public class PayMoneyDialog extends DialogFragment {
                 getActivity(). overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
             }
         });
+
+        checkBox_rem_paypwd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    String paypwd=SharePreferenceUtil.getInstance(getActivity()).getPayPwd();
+                    if(!TextUtils.isEmpty(paypwd)){
+                     mEditPsd.setText(paypwd);
+                    }
+                }else {
+                    mEditPsd.setText("");
+                }
+
+            }
+        });
+
         initDatas();
 
     }

@@ -15,7 +15,7 @@
         android:layout_height="70dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/login_banner"
-        />
+        android:contentDescription="TODO" />
 
     <LinearLayout
         android:layout_width="match_parent"

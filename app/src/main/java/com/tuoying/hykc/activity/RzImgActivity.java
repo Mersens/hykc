@@ -587,7 +587,7 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
 
     private void uploadData() {
         final LoadingDialogFragment uploadDataLoadView = LoadingDialogFragment.getInstance();
-        uploadDataLoadView.show(getSupportFragmentManager(),"uploadDataLoadView");
+        uploadDataLoadView.showF(getSupportFragmentManager(),"uploadDataLoadView");
         RequestManager.getInstance()
                 .mServiceStore
                 .image_upload_new(textMap)
@@ -607,15 +607,14 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
                                     mBtnOk.setBackgroundResource(R.drawable.btn_clickable_false_bg);
                                     Toast.makeText(RzImgActivity.this, "上传成功！", Toast.LENGTH_SHORT).show();
                                     if(uploadDataLoadView!=null){
-                                        uploadDataLoadView.dismiss();
+                                        uploadDataLoadView.dismissAllowingStateLoss();
                                     }
                                     Intent intentReg = new Intent(RzImgActivity.this, MainActivity.class);
                                     startActivity(intentReg);
                                     overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-
                                 } else {
                                     if(uploadDataLoadView!=null){
-                                        uploadDataLoadView.dismiss();
+                                        uploadDataLoadView.dismissAllowingStateLoss();
                                     }
                                     Toast.makeText(RzImgActivity.this, "上传失败！", Toast.LENGTH_SHORT).show();
 
@@ -632,7 +631,7 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
                     @Override
                     public void onError(String msg) {
                         if(uploadDataLoadView!=null){
-                            uploadDataLoadView.dismiss();
+                            uploadDataLoadView.dismissAllowingStateLoss();
                         }
                         Log.e("upLoadImgToService", msg);
                         Toast.makeText(RzImgActivity.this, "上传失败！", Toast.LENGTH_SHORT).show();

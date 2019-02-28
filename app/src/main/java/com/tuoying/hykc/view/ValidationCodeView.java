@@ -90,7 +90,8 @@ public class ValidationCodeView extends View {
         Random random = new Random();
         for (int i = 0; i < length; i++) {
             // 输出字母还是数字
-            String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
+           // String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
+            String charOrNum="num";
             // 字符串
             if ("char".equalsIgnoreCase(charOrNum)) {
                 // 取得大写字母还是小写字母
@@ -205,12 +206,12 @@ public class ValidationCodeView extends View {
 
         // 初始化干扰点画笔
         mPointPaint = new Paint();
-        mPointPaint.setStrokeWidth(6);
+        mPointPaint.setStrokeWidth(2);
         mPointPaint.setStrokeCap(Paint.Cap.ROUND); // 设置断点处为圆形
 
         // 初始化干扰线画笔
         mPathPaint = new Paint();
-        mPathPaint.setStrokeWidth(5);
+        mPathPaint.setStrokeWidth(2);
         mPathPaint.setColor(Color.GRAY);
         mPathPaint.setStyle(Paint.Style.STROKE); // 设置画笔为空心
         mPathPaint.setStrokeCap(Paint.Cap.ROUND); // 设置断点处为圆形

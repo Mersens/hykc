@@ -64,7 +64,6 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
     private RelativeLayout mLayoutSC;
     private RelativeLayout mLayoutFW;
     private RelativeLayout mLayoutBX;
-
     public static OthersFragment getInstance() {
         return new OthersFragment();
     }
@@ -90,15 +89,15 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
     }
 
     private void init(View view) {
-        dao = new DBDaoImpl(activity);
-        userid = SharePreferenceUtil.getInstance(activity).getUserId();
+        dao = new DBDaoImpl(getActivity());
+        userid = SharePreferenceUtil.getInstance(getActivity()).getUserId();
         initViews(view);
         initEvent();
         initDatas();
     }
 
     private void initDatas() {
-        userid = SharePreferenceUtil.getInstance(activity).getUserId();
+        userid = SharePreferenceUtil.getInstance(getActivity()).getUserId();
         if (!TextUtils.isEmpty(userid)) {
             User user = dao.findUserInfoById(userid);
             if (user != null) {
@@ -187,7 +186,6 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
         mLayoutSC=view.findViewById(R.id.layout_sc);
         mLayoutFW=view.findViewById(R.id.layout_fw);
         mLayoutBX=view.findViewById(R.id.layout_bx);
-
 
         if (!TextUtils.isEmpty(userid)) {
             User user = dao.findUserInfoById(userid);

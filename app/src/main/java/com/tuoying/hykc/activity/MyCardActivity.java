@@ -212,6 +212,8 @@ public class MyCardActivity extends BaseActivity {
     }
 
     private void delCardInfo(CardEntity entity,User user) {
+        final LoadingDialogFragment dialogFragment=LoadingDialogFragment.getInstance();
+        dialogFragment.showF(getSupportFragmentManager(),"delCardInfoDialog");
         Map<String,String> map=new HashMap<>();
         map.put("rowid","USER-"+user.getUserId()+"-"+Constants.AppId);
         map.put("token",user.getToken());
@@ -227,6 +229,10 @@ public class MyCardActivity extends BaseActivity {
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
+                        if(dialogFragment!=null){
+                            dialogFragment.dismissAllowingStateLoss();
+
+                        }
                         Log.e("delCardInfo", "====" + msg);
                         String str = msg.replaceAll("\r", "").replaceAll("\n", "");
                         if (str.equals("[]")) {
@@ -253,6 +259,10 @@ public class MyCardActivity extends BaseActivity {
                     public void onError(String msg) {
                         Toast.makeText(MyCardActivity.this, msg, Toast.LENGTH_SHORT).show();
                         Log.e("onError", "====" + msg);
+                        if(dialogFragment!=null){
+                            dialogFragment.dismissAllowingStateLoss();
+
+                        }
 
                     }
                 }));
@@ -429,14 +439,12 @@ public class MyCardActivity extends BaseActivity {
         }
         loadingDialogFragment.show(getSupportFragmentManager(), "ZFBOrWXBandInfo");
         JSONObject object = new JSONObject();
-
         if(isAdd) {
 
             try {
                 object.put("name", name);
                 object.put("type", t);
                 object.put("account", account);
-
             } catch (JSONException e) {
                 e.printStackTrace();
                 loadingDialogFragment.dismiss();
@@ -473,7 +481,6 @@ public class MyCardActivity extends BaseActivity {
                             }
                         }
                     }
-
                     @Override
                     public void onError(String msg) {
                         Toast.makeText(MyCardActivity.this, msg, Toast.LENGTH_SHORT).show();

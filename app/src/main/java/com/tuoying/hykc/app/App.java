@@ -10,7 +10,7 @@ import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.alct.mdp.MDPLocationCollectionManager;
-
+import com.tuoying.hykc.processprotection.PlayerMusicService;
 
 
 import java.util.ArrayList;
@@ -68,7 +68,8 @@ public class App extends Application {
     private void initALCT(Context context) {
         if (context.getPackageName().equals(getCurrentProcessName(context))) {
             MDPLocationCollectionManager.initialize(this, Constants.ALCT_URL);
-
+            MDPLocationCollectionManager.initServiceProcessProguard(context); // 保活代码
+            context.startService(new Intent(context, PlayerMusicService.class)); // 保活代码
         }
     }
 

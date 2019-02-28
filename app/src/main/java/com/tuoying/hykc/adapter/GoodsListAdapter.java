@@ -31,6 +31,11 @@ public class GoodsListAdapter extends BaseAdapter {
 
     }
 
+    public void setList(List<GoodsEntity> mList){
+        this.mList=mList;
+        notifyDataSetChanged();
+
+    }
     @Override
     public int getCount() {
         return mList == null ? 0 : mList.size();

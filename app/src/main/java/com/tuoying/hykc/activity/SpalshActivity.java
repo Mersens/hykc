@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 
 
 import com.tuoying.hykc.R;
@@ -32,6 +33,7 @@ public class SpalshActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        getWindow().setBackgroundDrawable(null);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_splash);
         init();
@@ -107,5 +109,14 @@ public class SpalshActivity extends FragmentActivity {
         super.onDestroy();
         mCompositeDisposable.clear();
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 
 }
