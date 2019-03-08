@@ -19,6 +19,7 @@ public class SharePreferenceUtil {
     private static final String SD_MSG = "sd_msg";
     private static final String ALCT_MSG = "alct_msg";
     private static final String PAY_PWD = "pay_pwd";
+    private static final String LOGIN_PWD = "login_pwd";
     private static SharePreferenceUtil sp;
     private static SharedPreferences mSharedPreferences;
     private static SharedPreferences.Editor editor;
@@ -108,6 +109,13 @@ public class SharePreferenceUtil {
         editor.putString(PAY_PWD, msg);
         editor.commit();
     }
+    public String getLoginPwd() {
+        return mSharedPreferences.getString(LOGIN_PWD, null);
+    }
 
+    public void setLoginPwd(String msg) {
+        editor.putString(LOGIN_PWD, msg);
+        editor.commit();
+    }
 
 }

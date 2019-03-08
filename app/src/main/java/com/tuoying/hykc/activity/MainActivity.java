@@ -37,6 +37,7 @@ import com.alct.mdp.callback.OnDownloadResultListener;
 import com.alct.mdp.callback.OnResultListener;
 import com.alct.mdp.model.EnterpriseIdentity;
 import com.alct.mdp.model.Invoice;
+import com.alct.mdp.model.Location;
 import com.alct.mdp.model.MultiIdentity;
 import com.alct.mdp.response.GetInvoicesResponse;
 import com.allenliu.versionchecklib.v2.AllenVersionChecker;
@@ -97,6 +98,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity
         implements View.OnClickListener {
+    private static final String TYPE = "driver";
     boolean isStartNfc=false;
     private static final int MY_WAYBILL = 0;//我的运单
     private static final int GOODS_MSG_LIST = 1; //货源列表
@@ -223,6 +225,7 @@ public class MainActivity extends BaseActivity
             Log.e("nfcid","nfcid=="+nfcid);
             if(!TextUtils.isEmpty(nfcid)){
             RxBus.getInstance().send(new EventEntity("nfc",nfcid));
+
             }
 
         } catch (UnsupportedEncodingException e) {
@@ -566,15 +569,44 @@ public class MainActivity extends BaseActivity
 
     private void initDatas() {
         userid = SharePreferenceUtil.getInstance(this).getUserId();
+        String pwd=SharePreferenceUtil.getInstance(this).getLoginPwd();
         if (!TextUtils.isEmpty(userid)) {
             User user = dao.findUserInfoById(userid);
             if (user != null) {
-                getRzInfo(user, userid);
+                if(!TextUtils.isEmpty(pwd)){
+                    login(userid,pwd);
+                }else {
+                    showLoginViews("请重新登录！");
+                }
+               // getRzInfo(user, userid);
                 loadmqttmessage(user, userid);
             }
+        }else {
+            //重新登录
+            showLoginViews("请重新登录！");
         }
     }
 
+    private void showLoginViews(String msg){
+        final ExitDialogFragment dialogFragment=ExitDialogFragment.getInstance(msg);
+        dialogFragment.show(getSupportFragmentManager(),"showLoginViews");
+        dialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+            @Override
+            public void onClickCancel() {
+                dialogFragment.dismissAllowingStateLoss();
+                Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onClickOk() {
+                dialogFragment.dismissAllowingStateLoss();
+                Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -720,11 +752,64 @@ public class MainActivity extends BaseActivity
                 }));
 
     }
-
-    private void getRzInfo(final User user, final String id) {
+    private void login(final String tel, final String psd) {
         RequestManager.getInstance()
                 .mServiceStore
-                .findMyRz(user.getToken(), user.getUserId(), Constants.AppId)
+                .login(tel, psd, TYPE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.e("login main onSuccess", msg);
+                        analysisJson(msg,psd);
+                    }
+                    @Override
+                    public void onError(String msg) {
+
+                    }
+                }));
+    }
+    private void analysisJson(String json,final String pwd) {
+        boolean isSuccess = false;
+        try {
+            JSONObject mySO = new JSONObject(json);
+            isSuccess = mySO.getBoolean("success");
+            if (isSuccess) {
+                User user = new User();
+                String tel = mySO.getString("mobile");
+                String psd = mySO.getString("pwd");
+                user.setUserId(tel);
+                user.setPsd(psd);
+                user.setUserName(tel);
+                user.setToken(mySO.getString("token"));
+                if (dao.findUserIsExist(tel)) {
+                    dao.updateUserInfo(user, tel);
+                } else {
+                    dao.addUserInfo(user);
+                }
+                String port=mySO.getString("port");
+                String server=mySO.getString("server");
+                String mqtturl="tcp://"+server+":"+port;
+                SharePreferenceUtil.getInstance(this).setMqttUrl(mqtturl);
+                SharePreferenceUtil.getInstance(this).setUserId(tel);
+                SharePreferenceUtil.getInstance(this).setLoginPwd(pwd);
+                String alct=mySO.getString("alct");
+                // SharePreferenceUtil.getInstance(this).setALCTMsg(alct);
+                getRzInfo(alct,user.getToken(), user.getUserId(), user);
+            } else {
+                String msg = mySO.getString("message");
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getRzInfo(final String alct,final String token, final String id,final User user) {
+        RequestManager.getInstance()
+                .mServiceStore
+                .findMyRz(token, id, Constants.AppId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
@@ -742,16 +827,14 @@ public class MainActivity extends BaseActivity
                         map.put("time",getNowtime());
                         map.put("rowid","");
                         upLoadUserLog(map);
-                        Log.e("getRzInfo onSuccess", msg);
+                        Log.e("getRzInfo main", msg);
+                        doRegisterAlct(alct,msg,id);
                         if(TextUtils.isEmpty(msg)){
                             return;
                         }
                         boolean isSuccess = false;
                         try {
-                            String alct=SharePreferenceUtil.getInstance(MainActivity.this).getALCTMsg();
-                            if(!TextUtils.isEmpty(alct)){
-                                doRegisterAlct(alct,msg,id);
-                            }
+
                             JSONObject jsonObject = new JSONObject(msg.replaceAll("\r", "").replaceAll("\n", ""));
                             User locUser = user;
                             if(jsonObject.has("ofwlgsinfo")){
@@ -761,7 +844,6 @@ public class MainActivity extends BaseActivity
                                 }else {
                                     locUser.setOfwlgsinfo(jsonObject.getString("ofwlgsinfo"));
                                 }
-
                             }
                             if (jsonObject.has("rz#zt")) {
                                 String info = jsonObject.getString("rz#zt");
@@ -801,6 +883,7 @@ public class MainActivity extends BaseActivity
                         map.put("time",getNowtime());
                         map.put("rowid","");
                         upLoadUserLog(map);
+                        doRegisterAlct(alct,msg,id);
                     }
                 }));
     }
@@ -837,7 +920,7 @@ public class MainActivity extends BaseActivity
                 enterpriseIdentity.setAppKey(object.getString("alctkey"));
                 enterpriseIdentity.setEnterpriseCode(object.getString("alctcode"));
                 String string="alctid="+object.getString("alctid")+";alctkey="+object.getString("alctkey")+";alctcode=="+object.getString("alctcode");
-                Log.e("Identity",string);
+                Log.e("Identity main",string);
                 mList.add(enterpriseIdentity);
             }
             //总公司
@@ -848,6 +931,7 @@ public class MainActivity extends BaseActivity
             mList.add(enterpriseIdentity);
             mMultiIdentity.setEnterpriseIdentities(mList);
             mMultiIdentity.setDriverIdentity(mySO.getString("rz#sfzh"));
+            upLoadLog(mList);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -872,7 +956,6 @@ public class MainActivity extends BaseActivity
                 getInvoices(mMultiIdentity);
                 SharePreferenceUtil.getInstance(MainActivity.this).setSDMsg("0");
             }
-
             @Override
             public void onFailure(String s, String s1) {
                 Log.e("Main register","register onFailure");
@@ -894,6 +977,27 @@ public class MainActivity extends BaseActivity
             }
         });
     }
+
+    private void upLoadLog(List<EnterpriseIdentity> list){
+        StringBuffer sbf=new StringBuffer();
+        for(EnterpriseIdentity enterpriseIdentity:list){
+            sbf.append("alctid:"+enterpriseIdentity.getAppIdentity()+" ; ");
+            sbf.append("alctkey:"+enterpriseIdentity.getAppKey()+" ; ");
+            sbf.append("alctcode:"+enterpriseIdentity.getEnterpriseCode()+" ; ");
+            sbf.append("\n");
+        }
+        Map<String,String> map=new HashMap<>();
+        map.put("tel",userid);
+        map.put("msg","MainActivity页面安联登录企业参数");
+        map.put("time",getNowtime());
+        map.put("rowid","");
+        map.put("param",sbf.toString());
+        upLoadUserLog(map);
+    }
+
+
+
+
 
     private void getInvoices(final MultiIdentity mMultiIdentity){
         List<EnterpriseIdentity> mList=mMultiIdentity.getEnterpriseIdentities();

@@ -27,7 +27,7 @@ public class Constants {
     public static final String CYZGZ = "CYZGZ";//从业资格证
     public static final int LOC_RADIUS = 3000;
     public static final String PAYTYPE_WX = "wx";
-    public static final String VERSIONTIME = "2019.01.15";
+    public static final String VERSIONTIME = "2019.03.06";
     public static final String PICTUREFILE = Environment.getExternalStorageDirectory().toString() + File.separator +
             "hykctemp";
     public static final String UPLOADE_URL = WEBSERVICE_URL + "files/image_upload_new.jsp";

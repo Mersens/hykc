@@ -149,8 +149,13 @@ public interface ServiceStore {
     Observable<ResponseBody> findphoto(@FieldMap Map<String, String> params);
 
     @FormUrlEncoded
-    @POST("showdata/alct/log/uplog2.jsp")
+    @POST("showdata/alct/log/uplog3.jsp")
     Observable<ResponseBody> uplog(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("showdata/mox/checkPickupOk.jsp")
+    Observable<ResponseBody> checkPickupOk(@FieldMap Map<String, String> params);
+
 
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);

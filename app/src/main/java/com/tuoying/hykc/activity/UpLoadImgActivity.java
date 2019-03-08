@@ -804,59 +804,24 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         }
     }
 
-    private class OthersImgTask extends AsyncTask<String,Integer,String> {
-        private String type;
-        private String imgBuffer;
-        public OthersImgTask(String type,String imgBuffer){
-            this.type=type;
-            this.imgBuffer=imgBuffer;
-        }
+    private void upLoadUserLog(Map<String, String> params){
+        RequestManager.getInstance()
+                .mServiceStore
+                .uplog(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
 
-        @Override
-        protected String doInBackground(String... voids) {
-            loadingDialogFragment.showF(getSupportFragmentManager(), "uploadLoading");
-            Map<String, String> m = new HashMap<>();
-            m.put("mobile", user.getUserId());
-            m.put("app", Constants.AppId);
-            m.put("token", user.getToken());
-            m.put("type", type);
-            m.put("rowid", entity.getRowid());
-            m.put("base64", imgBuffer);
-            return HttpTools.submitPostData(Constants.WEBSERVICE_URL+"showdata/uploadalctimages.jsp",m,"UTF-8");
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            if(loadingDialogFragment!=null){
-                loadingDialogFragment.dismissAllowingStateLoss();
-            }
-            String str = s.replaceAll("\r", "").replaceAll("\n", "");
-            Log.e("upLoadImgToService","str=="+str);
-            if(!TextUtils.isEmpty(str)){
-                if(str.contains("{") && str.contains("}")){
-                    int firstIndex=str.indexOf("{");
-                    int lastIndex=str.lastIndexOf("}");
-                    try {
-                        JSONObject object=new JSONObject(str.substring(firstIndex,lastIndex+1));
-                        if(object.getBoolean("success")){
-                            if(UpLoadImgActivity.this!=null){
-                                Toast.makeText(UpLoadImgActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
-                            imgNameIndex=imgNameIndex+1;
-                            }
-                        }else {
-                            if(UpLoadImgActivity.this!=null) {
-                                Toast.makeText(UpLoadImgActivity.this, "保存失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
 
-            }
+                    @Override
+                    public void onError(String msg) {
 
-        }
+                    }
+                }));
+
     }
 
     private class MyTask extends AsyncTask<String,Integer,String> {
@@ -980,24 +945,59 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         }
     }
 
-    private void upLoadUserLog(Map<String, String> params){
-        RequestManager.getInstance()
-                .mServiceStore
-                .uplog(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
-                    @Override
-                    public void onSuccess(String msg) {
+    private class OthersImgTask extends AsyncTask<String,Integer,String> {
+        private String type;
+        private String imgBuffer;
+        public OthersImgTask(String type,String imgBuffer){
+            this.type=type;
+            this.imgBuffer=imgBuffer;
+        }
 
+        @Override
+        protected String doInBackground(String... voids) {
+            loadingDialogFragment.showF(getSupportFragmentManager(), "uploadLoading");
+            Map<String, String> m = new HashMap<>();
+            m.put("mobile", user.getUserId());
+            m.put("app", Constants.AppId);
+            m.put("token", user.getToken());
+            m.put("type", type);
+            m.put("rowid", entity.getRowid());
+            m.put("base64", imgBuffer);
+            return HttpTools.submitPostData(Constants.WEBSERVICE_URL+"showdata/uploadalctimages.jsp",m,"UTF-8");
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if(loadingDialogFragment!=null){
+                loadingDialogFragment.dismissAllowingStateLoss();
+            }
+            String str = s.replaceAll("\r", "").replaceAll("\n", "");
+            Log.e("upLoadImgToService","str=="+str);
+            if(!TextUtils.isEmpty(str)){
+                if(str.contains("{") && str.contains("}")){
+                    int firstIndex=str.indexOf("{");
+                    int lastIndex=str.lastIndexOf("}");
+                    try {
+                        JSONObject object=new JSONObject(str.substring(firstIndex,lastIndex+1));
+                        if(object.getBoolean("success")){
+                            if(UpLoadImgActivity.this!=null){
+                                Toast.makeText(UpLoadImgActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
+                            imgNameIndex=imgNameIndex+1;
+                            }
+                        }else {
+                            if(UpLoadImgActivity.this!=null) {
+                                Toast.makeText(UpLoadImgActivity.this, "保存失败！", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+                }
 
-                    @Override
-                    public void onError(String msg) {
+            }
 
-                    }
-                }));
-
+        }
     }
 
 

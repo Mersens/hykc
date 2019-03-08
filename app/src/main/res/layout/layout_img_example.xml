@@ -39,27 +39,27 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
+                android:layout_height="230dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_height="230dp">
+                android:layout_marginRight="16dp">
 
                 <ImageView
                     android:id="@+id/img_example"
                     android:layout_width="300dp"
                     android:layout_height="200dp"
-                    android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
-                    android:scaleType="centerCrop"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginBottom="5dp"
+                    android:scaleType="centerCrop"
                     />
 
             </RelativeLayout>
             <TextView
                 android:id="@+id/tv_tips"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:gravity="center"
                 android:text=""
                 android:textColor="@color/colorAccent"

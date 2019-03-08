@@ -42,6 +42,25 @@ public class LoadingDialogFragment extends DialogFragment {
         return inflater.inflate(R.layout.layout_loading,null);
     }
 
+    public static LoadingDialogFragment getInstance(){
+
+        return getInstance("");
+    }
+
+    public static LoadingDialogFragment getInstance(String msg){
+        LoadingDialogFragment fragment=  new LoadingDialogFragment();
+        Bundle bundle=new Bundle();
+        bundle.putString("tips",msg);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public void showF(FragmentManager manager, String tag) {
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.add(this, tag);
+        ft.commitAllowingStateLoss();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -55,23 +74,5 @@ public class LoadingDialogFragment extends DialogFragment {
             mTextTips.setText(tips);
         }
 
-    }
-
-    public void showF(FragmentManager manager, String tag) {
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.add(this, tag);
-        ft.commitAllowingStateLoss();
-    }
-
-    public static LoadingDialogFragment getInstance(){
-
-        return getInstance("");
-    }
-    public static LoadingDialogFragment getInstance(String msg){
-        LoadingDialogFragment fragment=  new LoadingDialogFragment();
-        Bundle bundle=new Bundle();
-        bundle.putString("tips",msg);
-        fragment.setArguments(bundle);
-        return fragment;
     }
 }

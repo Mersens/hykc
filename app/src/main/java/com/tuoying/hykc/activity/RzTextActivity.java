@@ -794,8 +794,14 @@ public class RzTextActivity extends BaseActivity {
                 if (result != null) {
                     //IDCardResult front{direction=0, wordsResultNumber=6, address=河南省孟津县常袋乡马岭村, idNumber=410322199304228314, birthday=19930422, name=马新新, gender=男, ethnic=汉}
                     Log.e("recognizeIDCard","==="+result.toString());
-                    mEditName.setText(result.getName().toString());
-                    mEditCardNum.setText(result.getIdNumber().toString());
+                    String name=result.getName().toString();
+                    if(!TextUtils.isEmpty(name)){
+                        mEditName.setText(name);
+                    }
+                    String cardNum=result.getIdNumber().toString();
+                    if(!TextUtils.isEmpty(cardNum)){
+                        mEditCardNum.setText(cardNum);
+                    }
                 }
             }
 

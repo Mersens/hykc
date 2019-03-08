@@ -27,6 +27,14 @@ public class ImageExampleDialog extends DialogFragment {
     private TextView mTextMsg;
     private int type=-1;
 
+    public static ImageExampleDialog getInstance(int type){
+        ImageExampleDialog fragment=new ImageExampleDialog();
+        Bundle bundle=new Bundle();
+        bundle.putInt("type",type);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -68,16 +76,10 @@ public class ImageExampleDialog extends DialogFragment {
         }
 
     }
+
     public void showF(FragmentManager manager, String tag) {
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
-    }
-    public static ImageExampleDialog getInstance(int type){
-        ImageExampleDialog fragment=new ImageExampleDialog();
-        Bundle bundle=new Bundle();
-        bundle.putInt("type",type);
-        fragment.setArguments(bundle);
-        return fragment;
     }
 }

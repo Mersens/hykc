@@ -90,21 +90,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     private long allon1;
     private long allon2;
     private boolean onPouse=false;
-    private String nfcid="";
-    private ExitDialogFragment nfcDialogFragment;
-    final LoadingDialogFragment nfcTipsFragment = LoadingDialogFragment.getInstance("正在检测NFCID");
     private static final int NFCTIPSDISMISS = 1;
-    public static WWCFragment getInstance() {
-        return new WWCFragment();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mActivityReference = new WeakReference<>((MainActivity) context);
-    }
-
-
+    final LoadingDialogFragment nfcTipsFragment = LoadingDialogFragment.getInstance("正在检测NFCID");
     public Handler handler=new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -116,6 +103,18 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             return true;
         }
     });
+    private String nfcid="";
+    private ExitDialogFragment nfcDialogFragment;
+
+    public static WWCFragment getInstance() {
+        return new WWCFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mActivityReference = new WeakReference<>((MainActivity) context);
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -167,7 +166,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                                 if (v.equals("刷新")) {
                                     isRefrush = true;
                                     list.clear();
-                                    adapter.setList(list);
+                                    if(adapter!=null){
+                                        adapter.setList(list);
+                                    }
                                     initDatas();
                                 }
                             }else if(type.equals("nfc")){
@@ -270,11 +271,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             mLayoutNoMsg.setVisibility(View.VISIBLE);
                             return;
                         }
-
                         if(mSwipeToLoadLayout.isRefreshing()){
-
                             mSwipeToLoadLayout.setRefreshing(false);
-
                         }
                         if(mSwipeToLoadLayout.isLoadingMore()){
                             mSwipeToLoadLayout.setLoadingMore(false);
@@ -490,7 +488,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
                 break;
             case 2:
-                doPs(entity);
+                checkStatu(entity);
                 break;
             case 3:
                 calculateTime(entity);
@@ -523,6 +521,46 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 break;
         }
     }
+
+    private void checkStatu(final GoodsEntity entity){
+        Map<String, String> map = new HashMap<>();
+        map.put("rowid", entity.getRowid());
+        System.out.println("mox+++" + entity.toString());
+        RequestManager.getInstance()
+                .mServiceStore
+                .checkPickupOk(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        msg=msg.trim();
+                        Log.e("checkStatu","checkStatu==="+msg);
+                        if("0".equals(msg)){
+                            doPs(entity);
+                        }else if("1".equals(msg)){
+                            confirmTips("运单同步中,请等待！");
+
+                        }else if("2".equals(msg)){
+                            confirmTips("运单同步中,请等待！");
+                        }
+                        else if("3".equals(msg)){
+                            confirmTips("正在重新同步,请稍后!");
+                        }
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        final MainActivity activity = mActivityReference.get();
+                        if (activity == null) {
+                            return;
+                        }
+                        Log.e("create_request onError", msg);
+                    }
+                }));
+
+    }
+
     private void calculateTime(final GoodsEntity entity) {
         if (!TextUtils.isEmpty(entity.getJdTime())) {
             int i = (int) DateUtils.formatTime(entity.getJdTime());
@@ -745,20 +783,16 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
     private void confirmTips(String msg) {
-        //退出操作
         final ExitDialogFragment dialog = ExitDialogFragment.getInstance(msg);
         dialog.show(getChildFragmentManager(), "tipswwcDialog");
         dialog.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
-
-                dialog.dismiss();
+                dialog.dismissAllowingStateLoss();
             }
-
             @Override
             public void onClickOk() {
-
-                dialog.dismiss();
+                dialog.dismissAllowingStateLoss();
 
             }
         });
@@ -1365,7 +1399,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 Log.e("PSal_TimeMillis==","psalTimeMillis=="+l);
                 Log.e("doPickUp", "onSuccess----");
                 isPickUp = true;
-                dopickup(entity.getRowid(), true + "");
+                StringBuffer sbf=new StringBuffer();
+                sbf.append("安联pickup执行成功，提货成功");
+                dopickup(entity.getRowid(), true + "",sbf.toString());
             }
 
             @Override
@@ -1381,6 +1417,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
                     map.put("param",param);
                     upLoadUserLog(map);
+                    StringBuffer sbf=new StringBuffer();
+                    sbf.append("安联pickup执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                    dopickup(entity.getRowid(), false + "",sbf.toString());
                 }else {
                     //step:14
                     //tel:157****0385
@@ -1400,7 +1439,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     doUploadErrorMsg(shipmentCode, s, s1);
                     isPickUp = true;
                     changeOrderStatu(entity);
-                    dopickup(entity.getRowid(), false + "");
+                    StringBuffer sbf=new StringBuffer();
+                    sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                    dopickup(entity.getRowid(), false + "",sbf.toString());
                 }
             }
         });
@@ -1627,11 +1668,12 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }));
     }
 
-    private void dopickup(String id, String orderType) {
+    private void dopickup(String id, String orderType,String msg) {
         Log.e("moxid==", "moxid==" + id);
         Map<String, String> map = new HashMap<>();
         map.put("rowid", id);
         map.put("orderType", orderType);
+        map.put("msg",msg);
         RequestManager.getInstance()
                 .mServiceStore
                 .pickup(map)

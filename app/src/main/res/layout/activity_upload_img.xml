@@ -42,20 +42,20 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="卸货照"
-                    android:layout_marginLeft="16dp"
                     android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:text="卸货照"
                     android:textColor="@color/actionbar_color"
                     android:textSize="@dimen/text_size_medium" />
                 <TextView
                     android:id="@+id/tv_xhz_example"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="示例"
-                    android:layout_marginRight="16dp"
                     android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp"
+                    android:text="示例"
                     android:textColor="@color/actionbar_color"
                     android:textSize="@dimen/text_size_medium" />
             </RelativeLayout>
@@ -104,20 +104,20 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="回单照"
-                    android:layout_marginLeft="16dp"
                     android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:text="回单照"
                     android:textColor="@color/actionbar_color"
                     android:textSize="@dimen/text_size_medium" />
                 <TextView
                     android:id="@+id/tv_hdz_example"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="示例"
-                    android:layout_marginRight="16dp"
                     android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp"
+                    android:text="示例"
                     android:textColor="@color/actionbar_color"
                     android:textSize="@dimen/text_size_medium" />
             </RelativeLayout>

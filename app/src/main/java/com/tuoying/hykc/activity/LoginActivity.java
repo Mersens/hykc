@@ -58,6 +58,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase;
 
 /**
  * Created by Administrator on 2018/3/22.
@@ -91,14 +92,14 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void init() {
         compositeDisposable = new CompositeDisposable();
-
-        tel = getIntent().getStringExtra("tel");
+        if(getIntent().hasExtra("tel")){
+            tel = getIntent().getStringExtra("tel");
+        }
         mEditPhone = (EditText) findViewById(R.id.editPhone);
         if (!TextUtils.isEmpty(tel)) {
             mEditPhone.setText(tel);
         }
         mEditPsd = (EditText) findViewById(R.id.editPass);
-
         mTextFind = (TextView) findViewById(R.id.tvselect);
         mTextRegister = (TextView) findViewById(R.id.tvnewReg);
         mBtnLogin = (Button) findViewById(R.id.btnlogin);
@@ -171,7 +172,6 @@ public class LoginActivity extends BaseActivity {
         }
         loadingDialogFragment.show(getSupportFragmentManager(), "loadingDialogFragment");
         login(tel, psd);
-
     }
 
     private void login(final String tel, final String psd) {
@@ -184,9 +184,8 @@ public class LoginActivity extends BaseActivity {
                     @Override
                     public void onSuccess(String msg) {
                         Log.e("login onSuccess", msg);
-                        analysisJson(msg);
+                        analysisJson(msg,psd);
                     }
-
                     @Override
                     public void onError(String msg) {
                         loadingDialogFragment.dismiss();
@@ -194,8 +193,7 @@ public class LoginActivity extends BaseActivity {
                     }
                 }));
     }
-
-    private void analysisJson(String json) {
+    private void analysisJson(String json,final String pwd) {
         boolean isSuccess = false;
         try {
             JSONObject mySO = new JSONObject(json);
@@ -218,9 +216,10 @@ public class LoginActivity extends BaseActivity {
                 String mqtturl="tcp://"+server+":"+port;
                 SharePreferenceUtil.getInstance(this).setMqttUrl(mqtturl);
                 SharePreferenceUtil.getInstance(this).setUserId(tel);
+                SharePreferenceUtil.getInstance(this).setLoginPwd(pwd);
                 Toast.makeText(this, "登录成功！", Toast.LENGTH_SHORT).show();
                 String alct=mySO.getString("alct");
-                SharePreferenceUtil.getInstance(this).setALCTMsg(alct);
+               // SharePreferenceUtil.getInstance(this).setALCTMsg(alct);
                 getRzInfo(alct,user.getToken(), user.getUserId());
             } else {
                 loadingDialogFragment.dismiss();
@@ -282,7 +281,7 @@ public class LoginActivity extends BaseActivity {
             mList.add(enterpriseIdentity);
             mMultiIdentity.setEnterpriseIdentities(mList);
             mMultiIdentity.setDriverIdentity(mySO.getString("rz#sfzh"));
-
+            upLoadLog(mList,id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -339,7 +338,22 @@ public class LoginActivity extends BaseActivity {
         });
 
     }
-
+    private void upLoadLog(List<EnterpriseIdentity> list,String id){
+        StringBuffer sbf=new StringBuffer();
+        for(EnterpriseIdentity enterpriseIdentity:list){
+            sbf.append("alctid:"+enterpriseIdentity.getAppIdentity()+" ; ");
+            sbf.append("alctkey:"+enterpriseIdentity.getAppKey()+" ; ");
+            sbf.append("alctcode:"+enterpriseIdentity.getEnterpriseCode()+" ; ");
+            sbf.append("\n");
+        }
+        Map<String,String> map=new HashMap<>();
+        map.put("tel",id);
+        map.put("msg","LoginActivity页面安联登录企业参数");
+        map.put("time",getNowtime());
+        map.put("rowid","");
+        map.put("param",sbf.toString());
+        upLoadUserLog(map);
+    }
     private void getInvoices(final MultiIdentity mMultiIdentity){
         List<EnterpriseIdentity> mList=mMultiIdentity.getEnterpriseIdentities();
         for(EnterpriseIdentity identity:mList){
