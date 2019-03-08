@@ -119,7 +119,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.layout_wwc, null);
 
     }
