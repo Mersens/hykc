@@ -39,6 +39,25 @@ public class GoodsEntity implements Serializable {
     private String jdTime;//接单时间
     private String pdwlgs;//派单物流公司
     private boolean isGuiding = false;
+    private String task_id;
+    private String driverPrice;
+
+    public String getTask_id() {
+        return task_id;
+    }
+
+    public void setTask_id(String task_id) {
+        this.task_id = task_id;
+    }
+
+    public String getDriverPrice() {
+        return driverPrice;
+    }
+
+    public void setDriverPrice(String driverPrice) {
+        this.driverPrice = driverPrice;
+    }
+
 
     public String getPdwlgs() {
         return pdwlgs;

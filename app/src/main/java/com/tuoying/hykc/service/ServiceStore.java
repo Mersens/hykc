@@ -156,7 +156,9 @@ public interface ServiceStore {
     @POST("showdata/mox/checkPickupOk.jsp")
     Observable<ResponseBody> checkPickupOk(@FieldMap Map<String, String> params);
 
-
+    @FormUrlEncoded
+    @POST("/acceptBillOfTask.jsp")
+    Observable<ResponseBody> acceptBillOfTask(@FieldMap Map<String, String> params);
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

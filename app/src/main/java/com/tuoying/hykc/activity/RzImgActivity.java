@@ -515,6 +515,7 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
         textMap.put("mobile", entity.getMobile());
         textMap.put("app", Constants.AppId);
         textMap.put("xm", entity.getXm());
+        Log.e("xmmmm","xmmmm=="+entity.getXm());
         textMap.put("cph", entity.getCph());
         textMap.put("pp", entity.getPp());
         textMap.put("token", user.getToken());
@@ -609,6 +610,8 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
                                     if(uploadDataLoadView!=null){
                                         uploadDataLoadView.dismissAllowingStateLoss();
                                     }
+                                    RxBus.getInstance().send(new EventEntity("heardview_rz","heardview_rz"));
+                                    SharePreferenceUtil.getInstance(RzImgActivity.this).setUserId(textMap.get("mobile"));
                                     Intent intentReg = new Intent(RzImgActivity.this, MainActivity.class);
                                     startActivity(intentReg);
                                     overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
@@ -617,7 +620,6 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
                                         uploadDataLoadView.dismissAllowingStateLoss();
                                     }
                                     Toast.makeText(RzImgActivity.this, "上传失败！", Toast.LENGTH_SHORT).show();
-
                                 }
 
                             } catch (JSONException e) {
@@ -649,7 +651,6 @@ public class RzImgActivity extends BaseActivity implements View.OnClickListener 
         m.put("base64", uploadBuffer);
         m.put("token",user.getToken());
         m.put("app",Constants.AppId);
-
         RequestManager.getInstance()
                 .mServiceStore
                 .upLoadImg(m)

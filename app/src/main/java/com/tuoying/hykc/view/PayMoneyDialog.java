@@ -284,6 +284,12 @@ public class PayMoneyDialog extends DialogFragment {
                                     }
                                     String strMoney = String.format("%.2f", dbl);
                                     mTextBL.setText(strMoney + "元");
+                                    String task_id=entity.getTask_id();
+                                    String driverPrice=entity.getDriverPrice();
+                                    if(!TextUtils.isEmpty(task_id) && !TextUtils.isEmpty(driverPrice)){
+                                        dbl = 0;
+                                        mTextBL.setText(0+"元");
+                                    }
                                     if (!TextUtils.isEmpty(money)) {
                                         double d1 = Double.valueOf(money);
                                         if (dbl > d1) {

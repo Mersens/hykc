@@ -156,6 +156,7 @@ public class WWCAdapter extends BaseAdapter {
 
         holder.mFhrName.setText(entity.getHzxm());
 
+
         String pdwlgs=entity.getPdwlgs();
         if(!TextUtils.isEmpty(pdwlgs)){
             if("-1".equals(pdwlgs)){
@@ -178,7 +179,11 @@ public class WWCAdapter extends BaseAdapter {
             String str=String.format("%.2f", (1-bl)*d);
             holder.mPrice.setText(str+"元");
         }
-
+        String task_id=entity.getTask_id();
+        String driverPrice=entity.getDriverPrice();
+        if(!TextUtils.isEmpty(task_id) && !TextUtils.isEmpty(driverPrice)){
+            holder.mPrice.setText(driverPrice+"元/吨");
+        }
         holder.mGoodsName.setText(entity.getName());
         holder.mTextTj.setText(entity.getVolume()+"立方");
         holder.mTextZl.setText(entity.getWeight()+"吨");

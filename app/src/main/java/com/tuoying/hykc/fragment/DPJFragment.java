@@ -259,6 +259,15 @@ public class DPJFragment extends BaseFragment implements OnRefreshListener, OnLo
                     String bz = object.getString("data:bz");
                     entity.setBz(bz);
                 }
+                if(object.has("data:task_id")){
+                    String task_id=object.getString("data:task_id");
+                    entity.setTask_id(task_id);
+
+                }
+                if(object.has("data:driverPrice")){
+                    String driverPrice = object.getString("data:driverPrice");
+                    entity.setDriverPrice(driverPrice);
+                }
                 String hzxm = object.getString("data:fhr");
                 entity.setHzxm(hzxm);
                 String zyf = object.getString("data:yf");

@@ -27,6 +27,7 @@ import com.tuoying.hykc.utils.RxBus;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
 import com.tuoying.hykc.view.ExitDialogFragment;
 import com.tuoying.hykc.view.LoadingDialogFragment;
+import com.tuoying.hykc.view.MoreMsgDialog;
 import com.tuoying.hykc.view.PayMoneyDialog;
 
 import org.json.JSONException;
@@ -67,6 +68,9 @@ public class GoodsListDetailActivity extends BaseActivity {
     private TextView mTextHSHC;
     private TextView mTextJSYFBZ;
     private TextView mTextSid;
+    private String taskid;
+    private String yd_driver;
+    private Button mBtnMore;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,6 +99,7 @@ public class GoodsListDetailActivity extends BaseActivity {
     }
 
     private void initViews() {
+        mBtnMore=findViewById(R.id.btn_more);
         mLayoutNoMsg = findViewById(R.id.layout_nomsg);
         mLayoutLoading = findViewById(R.id.layout_loading);
         mTextFhrName = findViewById(R.id.tv_hz);
@@ -139,6 +144,22 @@ public class GoodsListDetailActivity extends BaseActivity {
                 }
             }
         });
+        mBtnMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!TextUtils.isEmpty(taskid) && !TextUtils.isEmpty(yd_driver)){
+                    showMoreView(taskid,yd_driver);
+                }
+
+            }
+        });
+    }
+
+    private void showMoreView(String task_id,String yd_driver){
+        final MoreMsgDialog dialog=MoreMsgDialog.getInstance(task_id,yd_driver);
+        dialog.show(getSupportFragmentManager(),"MoreMsgDialog");
+
+
     }
     private void confirmRZTips(String msg) {
         //退出操作
@@ -254,7 +275,11 @@ public class GoodsListDetailActivity extends BaseActivity {
                     mTextPrice.setText(str+"元");
                 }
             }
-
+            String task_id=entity.getTask_id();
+            String driverPrice=entity.getDriverPrice();
+            if(!TextUtils.isEmpty(task_id) && !TextUtils.isEmpty(driverPrice)){
+                mTextPrice.setText(driverPrice+"元/吨");
+            }
             String hwmc = object.getString("hwmc");
             mTextHwmc.setText(hwmc);
 
@@ -262,6 +287,11 @@ public class GoodsListDetailActivity extends BaseActivity {
                 String sid=object.getString("sid");
                 mTextSid.setText(sid);
             }
+            if(object.has("task_id")){
+                mBtnMore.setVisibility(View.VISIBLE);
+                taskid=object.getString("task_id");
+            }
+            yd_driver=object.getString("yd_driver");
             String fhrTel = object.getString("fhrdh");
             mTextFhrTel.setText(fhrTel);
             String zl = object.getString("hwzl");
@@ -272,7 +302,9 @@ public class GoodsListDetailActivity extends BaseActivity {
             String fromeCounty = object.getString("from_county");
             mTextStart.setText(fromeCity + " " + fromeCounty);
             String end = object.getString("to_addr");
-            mTextEnd.setText(end);
+            String toCity=object.getString("to_city");
+            String toCounty = object.getString("to_county");
+            mTextEnd.setText(toCity+" "+toCounty);
             String bz = object.getString("bz");
             mTextBz.setText(bz);
             String shrxm = object.getString("shr");

@@ -11,7 +11,6 @@ import java.io.File;
 public class Constants {
     public static final String WEBSERVICE_URL = "http://tuoying.huoyunkuaiche.com/";
     //public static final String WEBSERVICE_URL="http://ewytek.cn/";
-
     public static final String APPUPDATEURL=WEBSERVICE_URL+"searchversion.jsp?app=driver";
     public static final String MQTT_URL = "tcp://59.110.159.178:1883";
     public static final String YDIp="http://122.114.76.37:8080";

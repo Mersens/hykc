@@ -1,5 +1,6 @@
 package com.tuoying.hykc.fragment;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,9 +22,11 @@ import com.tuoying.hykc.activity.AboutActivity;
 import com.tuoying.hykc.activity.BXActivity;
 import com.tuoying.hykc.activity.CheckRzTextActivity;
 import com.tuoying.hykc.activity.FWActivity;
+import com.tuoying.hykc.activity.GoodsListDetailActivity;
 import com.tuoying.hykc.activity.LXKFActivity;
 import com.tuoying.hykc.activity.MainActivity;
 import com.tuoying.hykc.activity.MyInfoActivity;
+import com.tuoying.hykc.activity.MyMsgActivity;
 import com.tuoying.hykc.activity.MyWalletActivity;
 import com.tuoying.hykc.activity.RzTextActivity;
 import com.tuoying.hykc.activity.SCActivity;
@@ -33,9 +36,15 @@ import com.tuoying.hykc.app.App;
 import com.tuoying.hykc.app.Constants;
 import com.tuoying.hykc.db.DBDao;
 import com.tuoying.hykc.db.DBDaoImpl;
+import com.tuoying.hykc.entity.EventEntity;
+import com.tuoying.hykc.entity.GoodsEntity;
+import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
+import com.tuoying.hykc.utils.DateUtils;
+import com.tuoying.hykc.utils.NotificationUtils;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
+import com.tuoying.hykc.utils.RxBus;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
 import com.tuoying.hykc.view.ExitDialogFragment;
 
@@ -46,9 +55,14 @@ import java.lang.ref.WeakReference;
 import java.util.Iterator;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class OthersFragment extends Fragment implements View.OnClickListener{
     WeakReference<MainActivity> mActivityReference;
+    private CompositeDisposable mCompositeDisposable;
     private ImageView imgExit;
     private TextView mTextName;
     private TextView mTextRZ;
@@ -94,6 +108,23 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
         initViews(view);
         initEvent();
         initDatas();
+        mCompositeDisposable = new CompositeDisposable();
+        //监听订阅事件
+        Disposable d = RxBus.getInstance().toObservable().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        if (o instanceof EventEntity) {
+                            EventEntity e = (EventEntity) o;
+                            String type = e.type;
+                            if (type.equals("heardview_rz")) {
+                                initDatas();
+                            }
+                        }
+                    }
+                });
+        //subscription交给compositeSubscription进行管理，防止内存溢出
+        mCompositeDisposable.add(d);
     }
 
     private void initDatas() {
@@ -187,20 +218,6 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
         mLayoutFW=view.findViewById(R.id.layout_fw);
         mLayoutBX=view.findViewById(R.id.layout_bx);
 
-        if (!TextUtils.isEmpty(userid)) {
-            User user = dao.findUserInfoById(userid);
-            if (user != null) {
-                mTextName.setText(user.getUserName());
-                String rzType = user.getRz();
-                if ("0".equals(rzType)) {
-                    mTextRZ.setText("未通过");
-                } else if ("1".equals(rzType)) {
-                    mTextRZ.setText("已认证");
-                } else if (TextUtils.isEmpty(rzType)) {
-                    mTextRZ.setText("未认证");
-                }
-            }
-        }
     }
 
     private void getRzInfo(final User user, final String id) {
@@ -252,8 +269,21 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
                                 locUser.setRz("");
                                 confirmRZTips("用户未认证,请认证！");
                             }
-
                             dao.updateUserInfo(locUser, id);
+                            if (!TextUtils.isEmpty(userid)) {
+                                User user = dao.findUserInfoById(userid);
+                                if (user != null) {
+                                    mTextName.setText(user.getUserName());
+                                    String rzType = user.getRz();
+                                    if ("0".equals(rzType)) {
+                                        mTextRZ.setText("未通过");
+                                    } else if ("1".equals(rzType)) {
+                                        mTextRZ.setText("已认证");
+                                    } else if (TextUtils.isEmpty(rzType)) {
+                                        mTextRZ.setText("未认证");
+                                    }
+                                }
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -349,5 +379,9 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
 
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mCompositeDisposable.clear();
+    }
 }

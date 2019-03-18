@@ -189,6 +189,7 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         startCheckNfc();
+        initDatas();
     }
 
     @Override
@@ -323,7 +324,7 @@ public class MainActivity extends BaseActivity
         initViews();
         initFragment();
         initEvent();
-        initDatas();
+        //initDatas();
         checkVerson();
         initQuestion();
         mCompositeDisposable = new CompositeDisposable();
@@ -388,6 +389,8 @@ public class MainActivity extends BaseActivity
         //subscription交给compositeSubscription进行管理，防止内存溢出
         mCompositeDisposable.add(d);
     }
+
+
 
     private void initViews() {
         mLayoutHY = findViewById(R.id.layout_hy);
@@ -531,7 +534,6 @@ public class MainActivity extends BaseActivity
                 dialog.dismiss();
             }
         });
-
 
     }
 

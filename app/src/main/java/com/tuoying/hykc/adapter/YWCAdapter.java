@@ -73,6 +73,11 @@ public class YWCAdapter extends BaseAdapter {
         double p=yf*(1-bl);
         String strMoney = String.format("%.2f", p);
         holder.mPrice.setText(strMoney+"元");
+        String task_id=entity.getTask_id();
+        String driverPrice=entity.getDriverPrice();
+        if(!TextUtils.isEmpty(task_id) && !TextUtils.isEmpty(driverPrice)){
+            holder.mPrice.setText(driverPrice+"元/吨");
+        }
         if(!TextUtils.isEmpty(entity.getJdTime())){
             holder.mTextJDTime.setText(entity.getJdTime());
         }else {

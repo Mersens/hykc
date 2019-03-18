@@ -305,7 +305,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         mLayoutLoading.setVisibility(View.GONE);
                         Log.e("onError", "====" + msg);
                         Toast.makeText(activity, "失败！", Toast.LENGTH_SHORT).show();
-
                     }
                 }));
     }
@@ -345,6 +344,16 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 entity.setWeight(zl);
                 String tj = object.getString("data:hwtj");
                 entity.setVolume(tj);
+                if(object.has("data:task_id")){
+                    String task_id=object.getString("data:task_id");
+                    entity.setTask_id(task_id);
+
+                }
+                if(object.has("data:driverPrice")){
+                    String driverPrice = object.getString("data:driverPrice");
+                    entity.setDriverPrice(driverPrice);
+                }
+
                 if (object.has("data:bz")) {
                     String bz = object.getString("data:bz");
                     entity.setBz(bz);
@@ -426,7 +435,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 if(adapter!=null){
                     adapter.setList(list);
                     adapter.notifyDataSetChanged();
-
                 }
             }
             list.addAll(mList);
@@ -487,7 +495,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
                 break;
             case 2:
-                checkStatu(entity);
+              //  doPs(entity);
+               checkStatu(entity);
                 break;
             case 3:
                 calculateTime(entity);
@@ -500,14 +509,12 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     public void onClickCancel() {
                         validationCodeFragment.dismissAllowingStateLoss();
                     }
-
                     @Override
                     public void onClickOk() {
                         validationCodeFragment.dismissAllowingStateLoss();
                         doCancel(entity);
                     }
                 });
-
                 break;
             case 13:
                 doGuide(index, entity, type);
@@ -520,7 +527,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 break;
         }
     }
-
     private void checkStatu(final GoodsEntity entity){
         Map<String, String> map = new HashMap<>();
         map.put("rowid", entity.getRowid());
@@ -547,7 +553,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             confirmTips("正在重新同步,请稍后!");
                         }
                     }
-
                     @Override
                     public void onError(String msg) {
                         final MainActivity activity = mActivityReference.get();
@@ -792,7 +797,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             @Override
             public void onClickOk() {
                 dialog.dismissAllowingStateLoss();
-
             }
         });
 
@@ -856,7 +860,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //doUnLoad(entity,entity.getName(),shipmentCode,enterpriseCode);
                 doUnLoadToService(entity);
             }
-
             @Override
             public void onClickOk() {
                 dialog.dismissAllowingStateLoss();
@@ -870,7 +873,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         if (activity == null) {
             return;
         }
-
         String sdmsg = SharePreferenceUtil.getInstance(activity).getSDMsg();
         if ("0".equals(sdmsg)) {
             //step:18
@@ -878,7 +880,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             //msg:登录获取用户信息成功
             //time:2018-12-18:11:11:10
             //rowid:
-
             if(TextUtils.isEmpty(nfcid)){
                 doUnLoad(entity, entity.getName(), entity.getRowid(), entity.getAlctCode());
             }else {
@@ -902,9 +903,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             Toast.makeText(activity, "用户未税登！", Toast.LENGTH_SHORT).show();
             doUnLoadToService(entity);
         }
-
     }
-
     private void doUnLoadToService(final GoodsEntity entity){
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
         loadingDialogFragment.showF(getChildFragmentManager(),"sdDialogFragment");
