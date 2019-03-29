@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,12 +26,14 @@ public class ImageExampleDialog extends DialogFragment {
     private ImageView mImg;
     private TextView mTextTitle;
     private TextView mTextMsg;
-    private int type=-1;
+    private int type = -1;
+    private Button mBtn;
+    private OnButtonClickListener listener;
 
-    public static ImageExampleDialog getInstance(int type){
-        ImageExampleDialog fragment=new ImageExampleDialog();
-        Bundle bundle=new Bundle();
-        bundle.putInt("type",type);
+    public static ImageExampleDialog getInstance(int type) {
+        ImageExampleDialog fragment = new ImageExampleDialog();
+        Bundle bundle = new Bundle();
+        bundle.putInt("type", type);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -41,7 +44,7 @@ public class ImageExampleDialog extends DialogFragment {
                              @Nullable Bundle savedInstanceState) {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         getDialog().setCanceledOnTouchOutside(false);
-        return inflater.inflate(R.layout.layout_img_example,null);
+        return inflater.inflate(R.layout.layout_img_example, null);
     }
 
     @Override
@@ -51,35 +54,51 @@ public class ImageExampleDialog extends DialogFragment {
     }
 
     private void initView(View view) {
-        type=getArguments().getInt("type");
-
-        mImageClose=view.findViewById(R.id.img_close);
+        type = getArguments().getInt("type");
+        mImageClose = view.findViewById(R.id.img_close);
         mImageClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
             }
         });
-        mImg=view.findViewById(R.id.img_example);
-        mTextTitle=view.findViewById(R.id.tv_title);
-        mTextMsg=view.findViewById(R.id.tv_tips);
-
-        if(type==1){
+        mImg = view.findViewById(R.id.img_example);
+        mTextTitle = view.findViewById(R.id.tv_title);
+        mTextMsg = view.findViewById(R.id.tv_tips);
+        mBtn = view.findViewById(R.id.btn_ok);
+        if (type == 1) {
             mTextTitle.setText("卸货照");
             mTextMsg.setText(R.string.xhz_tips);
             mImg.setImageResource(R.drawable.img_unload);
 
-        }else if(type==2){
+        } else if (type == 2) {
             mTextTitle.setText("回单照");
             mTextMsg.setText(R.string.hdz_tips);
             mImg.setImageResource(R.drawable.img_hdz);
         }
+        mBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(listener!=null){
+                    listener.onClick();
+                }
 
+            }
+        });
     }
 
     public void showF(FragmentManager manager, String tag) {
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    public void setOnButtonClickListener(OnButtonClickListener listener) {
+        this.listener = listener;
+
+    }
+
+    public interface OnButtonClickListener {
+        void onClick();
     }
 }

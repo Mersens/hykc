@@ -20,9 +20,14 @@ import com.alct.mdp.MDPLocationCollectionManager;
 import com.alct.mdp.callback.OnResultListener;
 import com.alct.mdp.model.Goods;
 import com.alct.mdp.model.Location;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
 import com.baidu.mapapi.utils.DistanceUtil;
+import com.google.gson.Gson;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.activity.BaseActivity;
 import com.tuoying.hykc.activity.GoodsListDetailActivity;
@@ -37,6 +42,8 @@ import com.tuoying.hykc.db.DBDao;
 import com.tuoying.hykc.db.DBDaoImpl;
 import com.tuoying.hykc.entity.EventEntity;
 import com.tuoying.hykc.entity.GoodsEntity;
+import com.tuoying.hykc.entity.LocEntity;
+import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.User;
 import com.tuoying.hykc.utils.DateUtils;
 import com.tuoying.hykc.utils.RequestManager;
@@ -55,6 +62,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,6 +98,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     private long allon1;
     private long allon2;
     private boolean onPouse=false;
+    public MyLocationListenner myListener =new  MyLocationListenner();
+    private LocationClient mLocClient;
+    private boolean isStopLocation=false;
     private static final int NFCTIPSDISMISS = 1;
     final LoadingDialogFragment nfcTipsFragment = LoadingDialogFragment.getInstance("正在检测NFCID");
     public Handler handler=new Handler(new Handler.Callback() {
@@ -127,6 +138,59 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init(view);
+    }
+
+    public static String changeTtime(String time) {
+        String str = null;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            str = format.format(sdf.parse(time));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
+
+
+    private void showGetNfcMsg(String msg){
+       final ExitDialogFragment exitDialogFragment=ExitDialogFragment.getInstance(msg);
+       exitDialogFragment.show(getChildFragmentManager(),"showGetNfcMsg");
+        exitDialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+            @Override
+            public void onClickCancel() {
+                exitDialogFragment.dismissAllowingStateLoss();
+
+            }
+
+            @Override
+            public void onClickOk() {
+                exitDialogFragment.dismissAllowingStateLoss();
+
+            }
+        });
+    }
+
+
+    private void initDatas() {
+        if (!TextUtils.isEmpty(userid)) {
+            User user = dao.findUserInfoById(userid);
+            if (user != null) {
+                getGoodsInfo(user);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        onPouse=false;
+        if(adapter!=null){
+            list.clear();
+            adapter.setList(list);
+        }
+        initDatas();
+        super.onResume();
+
     }
 
     @Override
@@ -190,58 +254,16 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 });
         //subscription交给compositeSubscription进行管理，防止内存溢出
         mCompositeDisposable.add(d);
-
-    }
-
-
-    private void showGetNfcMsg(String msg){
-       final ExitDialogFragment exitDialogFragment=ExitDialogFragment.getInstance(msg);
-       exitDialogFragment.show(getChildFragmentManager(),"showGetNfcMsg");
-        exitDialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
-            @Override
-            public void onClickCancel() {
-                exitDialogFragment.dismissAllowingStateLoss();
-
-            }
-
-            @Override
-            public void onClickOk() {
-                exitDialogFragment.dismissAllowingStateLoss();
-
-            }
-        });
-    }
-
-
-    private void initDatas() {
-
-        if (!TextUtils.isEmpty(userid)) {
-            User user = dao.findUserInfoById(userid);
-            if (user != null) {
-                getGoodsInfo(user);
-            }
-
-        }
-    }
-
-    @Override
-    public void onResume() {
-        onPouse=false;
-        if(adapter!=null){
-            list.clear();
-            adapter.setList(list);
-        }
-        initDatas();
-        super.onResume();
-
-    }
-
-    @Override
-    public void onPause() {
-        onPouse=true;
-        isRefrush=false;
-        super.onPause();
-
+        mLocClient = new LocationClient(getActivity().getApplicationContext());
+        mLocClient.registerLocationListener(myListener);
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(false); // 打开gps
+        option.setCoorType("bd09ll"); // 设置坐标类型
+        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setIsNeedLocationDescribe(true);//可选，设置是否需要地址描述
+        int t=(int) (2.5*60*1000);
+        option.setScanSpan(t);
+        mLocClient.setLocOption(option);
     }
 
     private void getGoodsInfo(final User user) {
@@ -309,165 +331,13 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }));
     }
 
-    private void analysisJson(String msgStr) {
-        boolean isOfwlgsinfo = false;
-        if (TextUtils.isEmpty(user.getOfwlgsinfo())) {
-            isOfwlgsinfo = true;
-        } else {
-            isOfwlgsinfo = false;
-        }
-        List<GoodsEntity> mList = new ArrayList<>();
-        try {
-            JSONArray array = new JSONArray(msgStr);
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                GoodsEntity entity = new GoodsEntity();
-                String formCity = object.getString("data:from_city");
-                String formCounty = object.getString("data:from_county");
-                entity.setStartAddress(formCity + " " + formCounty);
-                String toCity = object.getString("data:to_city");
-                String toCounty = object.getString("data:to_county");
-                String fromLon = object.getString("data:from_lon");
-                entity.setLon_from(fromLon);
-                String fromLat = object.getString("data:from_lat");
-                entity.setLat_from(fromLat);
-                String toLon = object.getString("data:to_lon");
-                entity.setLon_to(toLon);
-                String toLat = object.getString("data:to_lat");
-                entity.setLat_to(toLat);
-                entity.setEndAddress(toCity + " " + toCounty);
-                String sid = object.getString("data:sid");
-                entity.setSid(sid);
-                String name = object.getString("data:hwmc");
-                entity.setName(name);
-                String zl = object.getString("data:hwzl");
-                entity.setWeight(zl);
-                String tj = object.getString("data:hwtj");
-                entity.setVolume(tj);
-                if(object.has("data:task_id")){
-                    String task_id=object.getString("data:task_id");
-                    entity.setTask_id(task_id);
+    @Override
+    public void onPause() {
+        onPouse=true;
+        isRefrush=false;
 
-                }
-                if(object.has("data:driverPrice")){
-                    String driverPrice = object.getString("data:driverPrice");
-                    entity.setDriverPrice(driverPrice);
-                }
+        super.onPause();
 
-                if (object.has("data:bz")) {
-                    String bz = object.getString("data:bz");
-                    entity.setBz(bz);
-                }
-                String hzxm = object.getString("data:fhr");
-                entity.setHzxm(hzxm);
-                String zyf = object.getString("data:yf");
-                entity.setZyf(zyf);
-                if (object.has("data:alctid")) {
-                    String alctid = object.getString("data:alctid");
-                    entity.setAlctId(alctid);
-                } else {
-                    entity.setAlctId(Constants.APPIDENTITY);
-                }
-                if (object.has("data:alctcode")) {
-                    String alctcode = object.getString("data:alctcode");
-                    entity.setAlctCode(alctcode);
-                } else {
-                    entity.setAlctCode(Constants.ENTERPRISECODE);
-                }
-                if (object.has("data:alctkey")) {
-                    String alctKey = object.getString("data:alctkey");
-                    entity.setAlctKey(alctKey);
-                } else {
-                    entity.setAlctKey(Constants.APPKEY);
-                }
-                if (object.has("data:sxfbl")) {
-                    String bl = object.getString("data:sxfbl");
-                    entity.setBl(bl);
-                } else {
-                    entity.setBl("0.1");
-                }
-                if (object.has("data:moxid")) {
-                    String moxid = object.getString("data:moxid");
-                    entity.setMoxid(moxid);
-                    System.out.println("mox---" + entity.toString());
-                }
-                String time = object.getString("data:create_time");
-                entity.setTime(time);
-                String shrName = object.getString("data:shr");
-                entity.setShrName(shrName);
-                String shrTel = object.getString("data:shrdh");
-                entity.setShrTel(shrTel);
-                String statusName = object.getString("data:yd_trans_status");
-                entity.setStatusName(statusName);
-                String rowid = object.getString("rowid");
-                entity.setRowid(rowid);
-                String status = object.getString("data:yd_status");
-                entity.setStatus(status);
-                String driver = object.getString("data:yd_driver");
-                entity.setDriver(driver);
-                String huozhu = object.getString("data:fbr");
-                entity.setHuozhu(huozhu);
-                entity.setOfwlgsinfo(isOfwlgsinfo);
-                if (object.has("data:policyNo")) {
-                    String policyNo = object.getString("data:policyNo");
-                    entity.setPolicyNo(policyNo);
-                }
-                if (object.has("data:yd_1_time")) {
-                    entity.setJdTime(object.getString("data:yd_1_time"));
-
-                }
-                if(object.has("data:pdwlgs")){
-                    entity.setPdwlgs(object.getString("data:pdwlgs"));
-                }else {
-                    entity.setPdwlgs("-1");
-                }
-                mList.add(entity);
-            }
-            final MainActivity activity = mActivityReference.get();
-            if (activity == null) {
-                return;
-            }
-            if(onPouse){
-                return;
-            }
-            if (isRefrush) {
-                list.clear();
-                if(adapter!=null){
-                    adapter.setList(list);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-            list.addAll(mList);
-            if(adapter!=null){
-                adapter.setList(list);
-                adapter.notifyDataSetChanged();
-
-            }
-            if (adapter == null) {
-                adapter = new WWCAdapter(activity, list);
-                mListView.setAdapter(adapter);
-                adapter.setOnItemButtonClickListener(this);
-                adapter.setOnItemClickListener(new WWCAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int pos, GoodsEntity entity) {
-                        GoodsEntity e = (GoodsEntity) adapter.getItem(pos);
-                        Intent intent = new Intent(getActivity(), GoodsListDetailActivity.class);
-                        intent.putExtra("type", 1);
-                        intent.putExtra("entity", e);
-                        startActivity(intent);
-                        getActivity().overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-                    }
-                });
-            } else {
-                adapter.setList(list);
-                adapter.notifyDataSetChanged();
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            isRefrush = false;
-        }
     }
 
     @Override
@@ -904,74 +774,175 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             doUnLoadToService(entity);
         }
     }
-    private void doUnLoadToService(final GoodsEntity entity){
-        final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
-        loadingDialogFragment.showF(getChildFragmentManager(),"sdDialogFragment");
-        Map<String, String> map = new HashMap<>();
-        map.put("mobile", user.getUserId());
-        map.put("app", Constants.AppId);
-        map.put("token", user.getToken());
-        map.put("status_code", "2");
-        map.put("command", "送达客户");
-        map.put("rowid", entity.getRowid());
-        RequestManager.getInstance()
-                .mServiceStore
-                .change_yd_status(map)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+
+    private void analysisJson(String msgStr) {
+        boolean isOfwlgsinfo = false;
+        if(user==null){
+            return;
+        }
+        if (TextUtils.isEmpty(user.getOfwlgsinfo())) {
+            isOfwlgsinfo = true;
+        } else {
+            isOfwlgsinfo = false;
+        }
+        List<GoodsEntity> mList = new ArrayList<>();
+        try {
+            JSONArray array = new JSONArray(msgStr);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject object = array.getJSONObject(i);
+                GoodsEntity entity = new GoodsEntity();
+                String formCity = object.getString("data:from_city");
+                String formCounty = object.getString("data:from_county");
+                entity.setStartAddress(formCity + " " + formCounty);
+                String toCity = object.getString("data:to_city");
+                String toCounty = object.getString("data:to_county");
+                String fromLon = object.getString("data:from_lon");
+                entity.setLon_from(fromLon);
+                String fromLat = object.getString("data:from_lat");
+                entity.setLat_from(fromLat);
+                String toLon = object.getString("data:to_lon");
+                entity.setLon_to(toLon);
+                String toLat = object.getString("data:to_lat");
+                entity.setLat_to(toLat);
+                entity.setEndAddress(toCity + " " + toCounty);
+                String sid = object.getString("data:sid");
+                entity.setSid(sid);
+                String name = object.getString("data:hwmc");
+                entity.setName(name);
+                String zl = object.getString("data:hwzl");
+                entity.setWeight(zl);
+                String tj = object.getString("data:hwtj");
+                entity.setVolume(tj);
+
+                if(object.has("data:req_length")){
+                    String req_length=object.getString("data:req_length");
+                    entity.setReq_length(req_length);
+                }
+
+                if(object.has("data:task_id")){
+                    String task_id=object.getString("data:task_id");
+                    entity.setTask_id(task_id);
+
+                }
+                if(object.has("data:driverPrice")){
+                    String driverPrice = object.getString("data:driverPrice");
+                    entity.setDriverPrice(driverPrice);
+                }
+
+                if (object.has("data:bz")) {
+                    String bz = object.getString("data:bz");
+                    entity.setBz(bz);
+                }
+                String hzxm = object.getString("data:fhr");
+                entity.setHzxm(hzxm);
+                String zyf = object.getString("data:yf");
+                entity.setZyf(zyf);
+                if (object.has("data:alctid")) {
+                    String alctid = object.getString("data:alctid");
+                    entity.setAlctId(alctid);
+                } else {
+                    entity.setAlctId(Constants.APPIDENTITY);
+                }
+                if (object.has("data:alctcode")) {
+                    String alctcode = object.getString("data:alctcode");
+                    entity.setAlctCode(alctcode);
+                } else {
+                    entity.setAlctCode(Constants.ENTERPRISECODE);
+                }
+                if (object.has("data:alctkey")) {
+                    String alctKey = object.getString("data:alctkey");
+                    entity.setAlctKey(alctKey);
+                } else {
+                    entity.setAlctKey(Constants.APPKEY);
+                }
+                if (object.has("data:sxfbl")) {
+                    String bl = object.getString("data:sxfbl");
+                    entity.setBl(bl);
+                } else {
+                    entity.setBl("0.1");
+                }
+                if (object.has("data:moxid")) {
+                    String moxid = object.getString("data:moxid");
+                    entity.setMoxid(moxid);
+                    System.out.println("mox---" + entity.toString());
+                }
+                String time = object.getString("data:create_time");
+                entity.setTime(time);
+                String shrName = object.getString("data:shr");
+                entity.setShrName(shrName);
+                String shrTel = object.getString("data:shrdh");
+                entity.setShrTel(shrTel);
+                String statusName = object.getString("data:yd_trans_status");
+                entity.setStatusName(statusName);
+                String rowid = object.getString("rowid");
+                entity.setRowid(rowid);
+                String status = object.getString("data:yd_status");
+                entity.setStatus(status);
+                String driver = object.getString("data:yd_driver");
+                entity.setDriver(driver);
+                String huozhu = object.getString("data:fbr");
+                entity.setHuozhu(huozhu);
+                entity.setOfwlgsinfo(isOfwlgsinfo);
+                if (object.has("data:policyNo")) {
+                    String policyNo = object.getString("data:policyNo");
+                    entity.setPolicyNo(policyNo);
+                }
+                if (object.has("data:yd_1_time")) {
+                    entity.setJdTime(object.getString("data:yd_1_time"));
+
+                }
+                if(object.has("data:pdwlgs")){
+                    entity.setPdwlgs(object.getString("data:pdwlgs"));
+                }else {
+                    entity.setPdwlgs("-1");
+                }
+                mList.add(entity);
+            }
+            final MainActivity activity = mActivityReference.get();
+            if (activity == null) {
+                return;
+            }
+            if(onPouse){
+                return;
+            }
+            if (isRefrush) {
+                list.clear();
+                if(adapter!=null){
+                    adapter.setList(list);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+            list.addAll(mList);
+            if(adapter!=null){
+                adapter.setList(list);
+                adapter.notifyDataSetChanged();
+
+            }
+            if (adapter == null) {
+                adapter = new WWCAdapter(activity, list);
+                mListView.setAdapter(adapter);
+                adapter.setOnItemButtonClickListener(this);
+                adapter.setOnItemClickListener(new WWCAdapter.OnItemClickListener() {
                     @Override
-                    public void onSuccess(String msg) {
-                        final MainActivity activity = mActivityReference.get();
-                        if (activity == null) {
-                            return;
-                        }
-                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
-                            loadingDialogFragment.dismissAllowingStateLoss();
-                        }
-
-                        long sdl2=DateUtils.getTimeMillis();
-                        String str = msg.replaceAll("\r", "").replaceAll("\n", "");
-                        try {
-                            JSONObject jsonObject = new JSONObject(str);
-                            if (jsonObject.getBoolean("success")) {
-                                Toast.makeText(activity, "送达成功！", Toast.LENGTH_SHORT).show();
-                                RxBus.getInstance().send(new EventEntity("刷新", "刷新"));
-                                RxBus.getInstance().send(new EventEntity("dpj", "刷新"));
-/*                                String sdmsg = SharePreferenceUtil.getInstance(activity).getSDMsg();
-                                if ("0".equals(sdmsg)) {
-                                    doUnLoad(entity, entity.getName(), entity.getRowid(), entity.getAlctCode());
-
-                                }*/
-                            } else {
-                                if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
-                                    loadingDialogFragment.dismissAllowingStateLoss();
-                                }
-                                String error = jsonObject.getString("message");
-                                Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
-                                Log.e("create_request onError", msg);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } finally {
-                            isPickUp = false;
-                        }
+                    public void onItemClick(int pos, GoodsEntity entity) {
+                        GoodsEntity e = (GoodsEntity) adapter.getItem(pos);
+                        Intent intent = new Intent(getActivity(), GoodsListDetailActivity.class);
+                        intent.putExtra("type", 1);
+                        intent.putExtra("entity", e);
+                        startActivity(intent);
+                        getActivity().overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
                     }
+                });
+            } else {
+                adapter.setList(list);
+                adapter.notifyDataSetChanged();
+            }
 
-                    @Override
-                    public void onError(String msg) {
-                        final MainActivity activity = mActivityReference.get();
-                        if (activity == null) {
-                            return;
-                        }
-                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
-                            loadingDialogFragment.dismissAllowingStateLoss();
-                        }
-                        Toast.makeText(activity, "送达失败！", Toast.LENGTH_SHORT).show();
-                        Log.e("create_request onError", msg);
-                    }
-                }));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            isRefrush = false;
+        }
     }
 
 
@@ -1220,19 +1191,20 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     }
 
-
-    private void changeOrderStatu(final GoodsEntity entity){
-        final long startMillis=DateUtils.getTimeMillis();
+    private void doUnLoadToService(final GoodsEntity entity){
+        if (mLocClient!=null){
+            myListener.setRid(null);
+            mLocClient.stop();
+        }
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
-        loadingDialogFragment.showF(getChildFragmentManager(), "psdialog");
+        loadingDialogFragment.showF(getChildFragmentManager(),"sdDialogFragment");
         Map<String, String> map = new HashMap<>();
         map.put("mobile", user.getUserId());
         map.put("app", Constants.AppId);
         map.put("token", user.getToken());
-        map.put("status_code", "1");
-        map.put("command", "开始配送");
+        map.put("status_code", "2");
+        map.put("command", "送达客户");
         map.put("rowid", entity.getRowid());
-        System.out.println("mox+++" + entity.toString());
         RequestManager.getInstance()
                 .mServiceStore
                 .change_yd_status(map)
@@ -1241,43 +1213,44 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
-                        long endMillis=DateUtils.getTimeMillis();
-                        long l=DateUtils.getBetwnTime(endMillis,startMillis);
-                        Log.e("PS_TimeMillis==","psTimeMillis=="+l);
-                        Log.e("mox===", entity.toString());
-                        if(loadingDialogFragment!=null){
-                            loadingDialogFragment.dismissAllowingStateLoss();
-
-                        }
-
                         final MainActivity activity = mActivityReference.get();
                         if (activity == null) {
                             return;
                         }
+                        if(dao!=null){
+                            dao.delLocInfo(entity.getRowid());
+                        }
+
+                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                            loadingDialogFragment.dismissAllowingStateLoss();
+                        }
+
+                        long sdl2=DateUtils.getTimeMillis();
                         String str = msg.replaceAll("\r", "").replaceAll("\n", "");
                         try {
                             JSONObject jsonObject = new JSONObject(str);
                             if (jsonObject.getBoolean("success")) {
-                                Toast.makeText(activity, "开始配送成功！", Toast.LENGTH_SHORT).show();
-                                /*String sdmsg = SharePreferenceUtil.getInstance(getActivity()).getSDMsg();
-                                // dopickup(entity.getMoxid(), true+"");
+                                Toast.makeText(activity, "送达成功！", Toast.LENGTH_SHORT).show();
+                                RxBus.getInstance().send(new EventEntity("刷新", "刷新"));
+                                RxBus.getInstance().send(new EventEntity("dpj", "刷新"));
+/*                                String sdmsg = SharePreferenceUtil.getInstance(activity).getSDMsg();
                                 if ("0".equals(sdmsg)) {
-                                    doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
-                                }*/
-                                mSwipeToLoadLayout.setRefreshing(true);
-                            } else {
-                                String error = jsonObject.getString("message");
-                                mSwipeToLoadLayout.setRefreshing(true);
-                                if(loadingDialogFragment!=null){
-                                    loadingDialogFragment.dismissAllowingStateLoss();
+                                    doUnLoad(entity, entity.getName(), entity.getRowid(), entity.getAlctCode());
 
+                                }*/
+                            } else {
+                                if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                                    loadingDialogFragment.dismissAllowingStateLoss();
                                 }
+                                String error = jsonObject.getString("message");
                                 Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
                                 Log.e("create_request onError", msg);
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } finally {
+                            isPickUp = false;
                         }
                     }
 
@@ -1287,9 +1260,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         if (activity == null) {
                             return;
                         }
-                        mSwipeToLoadLayout.setRefreshing(true);
-                        loadingDialogFragment.dismissAllowingStateLoss();
-                        Toast.makeText(activity, "开始配送失败！", Toast.LENGTH_SHORT).show();
+                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                            loadingDialogFragment.dismissAllowingStateLoss();
+                        }
+                        Toast.makeText(activity, "送达失败！", Toast.LENGTH_SHORT).show();
                         Log.e("create_request onError", msg);
                     }
                 }));
@@ -1700,10 +1674,139 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     }
 
+    private void changeOrderStatu(final GoodsEntity entity){
+        if (mLocClient!=null){
+            myListener.setRid(entity.getRowid());
+            mLocClient.start();
+        }
+        final long startMillis=DateUtils.getTimeMillis();
+        final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
+        loadingDialogFragment.showF(getChildFragmentManager(), "psdialog");
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", user.getUserId());
+        map.put("app", Constants.AppId);
+        map.put("token", user.getToken());
+        map.put("status_code", "1");
+        map.put("command", "开始配送");
+        map.put("rowid", entity.getRowid());
+        System.out.println("mox+++" + entity.toString());
+        RequestManager.getInstance()
+                .mServiceStore
+                .change_yd_status(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        long endMillis=DateUtils.getTimeMillis();
+                        long l=DateUtils.getBetwnTime(endMillis,startMillis);
+                        Log.e("PS_TimeMillis==","psTimeMillis=="+l);
+                        Log.e("mox===", entity.toString());
+                        if(loadingDialogFragment!=null){
+                            loadingDialogFragment.dismissAllowingStateLoss();
+
+                        }
+
+                        final MainActivity activity = mActivityReference.get();
+                        if (activity == null) {
+                            return;
+                        }
+                        String str = msg.replaceAll("\r", "").replaceAll("\n", "");
+                        try {
+                            JSONObject jsonObject = new JSONObject(str);
+                            if (jsonObject.getBoolean("success")) {
+                                Toast.makeText(activity, "开始配送成功！", Toast.LENGTH_SHORT).show();
+                                /*String sdmsg = SharePreferenceUtil.getInstance(getActivity()).getSDMsg();
+                                // dopickup(entity.getMoxid(), true+"");
+                                if ("0".equals(sdmsg)) {
+                                    doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
+                                }*/
+                                mSwipeToLoadLayout.setRefreshing(true);
+                            } else {
+                                String error = jsonObject.getString("message");
+                                mSwipeToLoadLayout.setRefreshing(true);
+                                if(loadingDialogFragment!=null){
+                                    loadingDialogFragment.dismissAllowingStateLoss();
+
+                                }
+                                Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
+                                Log.e("create_request onError", msg);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        final MainActivity activity = mActivityReference.get();
+                        if (activity == null) {
+                            return;
+                        }
+                        mSwipeToLoadLayout.setRefreshing(true);
+                        loadingDialogFragment.dismissAllowingStateLoss();
+                        Toast.makeText(activity, "开始配送失败！", Toast.LENGTH_SHORT).show();
+                        Log.e("create_request onError", msg);
+                    }
+                }));
+    }
+
+
+    private double  getPointsDistances(String lat1,String lon1,String lat2,String lon2){
+        double distance=0;
+        double dLat1=Double.parseDouble(lat1);
+        double dLon1=Double.parseDouble(lon1);
+        double dLat2=Double.parseDouble(lat2);
+        double dLon2=Double.parseDouble(lon2);
+        LatLng p1LL = new LatLng(dLat1, dLon1);
+        LatLng p2LL = new LatLng(dLat2, dLon2);
+        distance=DistanceUtil.getDistance(p1LL, p2LL)/1000;
+        String str=lat1+","+lon1+","+lat2+","+lon2;
+        Log.e("distance",str);
+        return (double) Math.round(distance * 100) / 100;
+    }
+
+    private void upLoadUserLog(Map<String, String> params){
+        RequestManager.getInstance()
+                .mServiceStore
+                .uplog(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+
+                    }
+                }));
+
+    }
+
     private void getLocation(String id, final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
+        String reg=entity.getReq_length();
         Map<String, String> map = new HashMap<>();
         map.put("rowid", id);
-        map.put("type", "hykc");
+        if(TextUtils.isEmpty(reg)){
+            map.put("type", "0");
+        }else{
+            if("4.2米".equals(reg)){
+                LocationEntity locationEntity=dao.findLocInfoById(id);
+                Log.e("location","location==="+locationEntity.getLocation());
+                map.put("type", "1");
+                if(locationEntity!=null){
+                    map.put("location", locationEntity.getLocation());
+                }else {
+                    map.put("location", "");
+                }
+            }else {
+                map.put("type", "0");
+            }
+        }
         RequestManager.getInstance()
                 .mServiceStore
                 .getLocation(map)
@@ -1745,44 +1848,78 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }));
     }
 
-
-    private double  getPointsDistances(String lat1,String lon1,String lat2,String lon2){
-        double distance=0;
-        double dLat1=Double.parseDouble(lat1);
-        double dLon1=Double.parseDouble(lon1);
-        double dLat2=Double.parseDouble(lat2);
-        double dLon2=Double.parseDouble(lon2);
-        LatLng p1LL = new LatLng(dLat1, dLon1);
-        LatLng p2LL = new LatLng(dLat2, dLon2);
-        distance=DistanceUtil.getDistance(p1LL, p2LL)/1000;
-        String str=lat1+","+lon1+","+lat2+","+lon2;
-        Log.e("distance",str);
-        return (double) Math.round(distance * 100) / 100;
-    }
-
-    private void upLoadUserLog(Map<String, String> params){
-        RequestManager.getInstance()
-                .mServiceStore
-                .uplog(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
-                    @Override
-                    public void onSuccess(String msg) {
-
-                    }
-
-                    @Override
-                    public void onError(String msg) {
-
-                    }
-                }));
-
-    }
-
     @Override
     public void onDestroy() {
+        if (mLocClient != null) {
+            mLocClient.stop();
+        }
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
     }
+
+    public class MyLocationListenner implements BDLocationListener {
+        private String rid;
+        public void setRid(String rid) {
+            this.rid = rid;
+        }
+
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            if(bdLocation==null){
+                return;
+            }
+            Log.e("bdLocation","bdLocation recived");
+            final MainActivity activity = mActivityReference.get();
+            if (activity == null) {
+                return;
+            }
+
+            if(dao!=null && !TextUtils.isEmpty(rid)){
+                String loc=bdLocation.getAddrStr();
+                String lat=bdLocation.getLatitude()+"";
+                String lon=bdLocation.getLongitude()+"";
+                String time=changeTtime(bdLocation.getTime());
+                if(dao.findLocInfoIsExist(rid)){
+                    //存在更新
+                    LocationEntity entity=dao.findLocInfoById(rid);
+                    String str=entity.getLocation();
+                    try {
+                        if(!TextUtils.isEmpty(str)){
+                            JSONArray array=new JSONArray(str);
+                            Gson gson=new Gson();
+                            LocEntity locEntity=new LocEntity();
+                            locEntity.setTime(time);
+                            locEntity.setLongitude(lon);
+                            locEntity.setLatitude(lat);
+                            locEntity.setLocation(loc);
+                            entity.setRowid(rid);
+                            array.put(gson.toJson(locEntity));
+                            entity.setLocation(array.toString());
+                            dao.updateLocInfo(entity,rid);
+                            Toast.makeText(activity, "位置已更新", Toast.LENGTH_SHORT).show();
+                            Log.e("updateLocInfo","updateLocInfo==="+entity.getLocation());
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }else {
+                    //不存在添加
+                    Gson gson=new Gson();
+                    LocEntity locEntity=new LocEntity();
+                    locEntity.setTime(time);
+                    locEntity.setLongitude(lon);
+                    locEntity.setLatitude(lat);
+                    locEntity.setLocation(loc);
+                    LocationEntity entity=new LocationEntity();
+                    entity.setRowid(rid);
+                    entity.setLocation(gson.toJson(locEntity));
+                    dao.addLocInfo(entity);
+                    Toast.makeText(activity, "位置已添加", Toast.LENGTH_SHORT).show();
+                    Log.e("addLocInfo","addLocInfo==="+entity.getLocation());
+                }
+            }
+        }
+    }
+
 }

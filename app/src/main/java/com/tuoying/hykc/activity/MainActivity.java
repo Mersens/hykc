@@ -582,6 +582,8 @@ public class MainActivity extends BaseActivity
                 }
                // getRzInfo(user, userid);
                 loadmqttmessage(user, userid);
+            }else {
+                showLoginViews("请重新登录！");
             }
         }else {
             //重新登录
@@ -589,7 +591,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void showLoginViews(String msg){
+    public void showLoginViews(String msg){
         final ExitDialogFragment dialogFragment=ExitDialogFragment.getInstance(msg);
         dialogFragment.show(getSupportFragmentManager(),"showLoginViews");
         dialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {

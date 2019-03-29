@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
 
@@ -170,6 +171,70 @@ public class DBDaoImpl implements DBDao {
         db.execSQL(
                 "insert into " + MsgEntity.TABLE_NAME + "(" + MsgEntity.MSG + "," +MsgEntity.TIME+")" + " values(?,?)",
                 new Object[]{entity.getMsg(),entity.getTime()});
+        db.close();
+    }
+
+    @Override
+    public LocationEntity findLocInfoById(String rowid) {
+        List<LocationEntity> list = new ArrayList<>();
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + LocationEntity.TABLE_NAME + " where _rowid=?",
+                new String[]{rowid});
+        while (cursor.moveToNext()) {
+            LocationEntity entity=new LocationEntity();
+            String id = cursor.getString(cursor.getColumnIndex(LocationEntity.ROWID));
+            entity.setRowid(id);
+            String location = cursor.getString(cursor.getColumnIndex(LocationEntity.LOCATION));
+            entity.setLocation(location);
+            list.add(entity);
+        }
+        cursor.close();
+        db.close();
+        if (list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean findLocInfoIsExist(String rowid) {
+        boolean flag = false;
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor = db.rawQuery(
+                "select * from " + LocationEntity.TABLE_NAME + " where _rowid=? ",
+                new String[]{rowid});
+        while (cursor.moveToNext()) {
+            flag = true;
+        }
+        cursor.close();
+        db.close();
+        return flag;
+    }
+
+    @Override
+    public void delLocInfo(String rowid) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL("delete from " + LocationEntity.TABLE_NAME + " where _rowid=?",
+                new Object[]{rowid});
+        db.close();
+    }
+
+    @Override
+    public void updateLocInfo(LocationEntity locationEntity, String rowid) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL("UPDATE " + LocationEntity.TABLE_NAME + " SET "+LocationEntity.ROWID + "=?," + LocationEntity.LOCATION + "=? where _rowid=?", new Object[]{
+                locationEntity.getRowid(),locationEntity.getLocation(), rowid});
+        db.close();
+    }
+
+    @Override
+    public void addLocInfo(LocationEntity locationEntity) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(
+                "insert into " + LocationEntity.TABLE_NAME + "(" + LocationEntity.ROWID + ","+LocationEntity.LOCATION+")" + " values(?,?)",
+                new Object[]{locationEntity.getRowid(), locationEntity.getLocation()
+                       });
         db.close();
     }
 }

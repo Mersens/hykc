@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
 
@@ -12,13 +13,16 @@ import com.tuoying.hykc.entity.User;
  * Created by zzu on 2016/4/6.
  */
 public class DBHelper extends SQLiteOpenHelper {
-
-    private static final int VERSION = 5;
+    private static final int VERSION = 10;
     private static final String NAME = "CITY_FREIGHT.db";
-
     private static final String SQL_LOGIN_HISTORY_CREAT = "create table "+ User.TABLE_NAME+"(_id integer primary key autoincrement,"
             +User.USERID+" text ,"+User.USERNAME+" text, "+User.PSD+" text, "+User.TOKEN+" text,"+User.RZ+" text, "+User.OFWLGSINFO+" text)";
     private static final String SQL_LOGIN_HISTORY_DROP = "drop table if exists "+User.TABLE_NAME;
+
+    //位置信息表
+    private static final String SQL_LOCATIONENTITY_CREAT = "create table "+ LocationEntity.TABLE_NAME+"(_id integer primary key autoincrement,"
+            +LocationEntity.ROWID+" text ,"+LocationEntity.LOCATION+" text)";
+    private static final String SQL_LOCATIONENTITY_DROP = "drop table if exists "+LocationEntity.TABLE_NAME;
 
     private static final String SQL_MSG_CREAT = "create table "+ MsgEntity.TABLE_NAME+"(_id integer primary key autoincrement,"
            +MsgEntity.MSG+" text,"+MsgEntity.TIME+" text)";
@@ -47,6 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_LOGIN_HISTORY_CREAT);
         db.execSQL(SQL_MSG_CREAT);
+        db.execSQL(SQL_LOCATIONENTITY_CREAT);
     }
 
     /**
@@ -68,5 +73,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL(SQL_MSG_DROP);
         db.execSQL(SQL_MSG_CREAT);
+
+        db.execSQL(SQL_LOCATIONENTITY_DROP);
+        db.execSQL(SQL_LOCATIONENTITY_CREAT);
+
     }
 }

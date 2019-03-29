@@ -133,7 +133,7 @@ public interface ServiceStore {
     Observable<ResponseBody> pickup(@FieldMap Map<String, String> params);
 
     @FormUrlEncoded
-    @POST("showdata/mox/sendlocation.jsp")
+    @POST("showdata/mox/sendmoxlocation.jsp")
     Observable<ResponseBody> getLocation(@FieldMap Map<String, String> params);
 
     @FormUrlEncoded

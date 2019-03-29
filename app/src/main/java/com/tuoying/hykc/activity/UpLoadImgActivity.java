@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alct.mdp.MDPLocationCollectionManager;
+import com.alct.mdp.callback.OnDownloadResultListener;
 import com.alct.mdp.callback.OnResultListener;
 import com.alct.mdp.model.Image;
 import com.baidu.location.BDLocation;
@@ -38,6 +39,7 @@ import com.lzy.imagepicker.view.CropImageView;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.adapter.ImagePickerAdapter;
 import com.tuoying.hykc.adapter.OthersImgAdapter;
+import com.tuoying.hykc.app.App;
 import com.tuoying.hykc.app.Constants;
 import com.tuoying.hykc.db.DBDao;
 import com.tuoying.hykc.db.DBDaoImpl;
@@ -49,6 +51,7 @@ import com.tuoying.hykc.utils.ImageDownloader;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
+import com.tuoying.hykc.view.ExitDialogFragment;
 import com.tuoying.hykc.view.ImageExampleDialog;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 import com.tuoying.hykc.view.SelectDialog;
@@ -98,6 +101,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     private GoodsEntity entity;
     private boolean isSuccessXHZ=false;
     private boolean isSuccessHDZ=false;
+    private boolean isAnlXHZ=false;
+    private boolean isAnlHDZ=false;
     private User user;
     private String userid;
     private DBDao dao;
@@ -217,8 +222,66 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         option.setScanSpan(10000);
         mLocClient.setLocOption(option);
         mLocClient.start();
-
         initEvent();
+        checkAlctImg();
+    }
+
+    private void checkAlctImg(){
+        if(entity==null){
+            return;
+        }
+        String shipmentCode=entity.getRowid();
+        String enterpriseCode=entity.getAlctCode();
+        MDPLocationCollectionManager.getUnloadImageNames(this, shipmentCode, enterpriseCode, new OnDownloadResultListener() {
+            @Override
+            public void onSuccess(Object o) {
+                try {
+                    JSONArray array=new JSONArray(o.toString());
+                    if(array.length()>0){
+                        isAnlXHZ=true;
+                        setBtnStatu();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(String s, String s1) {
+
+            }
+        });
+
+        MDPLocationCollectionManager.getPODImageNames(this, shipmentCode, enterpriseCode, new OnDownloadResultListener() {
+            @Override
+            public void onSuccess(Object o) {
+                try {
+                    JSONArray array=new JSONArray(o.toString());
+                    if(array.length()>0){
+                        isAnlHDZ=true;
+                        setBtnStatu();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(String s, String s1) {
+
+            }
+        });
+    }
+
+    private void  setBtnStatu(){
+        if(isSuccessHDZ && isSuccessXHZ && isAnlHDZ && isAnlXHZ){
+            mBtnOk.setClickable(false);
+            mBtnOk.setEnabled(false);
+            mBtnOk.setBackgroundResource(R.drawable.btn_no_click_bg);
+
+        }
 
     }
 
@@ -289,7 +352,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                             }else {
                                 isSuccessHDZ=false;
                             }
-
+                            setBtnStatu();
                             JSONObject othersObject=new JSONObject(object.getString("other"));
                             JSONArray array=new JSONArray(othersObject.getString("msg"));
                             List<String> urls=new ArrayList<>();
@@ -317,11 +380,11 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                                 OthersImgAdapter adapter1=new OthersImgAdapter(urls,UpLoadImgActivity.this);
                                 showRecyclerView.setAdapter(adapter1);
                                 adapter.setMaxImgCount(maxImgCount);
-                                if(isSuccessHDZ && isSuccessXHZ){
+           /*                     if(isSuccessHDZ && isSuccessXHZ){
                                     mBtnOk.setText("上传照片");
                                 }else {
                                     mBtnOk.setText("返回");
-                                }
+                                }*/
                             }
 
                         } catch (JSONException e) {
@@ -344,32 +407,28 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         mImgXHZ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                selectType = XHZ;
-                setImg();
+                showXHZPicView(1,"xhzview");
             }
         });
         mImgHDZ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                selectType = HDZ;
-                setImg();
+                showHDZPicView(2,"hdzview");
             }
         });
 
         mBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text=mBtnOk.getText().toString();
+/*                String text=mBtnOk.getText().toString();
                 if("返回".equals(text)){
                     finish();
                     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
                 }else if("上传照片".equals(text)){
-                    doSave();
-                }
 
+                }*/
 
+                doSave();
             }
         });
         mTextXHZExample.setOnClickListener(new View.OnClickListener() {
@@ -390,10 +449,38 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     private void showDialogView(int type,String tag){
         final ImageExampleDialog dialog=ImageExampleDialog.getInstance(type);
         dialog.showF(getSupportFragmentManager(),tag);
+        dialog.setOnButtonClickListener(new ImageExampleDialog.OnButtonClickListener() {
+            @Override
+            public void onClick() {
+                dialog.dismissAllowingStateLoss();
+            }
+        });
     }
 
-
-
+    private void showXHZPicView(int type,String tag){
+        final ImageExampleDialog dialog=ImageExampleDialog.getInstance(type);
+        dialog.showF(getSupportFragmentManager(),tag);
+        dialog.setOnButtonClickListener(new ImageExampleDialog.OnButtonClickListener() {
+            @Override
+            public void onClick() {
+                dialog.dismissAllowingStateLoss();
+                selectType = XHZ;
+                setImg();
+            }
+        });
+    }
+    private void showHDZPicView(int type,String tag){
+        final ImageExampleDialog dialog=ImageExampleDialog.getInstance(type);
+        dialog.showF(getSupportFragmentManager(),tag);
+        dialog.setOnButtonClickListener(new ImageExampleDialog.OnButtonClickListener() {
+            @Override
+            public void onClick() {
+                dialog.dismissAllowingStateLoss();
+                selectType = HDZ;
+                setImg();
+            }
+        });
+    }
     private void doSave() {
         if(TextUtils.isEmpty(map.get(XHZ))){
             Toast.makeText(this, "请选择卸货照！", Toast.LENGTH_SHORT).show();
@@ -407,12 +494,11 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     }
 
     private void doUpLoad() {
-        final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
-        loadingDialogFragment.showF(getSupportFragmentManager(), "Alctdialog");
-        uploadUnloadImage(map.get(XHZ),loadingDialogFragment);
         mBtnOk.setClickable(false);
         mBtnOk.setEnabled(false);
         mBtnOk.setBackgroundResource(R.drawable.btn_no_click_bg);
+        uploadUnloadImage(map.get(XHZ));
+        uploadPODImage(map.get(HDZ));
     }
 
     private String getNowtime() {
@@ -593,7 +679,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     }
 
     //卸货照
-    private void uploadUnloadImage(String uploadBuffer,final LoadingDialogFragment loadingDialogFragment) {
+    private void uploadUnloadImage(String uploadBuffer) {
         if(entity==null){
             return;
         }
@@ -606,6 +692,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
+                        isAnlXHZ=true;
                         Map<String,String> m=new HashMap<>();
                         m.put("step","26");
                         m.put("tel",user.getUserId());
@@ -615,7 +702,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         upLoadUserLog(m);
                         Log.e("Unload","AlctCode="+entity.getAlctCode()+",Rowid="+entity.getRowid());
                         Toast.makeText(UpLoadImgActivity.this, "卸货照上传成功！", Toast.LENGTH_SHORT).show();
-                        uploadPODImage(map.get(HDZ),loadingDialogFragment);
+
 
                     }
 
@@ -626,25 +713,27 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","27");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联卸货照上传失败，失败原因："+"s="+s+":s1="+s1);
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
+                        isAnlXHZ=false;
+                        Map<String,String> m1=new HashMap<>();
+                        m1.put("step","27");
+                        m1.put("tel",user.getUserId());
+                        m1.put("msg","安联卸货照上传失败，失败原因："+"s="+s+":s1="+s1);
+                        m1.put("time",getNowtime());
+                        m1.put("rowid",entity.getRowid());
                         String param="AlctCode="+entity.getAlctCode()+"; Rowid="+entity.getRowid()+";货源信息="+entity.toString();
-                        map.put("param",param);
-                        upLoadUserLog(map);
+                        m1.put("param",param);
+                        upLoadUserLog(m1);
                         Log.e("卸货照 s111",s1);
-                        uploadPODImage(map.get(HDZ),loadingDialogFragment);
                         doUploadErrorMsg(entity.getAlctCode(),s,s1);
+                        mBtnOk.setClickable(true);
+                        mBtnOk.setEnabled(true);
+                        mBtnOk.setBackgroundResource(R.drawable.btn_cz_bg);
                     }
                 });
-
     }
 
     //回单照
-    private void uploadPODImage(String uploadBuffer,final LoadingDialogFragment loadingDialogFragment) {
+    private void uploadPODImage(String uploadBuffer) {
         if(entity==null){
             return;
         }
@@ -657,6 +746,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
+                        isAnlHDZ=true;
                         Map<String,String> map=new HashMap<>();
                         map.put("step","28");
                         map.put("tel",user.getUserId());
@@ -666,12 +756,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         upLoadUserLog(map);
                         Log.e("POD","AlctCode="+entity.getAlctCode()+",Rowid="+entity.getRowid());
                         Toast.makeText(UpLoadImgActivity.this, "回单照上传成功！", Toast.LENGTH_SHORT).show();
-                        if(loadingDialogFragment!=null){
-                            loadingDialogFragment.dismissAllowingStateLoss();
-                        }
-                        mBtnOk.setClickable(false);
-                        mBtnOk.setEnabled(false);
-                        mBtnOk.setBackgroundResource(R.drawable.btn_no_click_bg);
+
                     }
 
                     @Override
@@ -681,6 +766,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
+                        isAnlHDZ=false;
                         Map<String,String> map=new HashMap<>();
                         map.put("step","29");
                         map.put("tel",user.getUserId());
@@ -692,10 +778,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         upLoadUserLog(map);
                         Log.e("回单照 s111",s1);
                         doUploadErrorMsg(entity.getAlctCode(),s,s1);
-                        if(loadingDialogFragment!=null){
-                            loadingDialogFragment.dismissAllowingStateLoss();
-
-                        }
                         mBtnOk.setClickable(true);
                         mBtnOk.setEnabled(true);
                         mBtnOk.setBackgroundResource(R.drawable.btn_cz_bg);
@@ -760,8 +842,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+            onBackPressed();
+
             return true;
         }
 
@@ -824,66 +906,19 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
 
     }
 
-    private class MyTask extends AsyncTask<String,Integer,String> {
-        private String imgType;
-        @Override
-        protected String doInBackground(String... voids) {
-            loadingDialogFragment.showF(getSupportFragmentManager(), "uploadLoading");
-            String type=voids[0];
-            imgType=voids[0];
-            Map<String, String> m = new HashMap<>();
-            m.put("mobile", user.getUserId());
-            m.put("app", Constants.AppId);
-            m.put("token", user.getToken());
-            m.put("type", type);
-            m.put("rowid", entity.getRowid());
-            if(type.equals(TYPE_XHZ)){
-                m.put("base64", map.get(XHZ));
-            }else if(type.equals(TYPE_HDZ)){
-                m.put("base64", map.get(HDZ));
+    @Override
+    public void onBackPressed() {
+        if(isSuccessXHZ && isSuccessHDZ){
+            if(isAnlHDZ && isAnlXHZ){
+                super.onBackPressed();
+            }else {
+                confirmExit("请点击按钮上传图片");
             }
 
-           return HttpTools.submitPostData(Constants.WEBSERVICE_URL+"showdata/uploadalctimages.jsp",m,"UTF-8");
+        }else {
+            confirmExit("请上传图片");
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            if(loadingDialogFragment!=null){
-                loadingDialogFragment.dismissAllowingStateLoss();
-            }
-            String str = s.replaceAll("\r", "").replaceAll("\n", "");
-            Log.e("upLoadImgToService","str=="+str);
-            if(!TextUtils.isEmpty(str)){
-                if(str.contains("{") && str.contains("}")){
-                    int firstIndex=str.indexOf("{");
-                    int lastIndex=str.lastIndexOf("}");
-                    try {
-                        JSONObject object=new JSONObject(str.substring(firstIndex,lastIndex+1));
-                        if(object.getBoolean("success")){
-                            if(imgType.equals(TYPE_XHZ)){
-                                isSuccessXHZ=true;
-                            }else if(imgType.equals(TYPE_HDZ)){
-                                isSuccessHDZ=true;
-                            }
-                            if(isSuccessHDZ && isSuccessXHZ){
-                                mBtnOk.setText("上传照片");
-                            }else {
-                                mBtnOk.setText("返回");
-                            }
-                            Toast.makeText(UpLoadImgActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(UpLoadImgActivity.this, "保存失败！", Toast.LENGTH_SHORT).show();
-
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-        }
     }
 
     class BitmapThread extends Thread {
@@ -1000,6 +1035,88 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         }
     }
 
+    private void confirmExit(String msg) {
+        //退出操作
+        final ExitDialogFragment dialog = ExitDialogFragment.getInstance(msg);
+        dialog.show(getSupportFragmentManager(), "uploadImg");
+        dialog.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+            @Override
+            public void onClickCancel() {
+                dialog.dismiss();
+                finish();
+                overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+
+            }
+
+            @Override
+            public void onClickOk() {
+                dialog.dismiss();
+
+            }
+        });
 
 
+    }
+
+    private class MyTask extends AsyncTask<String,Integer,String> {
+        private String imgType;
+        @Override
+        protected String doInBackground(String... voids) {
+            loadingDialogFragment.showF(getSupportFragmentManager(), "uploadLoading");
+            String type=voids[0];
+            imgType=voids[0];
+            Map<String, String> m = new HashMap<>();
+            m.put("mobile", user.getUserId());
+            m.put("app", Constants.AppId);
+            m.put("token", user.getToken());
+            m.put("type", type);
+            m.put("rowid", entity.getRowid());
+            if(type.equals(TYPE_XHZ)){
+                m.put("base64", map.get(XHZ));
+            }else if(type.equals(TYPE_HDZ)){
+                m.put("base64", map.get(HDZ));
+            }
+
+           return HttpTools.submitPostData(Constants.WEBSERVICE_URL+"showdata/uploadalctimages.jsp",m,"UTF-8");
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            if(loadingDialogFragment!=null){
+                loadingDialogFragment.dismissAllowingStateLoss();
+            }
+            String str = s.replaceAll("\r", "").replaceAll("\n", "");
+            Log.e("upLoadImgToService","str=="+str);
+            if(!TextUtils.isEmpty(str)){
+                if(str.contains("{") && str.contains("}")){
+                    int firstIndex=str.indexOf("{");
+                    int lastIndex=str.lastIndexOf("}");
+                    try {
+                        JSONObject object=new JSONObject(str.substring(firstIndex,lastIndex+1));
+                        if(object.getBoolean("success")){
+                            if(imgType.equals(TYPE_XHZ)){
+                                isSuccessXHZ=true;
+                            }else if(imgType.equals(TYPE_HDZ)){
+                                isSuccessHDZ=true;
+                            }
+/*                            if(isSuccessHDZ && isSuccessXHZ){
+                                mBtnOk.setText("上传照片");
+                            }else {
+                                mBtnOk.setText("返回");
+                            }*/
+                            Toast.makeText(UpLoadImgActivity.this, "保存成功！", Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(UpLoadImgActivity.this, "保存失败！", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
+    }
 }

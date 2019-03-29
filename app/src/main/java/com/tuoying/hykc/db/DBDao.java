@@ -1,5 +1,6 @@
 package com.tuoying.hykc.db;
 
+import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
 
@@ -39,4 +40,14 @@ public interface DBDao {
 
     //添加信息
     public void addMsgInfo(MsgEntity entity);
+
+
+    public LocationEntity findLocInfoById(String rowid);
+
+    public boolean findLocInfoIsExist(String rowid);
+
+    public void delLocInfo(String rowid);
+
+    public void updateLocInfo(LocationEntity locationEntity, String rowid);
+    public void addLocInfo(LocationEntity locationEntity);
 }

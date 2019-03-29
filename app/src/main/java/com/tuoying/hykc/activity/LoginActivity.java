@@ -254,7 +254,9 @@ public class LoginActivity extends BaseActivity {
                 if(loadingDialogFragment!=null){
                     loadingDialogFragment.dismiss();
                 }
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                Intent intent=new Intent(LoginActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 finish();
                 return;
             }
@@ -307,7 +309,7 @@ public class LoginActivity extends BaseActivity {
                 }
                 getInvoices(mMultiIdentity);
                 SharePreferenceUtil.getInstance(LoginActivity.this).setSDMsg("0");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 finish();
             }
 
@@ -331,7 +333,7 @@ public class LoginActivity extends BaseActivity {
                     loadingDialogFragment.dismiss();
                 }
                 SharePreferenceUtil.getInstance(LoginActivity.this).setSDMsg("1");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 finish();
                // confirmTips("联系客服,是否税登");
             }
