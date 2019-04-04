@@ -497,9 +497,33 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
         mBtnOk.setClickable(false);
         mBtnOk.setEnabled(false);
         mBtnOk.setBackgroundResource(R.drawable.btn_no_click_bg);
+        updata_yd_upalctimg();
         uploadUnloadImage(map.get(XHZ));
         uploadPODImage(map.get(HDZ));
     }
+
+    private void updata_yd_upalctimg(){
+        Map<String, String> map = new HashMap<>();
+        map.put("rowid", entity.getRowid());
+        RequestManager.getInstance()
+                .mServiceStore
+                .updata_yd_upalctimg(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        msg=msg.trim();
+                        Log.e("updata_yd_upalctimg","updata_yd_upalctimg==="+msg);
+                    }
+                    @Override
+                    public void onError(String msg) {
+                        Log.e("updata_yd_onError", msg);
+                    }
+                }));
+
+    }
+
 
     private String getNowtime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -526,8 +550,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         setImage(imgs.get(0));
                     }
                 }
-
-
             }
         } else if (resultCode == ImagePicker.RESULT_CODE_BACK) {
             if (data != null && requestCode == REQUEST_CODE_PREVIEW) {

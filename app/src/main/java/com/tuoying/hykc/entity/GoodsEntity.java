@@ -42,6 +42,16 @@ public class GoodsEntity implements Serializable {
     private String task_id;
     private String driverPrice;
 
+    private String pd_ext;
+
+    public String getPd_ext() {
+        return pd_ext;
+    }
+
+    public void setPd_ext(String pd_ext) {
+        this.pd_ext = pd_ext;
+    }
+
     private String req_length;
 
     public String getReq_length() {

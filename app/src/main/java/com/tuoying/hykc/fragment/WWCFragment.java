@@ -262,6 +262,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
         option.setIsNeedLocationDescribe(true);//可选，设置是否需要地址描述
         int t=(int) (2.5*60*1000);
+       // int t=3000;
         option.setScanSpan(t);
         mLocClient.setLocOption(option);
     }
@@ -398,6 +399,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         }
     }
     private void checkStatu(final GoodsEntity entity){
+       // doPs(entity);
         Map<String, String> map = new HashMap<>();
         map.put("rowid", entity.getRowid());
         System.out.println("mox+++" + entity.toString());
@@ -412,7 +414,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         msg=msg.trim();
                         Log.e("checkStatu","checkStatu==="+msg);
                         if("0".equals(msg)){
-                            doPs(entity);
+
                         }else if("1".equals(msg)){
                             confirmTips("运单同步中,请等待！");
 
@@ -818,6 +820,11 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     String req_length=object.getString("data:req_length");
                     entity.setReq_length(req_length);
                 }
+                if(object.has("data:pd_ext")){
+                    String pd_ext=object.getString("data:pd_ext");
+                    entity.setPd_ext(pd_ext);
+
+                }
 
                 if(object.has("data:task_id")){
                     String task_id=object.getString("data:task_id");
@@ -1192,9 +1199,14 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
     private void doUnLoadToService(final GoodsEntity entity){
-        if (mLocClient!=null){
-            myListener.setRid(null);
-            mLocClient.stop();
+        String req=entity.getReq_length();
+        if(!TextUtils.isEmpty(req)){
+            if("4.2米".equals(req)){
+                if (mLocClient!=null){
+                    myListener.setRid(null);
+                    mLocClient.stop();
+                }
+            }
         }
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
         loadingDialogFragment.showF(getChildFragmentManager(),"sdDialogFragment");
@@ -1675,10 +1687,16 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
     private void changeOrderStatu(final GoodsEntity entity){
-        if (mLocClient!=null){
-            myListener.setRid(entity.getRowid());
-            mLocClient.start();
+        String req=entity.getReq_length();
+        if(!TextUtils.isEmpty(req)){
+            if("4.2米".equals(req)){
+                if (mLocClient!=null){
+                    myListener.setRid(entity.getRowid());
+                    mLocClient.start();
+                }
+            }
         }
+
         final long startMillis=DateUtils.getTimeMillis();
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
         loadingDialogFragment.showF(getChildFragmentManager(), "psdialog");
@@ -1787,7 +1805,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     }
 
-    private void getLocation(String id, final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
+    private void getLocation(final String id, final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
         String reg=entity.getReq_length();
         Map<String, String> map = new HashMap<>();
         map.put("rowid", id);
@@ -1796,10 +1814,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         }else{
             if("4.2米".equals(reg)){
                 LocationEntity locationEntity=dao.findLocInfoById(id);
-                Log.e("location","location==="+locationEntity.getLocation());
+                Log.e("location","location==="+locationEntity.getLocation().toString());
                 map.put("type", "1");
                 if(locationEntity!=null){
-                    map.put("location", locationEntity.getLocation());
+                    map.put("location", locationEntity.getLocation().toString());
                 }else {
                     map.put("location", "");
                 }
@@ -1825,6 +1843,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             JSONObject object = new JSONObject(str);
                             boolean isSuccess = object.getBoolean("success");
                             if (isSuccess) {
+                                if(dao!=null){
+                                    dao.delLocInfo(id);
+                                }
                                 String successMsg=object.getString("msg");
                                 Toast.makeText(activity, successMsg, Toast.LENGTH_SHORT).show();
                             } else {
@@ -1893,10 +1914,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             locEntity.setLatitude(lat);
                             locEntity.setLocation(loc);
                             entity.setRowid(rid);
-                            array.put(gson.toJson(locEntity));
+                            JSONObject object=new JSONObject(gson.toJson(locEntity));
+                            array.put(object);
                             entity.setLocation(array.toString());
                             dao.updateLocInfo(entity,rid);
-                            Toast.makeText(activity, "位置已更新", Toast.LENGTH_SHORT).show();
                             Log.e("updateLocInfo","updateLocInfo==="+entity.getLocation());
                         }
                     } catch (JSONException e) {
@@ -1912,11 +1933,17 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     locEntity.setLatitude(lat);
                     locEntity.setLocation(loc);
                     LocationEntity entity=new LocationEntity();
+                    JSONArray array=new JSONArray();
                     entity.setRowid(rid);
-                    entity.setLocation(gson.toJson(locEntity));
+                    try {
+                        JSONObject object=new JSONObject(gson.toJson(locEntity));
+                    array.put(object);
+                    entity.setLocation(array.toString());
                     dao.addLocInfo(entity);
-                    Toast.makeText(activity, "位置已添加", Toast.LENGTH_SHORT).show();
                     Log.e("addLocInfo","addLocInfo==="+entity.getLocation());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

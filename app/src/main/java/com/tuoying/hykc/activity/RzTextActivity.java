@@ -772,10 +772,7 @@ public class RzTextActivity extends BaseActivity {
     }
 
     private void recIDCard(String idCardSide, String filePath) {
-        if(loadingDialogFragment!=null){
-            loadingDialogFragment.show(getSupportFragmentManager(),"rzLoadingDialog");
 
-        }
         IDCardParams param = new IDCardParams();
         param.setImageFile(new File(filePath));
         // 设置身份证正反面
@@ -788,9 +785,7 @@ public class RzTextActivity extends BaseActivity {
         OCR.getInstance(this).recognizeIDCard(param, new OnResultListener<IDCardResult>() {
             @Override
             public void onResult(IDCardResult result) {
-                if(loadingDialogFragment!=null){
-                    loadingDialogFragment.dismiss();
-                }
+
                 if (result != null) {
                     //IDCardResult front{direction=0, wordsResultNumber=6, address=河南省孟津县常袋乡马岭村, idNumber=410322199304228314, birthday=19930422, name=马新新, gender=男, ethnic=汉}
                     Log.e("recognizeIDCard","==="+result.toString());
@@ -807,9 +802,7 @@ public class RzTextActivity extends BaseActivity {
 
             @Override
             public void onError(OCRError error) {
-                if(loadingDialogFragment!=null){
-                    loadingDialogFragment.dismiss();
-                }
+
                 Toast.makeText(RzTextActivity.this, error.getErrorCode(), Toast.LENGTH_SHORT).show();
 
             }
@@ -817,9 +810,6 @@ public class RzTextActivity extends BaseActivity {
     }
 
     private void recIDCardBack(String idCardSide, String filePath) {
-        if(loadingDialogFragment!=null){
-            loadingDialogFragment.show(getSupportFragmentManager(),"idcardLoadingDialog");
-        }
         IDCardParams param = new IDCardParams();
         param.setImageFile(new File(filePath));
         // 设置身份证正反面
@@ -832,9 +822,6 @@ public class RzTextActivity extends BaseActivity {
         OCR.getInstance(this).recognizeIDCard(param, new OnResultListener<IDCardResult>() {
             @Override
             public void onResult(IDCardResult result) {
-                if(loadingDialogFragment!=null){
-                    loadingDialogFragment.dismiss();
-                }
                 if (result != null) {
                     Log.e("recognizeIDCardBack","==="+result.toString());
                     String startTime=result.getSignDate().toString();
@@ -856,9 +843,6 @@ public class RzTextActivity extends BaseActivity {
 
             @Override
             public void onError(OCRError error) {
-                if(loadingDialogFragment!=null){
-                    loadingDialogFragment.dismiss();
-                }
                 Toast.makeText(RzTextActivity.this, error.getErrorCode(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -984,18 +968,13 @@ public class RzTextActivity extends BaseActivity {
         }
         // 识别成功回调，行驶证识别
         else if (requestCode == REQUEST_CODE_VEHICLE_LICENSE && resultCode == Activity.RESULT_OK) {
-            if(loadingDialogFragment!=null){
-                loadingDialogFragment.show(getSupportFragmentManager(),"rzLoadingDialog");
 
-            }
             saveDataToMap(XSZNAME,FileUtil.getSaveFile(getApplicationContext()).getAbsolutePath());
             RecognizeService.recVehicleLicense(this, FileUtil.getSaveFile(getApplicationContext()).getAbsolutePath(),
                     new RecognizeService.ServiceListener() {
                         @Override
                         public void onResult(String result) {
-                            if(loadingDialogFragment!=null){
-                                loadingDialogFragment.dismiss();
-                            }
+
                           Log.e("recVehicleLicense","==="+result);
                             if(!TextUtils.isEmpty(result)){
                                 try {
@@ -1049,17 +1028,11 @@ public class RzTextActivity extends BaseActivity {
 
         // 识别成功回调，驾驶证识别
        else if (requestCode == REQUEST_CODE_DRIVING_LICENSE && resultCode == Activity.RESULT_OK) {
-            if(loadingDialogFragment!=null){
-                loadingDialogFragment.showF(getSupportFragmentManager(),"rzLoadingDialog");
-            }
             saveDataToMap(JSZNAME,FileUtil.getSaveFile(getApplicationContext()).getAbsolutePath());
             RecognizeService.recDrivingLicense(this, FileUtil.getSaveFile(getApplicationContext()).getAbsolutePath(),
                     new RecognizeService.ServiceListener() {
                         @Override
                         public void onResult(String result) {
-                            if(loadingDialogFragment!=null){
-                                loadingDialogFragment.dismissAllowingStateLoss();
-                            }
                             if(!TextUtils.isEmpty(result)){
                                 try {
                                     JSONObject jsonObject=new JSONObject(result);

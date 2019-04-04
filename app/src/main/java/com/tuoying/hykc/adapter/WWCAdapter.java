@@ -108,7 +108,7 @@ public class WWCAdapter extends BaseAdapter {
             holder.mBtn.setEnabled(false);
             holder.mBtn.setClickable(false);
             holder.viewLin.setVisibility(View.VISIBLE);
-            holder.layoutBottom.setVisibility(View.VISIBLE);
+            holder.layoutBottom.setVisibility(View.GONE);
             holder.mBtnPZ.setVisibility(View.GONE);
         }
         else if("待结算尾款".equals(statusName)){
@@ -116,7 +116,7 @@ public class WWCAdapter extends BaseAdapter {
             holder.mBtn.setEnabled(false);
             holder.mBtn.setClickable(false);
             holder.viewLin.setVisibility(View.VISIBLE);
-            holder.layoutBottom.setVisibility(View.VISIBLE);
+            holder.layoutBottom.setVisibility(View.GONE);
             holder.mBtnPZ.setVisibility(View.VISIBLE);
         }
         else if("待装货".equals(statusName)){
@@ -126,7 +126,7 @@ public class WWCAdapter extends BaseAdapter {
             holder.mBtn.setClickable(true);
             holder.mBtnPZ.setVisibility(View.GONE);
             holder.viewLin.setVisibility(View.VISIBLE);
-            holder.layoutBottom.setVisibility(View.VISIBLE);
+            holder.layoutBottom.setVisibility(View.GONE);
         }
         else if("配送中".equals(statusName)){
             holder.mBtn.setText("送达");
@@ -135,7 +135,7 @@ public class WWCAdapter extends BaseAdapter {
             holder.mBtn.setEnabled(true);
             holder.mBtn.setClickable(true);
             holder.viewLin.setVisibility(View.VISIBLE);
-            holder.layoutBottom.setVisibility(View.VISIBLE);
+            holder.layoutBottom.setVisibility(View.GONE);
         }
         else if("已撤销".equals(statusName)){
             holder.mBtn.setText("已撤销");

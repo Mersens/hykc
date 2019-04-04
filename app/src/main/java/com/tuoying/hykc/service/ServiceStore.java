@@ -159,6 +159,11 @@ public interface ServiceStore {
     @FormUrlEncoded
     @POST("/acceptBillOfTask.jsp")
     Observable<ResponseBody> acceptBillOfTask(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("showdata/alct/updata_yd_upalctimg.jsp")
+    Observable<ResponseBody> updata_yd_upalctimg(@FieldMap Map<String, String> params);
+
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

@@ -71,6 +71,8 @@ public class GoodsListDetailActivity extends BaseActivity {
     private String taskid;
     private String yd_driver;
     private Button mBtnMore;
+    private RelativeLayout layout_pd;
+    private TextView mTextPD_Bz;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,11 +96,20 @@ public class GoodsListDetailActivity extends BaseActivity {
         mIntent = getIntent();
         type = mIntent.getIntExtra("type", 0);
         entity = (GoodsEntity) mIntent.getSerializableExtra("entity");
+        if(entity==null){
+            return;
+        }
         initViews();
         initDatas();
     }
 
     private void initViews() {
+        layout_pd=findViewById(R.id.layout_pd);
+        mTextPD_Bz=findViewById(R.id.tv_pd_bz);
+        if(TextUtils.isEmpty(entity.getPd_ext())){
+            layout_pd.setVisibility(View.GONE);
+        }
+        mTextPD_Bz.setText(entity.getPd_ext());
         mBtnMore=findViewById(R.id.btn_more);
         mLayoutNoMsg = findViewById(R.id.layout_nomsg);
         mLayoutLoading = findViewById(R.id.layout_loading);
@@ -148,15 +159,15 @@ public class GoodsListDetailActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if(!TextUtils.isEmpty(taskid) && !TextUtils.isEmpty(yd_driver)){
-                    showMoreView(taskid,yd_driver);
+                    showMoreView(taskid,yd_driver,entity.getWeight(),entity.getName());
                 }
 
             }
         });
     }
 
-    private void showMoreView(String task_id,String yd_driver){
-        final MoreMsgDialog dialog=MoreMsgDialog.getInstance(task_id,yd_driver);
+    private void showMoreView(String task_id,String yd_driver,String dw,String name){
+        final MoreMsgDialog dialog=MoreMsgDialog.getInstance(task_id,yd_driver,dw,name);
         dialog.show(getSupportFragmentManager(),"MoreMsgDialog");
 
 

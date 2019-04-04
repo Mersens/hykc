@@ -239,8 +239,6 @@ public class RegisterActivity extends BaseActivity {
                                 }
                                 String m = mySO.getString("mobile");
                                 mobile = m;
-
-
                             } else {
                                 String message = mySO.getString("message");
                                 Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
