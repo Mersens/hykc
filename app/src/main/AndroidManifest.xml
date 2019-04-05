@@ -56,7 +56,9 @@
         <activity
             android:name=".activity.SpalshActivity"
             android:label="@string/app_name"
-            android:theme="@style/SpalshTheme">
+            android:theme="@style/SpalshTheme"
+
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
