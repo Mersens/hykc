@@ -201,7 +201,7 @@
                     android:layout_marginBottom="16dp"
                     android:choiceMode="singleChoice"
                     android:divider="@null"
-                  android:fadingEdge="none"
+                    android:fadingEdge="none"
                     android:listSelector="@android:color/transparent"
                     android:scrollbarStyle="outsideOverlay"
                     app:layoutManager="android.support.v7.widget.GridLayoutManager"

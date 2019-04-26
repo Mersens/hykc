@@ -17,9 +17,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.alct.mdp.MDPLocationCollectionManager;
+import com.alct.mdp.callback.OnDownloadResultListener;
 import com.alct.mdp.callback.OnResultListener;
 import com.alct.mdp.model.Goods;
 import com.alct.mdp.model.Location;
+import com.alct.mdp.model.ShipmentStatusEnum;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -116,6 +118,11 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     });
     private String nfcid="";
     private ExitDialogFragment nfcDialogFragment;
+    private int pickUpCount=0;
+    private int unLoadCount=0;
+    private int signCount=0;
+    private int podCount=0;
+
 
     public static WWCFragment getInstance() {
         return new WWCFragment();
@@ -696,6 +703,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 Log.e("doCheckNfc onSuccess", "onSuccess----");
                 doUnLoad( entity,entity.getName(),shipmentCode, enterpriseCode);
             }
+
             @Override
             public void onFailure(String s, String s1) {
                 //step:12
@@ -896,7 +904,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }
                 if (object.has("data:yd_1_time")) {
                     entity.setJdTime(object.getString("data:yd_1_time"));
-
                 }
                 if(object.has("data:pdwlgs")){
                     entity.setPdwlgs(object.getString("data:pdwlgs"));
@@ -953,8 +960,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
 
-    private void doUnLoad(final GoodsEntity entity, final String hwmc, final String shipmentCode, final String enterpriseCode) {
-       allon1=DateUtils.getTimeMillis();
+    private void doAlctUnLoad(final GoodsEntity entity, final String hwmc, final String shipmentCode, final String enterpriseCode){
         MDPLocationCollectionManager.unload(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), new OnResultListener() {
             public void onSuccess() {
                 //step:20
@@ -962,6 +968,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
+                unLoadCount=0;
                 Map<String,String> map=new HashMap<>();
                 map.put("step","20");
                 map.put("tel",user.getUserId());
@@ -994,27 +1001,72 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     //msg:登录获取用户信息成功
                     //time:2018-12-18:11:11:10
                     //rowid:
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","14");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
-                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                    map.put("param",param);
-                    upLoadUserLog(map);
-                    Log.e("doPickUp", "onFailure----" + s + s1);
-                    doUploadErrorMsg(shipmentCode, s, s1);
-                    doUnLoadToService(entity);
+                    if(s1.contains("身份验证已过期")){
+                        if(unLoadCount<3){
+                            doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
+                            unLoadCount=unLoadCount+1;
+                        }else {
+                            unLoadCount=0;
+                            Map<String,String> map=new HashMap<>();
+                            map.put("step","14");
+                            map.put("tel",user.getUserId());
+                            map.put("msg","安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                            map.put("time",getNowtime());
+                            map.put("rowid",entity.getRowid());
+                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                            map.put("param",param);
+                            upLoadUserLog(map);
+                            Log.e("doPickUp", "onFailure----" + s + s1);
+                            doUploadErrorMsg(shipmentCode, s, s1);
+                            doUnLoadToService(entity);
+                        }
+                    }else {
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","14");
+                        map.put("tel",user.getUserId());
+                        map.put("msg","安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                        map.put("time",getNowtime());
+                        map.put("rowid",entity.getRowid());
+                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                        map.put("param",param);
+                        upLoadUserLog(map);
+                        Log.e("doPickUp", "onFailure----" + s + s1);
+                        doUploadErrorMsg(shipmentCode, s, s1);
+                        doUnLoadToService(entity);
+                    }
                 }
-
-
             }
         });
     }
 
-    private void doSign(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode, final String hwmc) {
 
+    private void doUnLoad(final GoodsEntity entity, final String hwmc, final String shipmentCode, final String enterpriseCode) {
+        getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
+            @Override
+            public void onSuccess(ShipmentStatusEnum status) {
+                Log.e("doUnLoad ShipmentStatus","ShipmentStatus=="+status.getValue());
+                switch (status){
+                    case PICKUPED://运单提货状态
+                        doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
+                        break;
+                    case UNLOADED://运单到货状态
+                        doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                        break;
+                    case SIGNED://运单签收状态
+                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        break;
+                }
+            }
+
+            @Override
+            public void onError() {
+                Log.e("doUnLoad ShipmentStatus","onError==");
+                doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
+            }
+        });
+    }
+
+    private void doAlctSign(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode, final String hwmc){
         MDPLocationCollectionManager.sign(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), getGoodsList(hwmc)
                 , new OnResultListener() {
                     @Override
@@ -1024,6 +1076,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
+                        signCount=0;
                         Map<String,String> map=new HashMap<>();
                         map.put("step","22");
                         map.put("tel",user.getUserId());
@@ -1040,29 +1093,74 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     @Override
                     public void onFailure(String s, String s1) {
                         //step:23
+
                         //tel:157****0385
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","23");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联sign执行失败，失败原因："+"s="+s+":s1="+s1+"");
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
-                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                        map.put("param",param);
-                        upLoadUserLog(map);
-                        Log.e("doSign", "onFailure----" + s + s1);
-                        doUploadErrorMsg(shipmentCode, s, s1);
-                        getLocation(entity.getRowid(), entity, shipmentCode, enterpriseCode);
+                        if(s1.contains("身份验证已过期")){
+                            if(signCount<3){
+                                doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                                signCount=signCount+1;
+                            }else {
+                                signCount=0;
+                                Map<String,String> map=new HashMap<>();
+                                map.put("step","23");
+                                map.put("tel",user.getUserId());
+                                map.put("msg","安联sign执行失败，失败原因："+"s="+s+":s1="+s1+"");
+                                map.put("time",getNowtime());
+                                map.put("rowid",entity.getRowid());
+                                String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                                map.put("param",param);
+                                upLoadUserLog(map);
+                                Log.e("doSign", "onFailure----" + s + s1);
+                                doUploadErrorMsg(shipmentCode, s, s1);
+                                getLocation(entity.getRowid(), entity, shipmentCode, enterpriseCode);
+
+                            }
+                        }else {
+                            Map<String,String> map=new HashMap<>();
+                            map.put("step","23");
+                            map.put("tel",user.getUserId());
+                            map.put("msg","安联sign执行失败，失败原因："+"s="+s+":s1="+s1+"");
+                            map.put("time",getNowtime());
+                            map.put("rowid",entity.getRowid());
+                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                            map.put("param",param);
+                            upLoadUserLog(map);
+                            Log.e("doSign", "onFailure----" + s + s1);
+                            doUploadErrorMsg(shipmentCode, s, s1);
+                            getLocation(entity.getRowid(), entity, shipmentCode, enterpriseCode);
+                        }
 
                     }
                 });
-
     }
 
-    private void pod(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
+    private void doSign(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode, final String hwmc) {
+        getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
+            @Override
+            public void onSuccess(ShipmentStatusEnum status) {
+                Log.e("doSign ShipmentStatus","ShipmentStatus=="+status.getValue());
+                switch (status){
+                    case UNLOADED://运单到货状态
+                        doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                        break;
+                    case SIGNED://运单签收状态
+                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        break;
+                }
+            }
+
+            @Override
+            public void onError() {
+                Log.e("doSign ShipmentStatus","onError==");
+                doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+            }
+        });
+    }
+
+    private void doAlctPod(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode){
         MDPLocationCollectionManager.pod(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), new OnResultListener() {
             @Override
             public void onSuccess() {
@@ -1071,6 +1169,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
+                podCount=0;
                 Map<String,String> map=new HashMap<>();
                 map.put("step","24");
                 map.put("tel",user.getUserId());
@@ -1095,19 +1194,63 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                Map<String,String> map=new HashMap<>();
-                map.put("step","25");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联pod执行失败，失败原因："+"s="+s+":s1="+s1+" 未跳转到上传卸货照、回单照页面");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
-                String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                map.put("param",param);
-                upLoadUserLog(map);
-                Log.e("doSign", "onFailure----" + s + s1);
-                doUploadErrorMsg(shipmentCode, s, s1);
+                if(s1.contains("身份验证已过期")){
+                    if(podCount<3){
+                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        podCount=podCount+1;
+                    }else {
+                        podCount=0;
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","25");
+                        map.put("tel",user.getUserId());
+                        map.put("msg","安联pod执行失败，失败原因："+"s="+s+":s1="+s1+" 未跳转到上传卸货照、回单照页面");
+                        map.put("time",getNowtime());
+                        map.put("rowid",entity.getRowid());
+                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                        map.put("param",param);
+                        upLoadUserLog(map);
+                        Log.e("doSign", "onFailure----" + s + s1);
+                        doUploadErrorMsg(shipmentCode, s, s1);
+                    }
+
+                }else {
+                    Map<String,String> map=new HashMap<>();
+                    map.put("step","25");
+                    map.put("tel",user.getUserId());
+                    map.put("msg","安联pod执行失败，失败原因："+"s="+s+":s1="+s1+" 未跳转到上传卸货照、回单照页面");
+                    map.put("time",getNowtime());
+                    map.put("rowid",entity.getRowid());
+                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                    map.put("param",param);
+                    upLoadUserLog(map);
+                    Log.e("doSign", "onFailure----" + s + s1);
+                    doUploadErrorMsg(shipmentCode, s, s1);
+                }
+
             }
         });
+
+    }
+
+    private void pod(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
+        getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
+            @Override
+            public void onSuccess(ShipmentStatusEnum status) {
+                Log.e("pod ShipmentStatus","ShipmentStatus=="+status.getValue());
+                switch (status){
+                    case SIGNED://运单签收状态
+                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        break;
+                }
+            }
+
+            @Override
+            public void onError() {
+                Log.e("pod ShipmentStatus","onError==");
+                doAlctPod(entity,shipmentCode,enterpriseCode);
+            }
+        });
+
 
     }
 
@@ -1148,6 +1291,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
 
     private void doPs(final GoodsEntity entity) {
+        pickUpCount=0;
         String sdmsg = SharePreferenceUtil.getInstance(getActivity()).getSDMsg();
         // dopickup(entity.getMoxid(), true+"");
         if ("0".equals(sdmsg)) {
@@ -1328,9 +1472,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 checkNFCAgainMsg("checkNfc失败！"+"\n"+"是否重新扫描？",entity);
             }
         });
-
     }
-
 
     private void checkNFCAgainMsg(String msg,final GoodsEntity entity){
        final ExitDialogFragment dialog=ExitDialogFragment.getInstance(msg);
@@ -1354,22 +1496,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
 
-
-
-    private void doPickUp(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity) {
+    private void doAlctPickUp(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity){
         final MainActivity activity = mActivityReference.get();
         if (activity == null) {
             return;
         }
+
         //需要获取坐标
         MDPLocationCollectionManager.pickup(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, true), new OnResultListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess() {//身份验证已过期
                 //step:13
                 //tel:157****0385
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
+                pickUpCount=0;
                 changeOrderStatu(entity);
                 Map<String,String> map=new HashMap<>();
                 map.put("step","13");
@@ -1410,25 +1552,73 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     //msg:登录获取用户信息成功
                     //time:2018-12-18:11:11:10
                     //rowid:
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","14");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
-                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                    map.put("param",param);
-                    upLoadUserLog(map);
-                    Log.e("doPickUp", "onFailure----" + s + s1);
-                    doUploadErrorMsg(shipmentCode, s, s1);
-                    isPickUp = true;
-                    changeOrderStatu(entity);
-                    StringBuffer sbf=new StringBuffer();
-                    sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    dopickup(entity.getRowid(), false + "",sbf.toString());
+                    if(s1.contains("身份验证已过期")){
+                        if(pickUpCount<3){
+                            doAlctPickUp(shipmentCode,enterpriseCode,entity);
+                            pickUpCount=pickUpCount+1;
+                        }else {
+                            pickUpCount=0;
+                            Map<String,String> map=new HashMap<>();
+                            map.put("step","14");
+                            map.put("tel",user.getUserId());
+                            map.put("msg","安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                            map.put("time",getNowtime());
+                            map.put("rowid",entity.getRowid());
+                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                            map.put("param",param);
+                            upLoadUserLog(map);
+                            Log.e("doPickUp", "onFailure----" + s + s1);
+                            doUploadErrorMsg(shipmentCode, s, s1);
+                            isPickUp = true;
+                            changeOrderStatu(entity);
+                            StringBuffer sbf=new StringBuffer();
+                            sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                            dopickup(entity.getRowid(), false + "",sbf.toString());
+                        }
+                    }else {
+                        Map<String,String> map=new HashMap<>();
+                        map.put("step","14");
+                        map.put("tel",user.getUserId());
+                        map.put("msg","安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                        map.put("time",getNowtime());
+                        map.put("rowid",entity.getRowid());
+                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
+                        map.put("param",param);
+                        upLoadUserLog(map);
+                        Log.e("doPickUp", "onFailure----" + s + s1);
+                        doUploadErrorMsg(shipmentCode, s, s1);
+                        isPickUp = true;
+                        changeOrderStatu(entity);
+                        StringBuffer sbf=new StringBuffer();
+                        sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
+                        dopickup(entity.getRowid(), false + "",sbf.toString());
+                    }
+
                 }
             }
         });
+    }
+
+
+    private void doPickUp(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity) {
+        getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
+            @Override
+            public void onSuccess(ShipmentStatusEnum status) {
+                Log.e("pickup ShipmentStatus","ShipmentStatus=="+status.getValue());
+                switch (status){
+                    case CONFIRMED://运单已确认状态
+                        doAlctPickUp(shipmentCode,enterpriseCode,entity);
+                        break;
+                }
+            }
+
+            @Override
+            public void onError() {
+                Log.e("pickup ShipmentStatus","onError");
+                doAlctPickUp(shipmentCode,enterpriseCode,entity);
+            }
+        });
+
     }
 
     private void showPickUpNfcView(String msg,final GoodsEntity entity){
@@ -1947,6 +2137,34 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }
             }
         }
+    }
+    private void getShipmentStatus(String shipmentCode,String enterpriseCode,final OnShipmentStatusListener shipmentStatusListener){
+        final MainActivity activity = mActivityReference.get();
+        if (activity == null) {
+            return;
+        }
+        MDPLocationCollectionManager.getShipmentStatus(activity, shipmentCode, enterpriseCode, new OnDownloadResultListener() {
+            @Override
+            public void onSuccess(Object o) {
+                if(o instanceof ShipmentStatusEnum){
+                    ShipmentStatusEnum shipmentStatusEnum=(ShipmentStatusEnum)o;
+                    if(shipmentStatusListener!=null){
+                        shipmentStatusListener.onSuccess(shipmentStatusEnum);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(String s, String s1) {
+                if(shipmentStatusListener!=null){
+                    shipmentStatusListener.onError();
+                }
+            }
+        });
+    }
+
+    private interface OnShipmentStatusListener{
+        void onSuccess(ShipmentStatusEnum status);
+        void onError();
     }
 
 }

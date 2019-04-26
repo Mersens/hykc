@@ -116,6 +116,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     private TextView tv_ysc;
     private TextView mTextXHZExample;
     private TextView mTextHDZExample;
+    private boolean isAlctUploadHDZ=false;
+    private boolean isAlctUploadXHZ=false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -327,7 +329,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                                         .into(mImgXHZ);
                             }else {
                                 isSuccessXHZ=false;
-
                             }
                             JSONObject hdzObject=new JSONObject(object.getString("hdz"));
                             String hdzUrl=hdzObject.getString("msg");
@@ -427,7 +428,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                 }else if("上传照片".equals(text)){
 
                 }*/
-
                 doSave();
             }
         });
@@ -521,7 +521,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         Log.e("updata_yd_onError", msg);
                     }
                 }));
-
     }
 
 
@@ -567,7 +566,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         setImage(imgs.get(0));
                     }
                 }
-
             }
         }
     }
@@ -715,6 +713,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //time:2018-12-18:11:11:10
                         //rowid:
                         isAnlXHZ=true;
+                        isAlctUploadXHZ=true;
+                        tipsView("上传成功！");
                         Map<String,String> m=new HashMap<>();
                         m.put("step","26");
                         m.put("tel",user.getUserId());
@@ -724,8 +724,6 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         upLoadUserLog(m);
                         Log.e("Unload","AlctCode="+entity.getAlctCode()+",Rowid="+entity.getRowid());
                         Toast.makeText(UpLoadImgActivity.this, "卸货照上传成功！", Toast.LENGTH_SHORT).show();
-
-
                     }
 
                     @Override
@@ -736,6 +734,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //time:2018-12-18:11:11:10
                         //rowid:
                         isAnlXHZ=false;
+                        isAlctUploadXHZ=true;
+                        tipsView("上传成功！");
                         Map<String,String> m1=new HashMap<>();
                         m1.put("step","27");
                         m1.put("tel",user.getUserId());
@@ -747,6 +747,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         upLoadUserLog(m1);
                         Log.e("卸货照 s111",s1);
                         doUploadErrorMsg(entity.getAlctCode(),s,s1);
+                        Toast.makeText(UpLoadImgActivity.this, "卸货照上传成功！", Toast.LENGTH_SHORT).show();
                         mBtnOk.setClickable(true);
                         mBtnOk.setEnabled(true);
                         mBtnOk.setBackgroundResource(R.drawable.btn_cz_bg);
@@ -769,6 +770,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //time:2018-12-18:11:11:10
                         //rowid:
                         isAnlHDZ=true;
+                        isAlctUploadHDZ=true;
+                        tipsView("上传成功！");
                         Map<String,String> map=new HashMap<>();
                         map.put("step","28");
                         map.put("tel",user.getUserId());
@@ -789,6 +792,8 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         //time:2018-12-18:11:11:10
                         //rowid:
                         isAnlHDZ=false;
+                        isAlctUploadHDZ=true;
+                        tipsView("上传成功！");
                         Map<String,String> map=new HashMap<>();
                         map.put("step","29");
                         map.put("tel",user.getUserId());
@@ -799,13 +804,13 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
                         map.put("param",param);
                         upLoadUserLog(map);
                         Log.e("回单照 s111",s1);
+                        Toast.makeText(UpLoadImgActivity.this, "回单照上传成功！", Toast.LENGTH_SHORT).show();
                         doUploadErrorMsg(entity.getAlctCode(),s,s1);
                         mBtnOk.setClickable(true);
                         mBtnOk.setEnabled(true);
                         mBtnOk.setBackgroundResource(R.drawable.btn_cz_bg);
                     }
                 });
-
     }
 
     //图片压缩
@@ -1140,5 +1145,23 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
             }
 
         }
+    }
+
+    private void tipsView(String msg){
+        if(isAlctUploadHDZ && isAlctUploadXHZ){
+            final ExitDialogFragment dialog = ExitDialogFragment.getInstance(msg);
+            dialog.show(getSupportFragmentManager(), "tipsView");
+            dialog.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+                @Override
+                public void onClickCancel() {
+                    dialog.dismissAllowingStateLoss();
+                }
+                @Override
+                public void onClickOk() {
+                    dialog.dismissAllowingStateLoss();
+                }
+            });
+        }
+
     }
 }
