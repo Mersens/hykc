@@ -414,7 +414,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         msg=msg.trim();
                         Log.e("checkStatu","checkStatu==="+msg);
                         if("0".equals(msg)){
-
+                            doPs(entity);
                         }else if("1".equals(msg)){
                             confirmTips("运单同步中,请等待！");
 
