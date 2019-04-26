@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.tuoying.hykc.entity.BugMsgEntity;
 import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
@@ -43,7 +44,7 @@ public class DBDaoImpl implements DBDao {
             user.setToken(token);
             String rz = cursor.getString(cursor.getColumnIndex(User.RZ));
             user.setRz(rz);
-            String of=cursor.getString(cursor.getColumnIndex(User.OFWLGSINFO));
+            String of = cursor.getString(cursor.getColumnIndex(User.OFWLGSINFO));
             user.setOfwlgsinfo(of);
             list.add(user);
         }
@@ -51,7 +52,7 @@ public class DBDaoImpl implements DBDao {
         db.close();
         return list;
     }
-    
+
     @Override
     public User findUserInfoById(String userid) {
         List<User> list = new ArrayList<User>();
@@ -70,7 +71,7 @@ public class DBDaoImpl implements DBDao {
             user.setToken(token);
             String rz = cursor.getString(cursor.getColumnIndex(User.RZ));
             user.setRz(rz);
-            String of=cursor.getString(cursor.getColumnIndex(User.OFWLGSINFO));
+            String of = cursor.getString(cursor.getColumnIndex(User.OFWLGSINFO));
             user.setOfwlgsinfo(of);
             list.add(user);
         }
@@ -112,9 +113,9 @@ public class DBDaoImpl implements DBDao {
     public void addUserInfo(User user) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(
-                "insert into " + User.TABLE_NAME + "(" + User.USERID + "," + User.USERNAME + "," + User.PSD + "," + User.TOKEN +","+User.RZ+","+User.OFWLGSINFO+")" + " values(?,?,?,?,?,?)",
+                "insert into " + User.TABLE_NAME + "(" + User.USERID + "," + User.USERNAME + "," + User.PSD + "," + User.TOKEN + "," + User.RZ + "," + User.OFWLGSINFO + ")" + " values(?,?,?,?,?,?)",
                 new Object[]{user.getUserId(), user.getUserName(),
-                        user.getPsd(),user.getToken(),user.getRz(),user.getOfwlgsinfo()});
+                        user.getPsd(), user.getToken(), user.getRz(), user.getOfwlgsinfo()});
         db.close();
 
     }
@@ -122,8 +123,8 @@ public class DBDaoImpl implements DBDao {
     @Override
     public void updateUserInfo(User user, String userid) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("UPDATE " + User.TABLE_NAME + " SET "+User.OFWLGSINFO + "=?," +User.RZ + "=?,"+ User.TOKEN + "=?,"+ User.USERID + "=?," + User.USERNAME + "=?," + User.PSD + "=? where userid=?", new Object[]{
-                user.getOfwlgsinfo(),user.getRz(),user.getToken(), user.getUserId(), user.getUserName(), user.getPsd(), userid});
+        db.execSQL("UPDATE " + User.TABLE_NAME + " SET " + User.OFWLGSINFO + "=?," + User.RZ + "=?," + User.TOKEN + "=?," + User.USERID + "=?," + User.USERNAME + "=?," + User.PSD + "=? where userid=?", new Object[]{
+                user.getOfwlgsinfo(), user.getRz(), user.getToken(), user.getUserId(), user.getUserName(), user.getPsd(), userid});
         db.close();
     }
 
@@ -137,7 +138,7 @@ public class DBDaoImpl implements DBDao {
         while (cursor.moveToNext()) {
             MsgEntity entity = new MsgEntity();
             int id = cursor.getInt(cursor.getColumnIndex("_id"));
-            entity.setId(id+"");
+            entity.setId(id + "");
             String msg = cursor.getString(cursor.getColumnIndex(MsgEntity.MSG));
             entity.setMsg(msg);
             String time = cursor.getString(cursor.getColumnIndex(MsgEntity.TIME));
@@ -161,7 +162,7 @@ public class DBDaoImpl implements DBDao {
     public void delAllMsg() {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL("delete from " + MsgEntity.TABLE_NAME
-               );
+        );
         db.close();
     }
 
@@ -169,8 +170,8 @@ public class DBDaoImpl implements DBDao {
     public void addMsgInfo(MsgEntity entity) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(
-                "insert into " + MsgEntity.TABLE_NAME + "(" + MsgEntity.MSG + "," +MsgEntity.TIME+")" + " values(?,?)",
-                new Object[]{entity.getMsg(),entity.getTime()});
+                "insert into " + MsgEntity.TABLE_NAME + "(" + MsgEntity.MSG + "," + MsgEntity.TIME + ")" + " values(?,?)",
+                new Object[]{entity.getMsg(), entity.getTime()});
         db.close();
     }
 
@@ -181,7 +182,7 @@ public class DBDaoImpl implements DBDao {
         Cursor cursor = db.rawQuery("select * from " + LocationEntity.TABLE_NAME + " where _rowid=?",
                 new String[]{rowid});
         while (cursor.moveToNext()) {
-            LocationEntity entity=new LocationEntity();
+            LocationEntity entity = new LocationEntity();
             String id = cursor.getString(cursor.getColumnIndex(LocationEntity.ROWID));
             entity.setRowid(id);
             String location = cursor.getString(cursor.getColumnIndex(LocationEntity.LOCATION));
@@ -223,8 +224,8 @@ public class DBDaoImpl implements DBDao {
     @Override
     public void updateLocInfo(LocationEntity locationEntity, String rowid) {
         SQLiteDatabase db = helper.getWritableDatabase();
-        db.execSQL("UPDATE " + LocationEntity.TABLE_NAME + " SET "+LocationEntity.ROWID + "=?," + LocationEntity.LOCATION + "=? where _rowid=?", new Object[]{
-                locationEntity.getRowid(),locationEntity.getLocation(), rowid});
+        db.execSQL("UPDATE " + LocationEntity.TABLE_NAME + " SET " + LocationEntity.ROWID + "=?," + LocationEntity.LOCATION + "=? where _rowid=?", new Object[]{
+                locationEntity.getRowid(), locationEntity.getLocation(), rowid});
         db.close();
     }
 
@@ -232,9 +233,66 @@ public class DBDaoImpl implements DBDao {
     public void addLocInfo(LocationEntity locationEntity) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(
-                "insert into " + LocationEntity.TABLE_NAME + "(" + LocationEntity.ROWID + ","+LocationEntity.LOCATION+")" + " values(?,?)",
+                "insert into " + LocationEntity.TABLE_NAME + "(" + LocationEntity.ROWID + "," + LocationEntity.LOCATION + ")" + " values(?,?)",
                 new Object[]{locationEntity.getRowid(), locationEntity.getLocation()
-                       });
+                });
+        db.close();
+    }
+
+    @Override
+    public List<BugMsgEntity> findBugMsgByUserId(String userid) {
+        List<BugMsgEntity> list = new ArrayList<BugMsgEntity>();
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + BugMsgEntity.TABLE_NAME + " where userId=?",
+                new String[]{userid});
+        while (cursor.moveToNext()) {
+            BugMsgEntity entity = new BugMsgEntity();
+            String uid = cursor.getString(cursor.getColumnIndex(BugMsgEntity.USERID));
+            entity.setUserId(uid);
+            String rowid = cursor.getString(cursor.getColumnIndex(BugMsgEntity.ROWID));
+            entity.setRowId(rowid);
+            String phoneModel = cursor.getString(cursor.getColumnIndex(BugMsgEntity.PHONEMODEL));
+            entity.setPhoneModel(phoneModel);
+            String code = cursor.getString(cursor.getColumnIndex(BugMsgEntity.VERSIONCODE));
+            entity.setVersionCode(code);
+            String deviceBrand = cursor.getString(cursor.getColumnIndex(BugMsgEntity.DEVICEBRAND));
+            entity.setDeviceBrand(deviceBrand);
+            String imei = cursor.getString(cursor.getColumnIndex(BugMsgEntity.IMEI));
+            entity.setiMEI(imei);
+            String time = cursor.getString(cursor.getColumnIndex(BugMsgEntity.TIME));
+            entity.setTime(time);
+            String errorMsg = cursor.getString(cursor.getColumnIndex(BugMsgEntity.ERRORMSG));
+            entity.setErrorMsg(errorMsg);
+            int submit = cursor.getInt(cursor.getColumnIndex(BugMsgEntity.SUBMIT));
+            entity.setSubmit(submit);
+            list.add(entity);
+        }
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    @Override
+    public void addBugMsg(BugMsgEntity entity) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(
+                "insert into " + BugMsgEntity.TABLE_NAME + "(" + BugMsgEntity.USERID + ","
+                        + BugMsgEntity.ROWID + "," + BugMsgEntity.PHONEMODEL + ","
+                        + BugMsgEntity.VERSIONCODE + "," + BugMsgEntity.DEVICEBRAND + ","
+                        + BugMsgEntity.IMEI + "," + BugMsgEntity.TIME + "," + BugMsgEntity.ERRORMSG + ","
+                        + BugMsgEntity.SUBMIT + ")" + " values(?,?,?,?,?,?,?,?,?)",
+                new Object[]{entity.getUserId(), entity.getRowId(),entity.getPhoneModel(),
+                        entity.getVersionCode(),entity.getDeviceBrand(),entity.getiMEI(),
+                        entity.getTime(),entity.getErrorMsg(),entity.getSubmit()
+                });
+        db.close();
+    }
+
+    @Override
+    public void delBugMsgByUserId(String userid) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL("delete from " + BugMsgEntity.TABLE_NAME + " where userid=?",
+                new Object[]{userid});
         db.close();
     }
 }

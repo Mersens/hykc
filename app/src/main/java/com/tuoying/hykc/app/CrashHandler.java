@@ -11,12 +11,23 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.j256.ormlite.dao.Dao;
 import com.tuoying.hykc.activity.MainActivity;
+import com.tuoying.hykc.db.DBDao;
+import com.tuoying.hykc.db.DBDaoImpl;
+import com.tuoying.hykc.entity.BugMsgEntity;
+import com.tuoying.hykc.utils.DateUtils;
+import com.tuoying.hykc.utils.HttpTools;
+import com.tuoying.hykc.utils.SharePreferenceUtil;
+import com.tuoying.hykc.utils.SystemUtil;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -116,7 +127,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
             // Sleep一会后结束程序  
             // 来让线程停止一会是为了显示Toast信息给用户，然后Kill程序  
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 Log.e(TAG, "Error : ", e);
             }
@@ -139,24 +150,17 @@ public class CrashHandler implements UncaughtExceptionHandler {
         // 收集设备信息
         collectCrashDeviceInfo(mContext);
         // 使用友盟SDK将错误报告保存到文件中，待下次应用程序重启时上传log
-        saveCrashInfo2File(ex);
-
         // 使用Toast来显示异常信息  
         new Thread() {
             @Override
             public void run() {
                 // Toast 显示需要出现在一个线程的消息队列中  
                 Looper.prepare();
+                saveCrashInfo2File(ex);
                 Toast.makeText(mContext, "程序迷路了,请关闭应用后重试！", Toast.LENGTH_SHORT).show();
                 Looper.loop();
             }
         }.start();
-
-
-//        String crashFileName = saveCrashInfoToFile(ex);  
-        // 发送错误报告到服务器
-        //已经使用了友盟SDK上传，故此处注掉
-        //sendCrashReportsToServer(mContext);  
         restartApplication();
         return true;
     }
@@ -165,15 +169,15 @@ public class CrashHandler implements UncaughtExceptionHandler {
         Intent intent = new Intent(mContext, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
-        App.getInstance().exit();
-        android.os.Process.killProcess(android.os.Process.myPid());
+       /* App.getInstance().exit();
+        android.os.Process.killProcess(android.os.Process.myPid());*/
     }
 
     /**
      * 收集程序崩溃的设备信息
-     *
      * @param ctx
      */
+
     public void collectCrashDeviceInfo(Context ctx) {
         try {
             // Class for retrieving various kinds of information related to the  
@@ -224,14 +228,12 @@ public class CrashHandler implements UncaughtExceptionHandler {
      * @return 返回文件名称, 便于将文件传送到服务器
      */
     private String saveCrashInfo2File(Throwable ex) {
-
         StringBuffer sb = new StringBuffer();
         for (Map.Entry<String, String> entry : infos.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             sb.append(key + "=" + value + "\n");
         }
-
         Writer writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
         ex.printStackTrace(printWriter);
@@ -244,6 +246,10 @@ public class CrashHandler implements UncaughtExceptionHandler {
         String result = writer.toString();
         Log.e("RESULT", result);
         sb.append(result);
+        sendCrashReportsToServer(mContext,sb.toString());
+        /*DBDao dbDao=new DBDaoImpl(mContext);
+        BugMsgEntity entity=new BugMsgEntity();
+        dbDao.addBugMsg(entity);*/
         try {
             long timestamp = System.currentTimeMillis();
             String time = formatter.format(new Date());
@@ -262,6 +268,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
         } catch (Exception e) {
             Log.e(TAG, "an error occured while writing file...", e);
         }
+
         return null;
     }
 
@@ -301,18 +308,36 @@ public class CrashHandler implements UncaughtExceptionHandler {
      *
      * @param ctx
      */
-    public void sendCrashReportsToServer(Context ctx) {
-        String[] crFiles = getCrashReportFiles(ctx);
-        if (crFiles != null && crFiles.length > 0) {
-            TreeSet<String> sortedFiles = new TreeSet<String>();
-            sortedFiles.addAll(Arrays.asList(crFiles));
-
-            for (String fileName : sortedFiles) {
-                File cr = new File(ctx.getFilesDir(), fileName);
-                postReport(ctx, cr);
-                cr.delete();// 删除已发送的报告  
+    public void sendCrashReportsToServer(Context ctx,final String msg) {
+        Log.e("sendCrashReport","sendCrashReport=="+msg);
+        String userId=SharePreferenceUtil.getInstance(ctx).getUserId();
+        final Map<String,String> map=new HashMap<>();
+        map.put("userId",userId);
+        map.put("rowId","");
+        map.put("phoneModel", SystemUtil.getSystemModel());
+        map.put("versionCode",SystemUtil.getSystemVersion());
+        map.put("deviceBrand",SystemUtil.getDeviceBrand());
+        map.put("iMEI",SystemUtil.getIMEI(ctx));
+        map.put("createtime",DateUtils.getStringNowTime());
+        map.put("errorMsg",msg);
+        Log.e("mapmap","mapmap=="+msg);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                JSONObject object=new JSONObject(map);
+                String body=object.toString();
+                try {
+                    String str = HttpTools.sendPost("http://39.105.210.202:8080/api/up_Error",body);
+                    Log.e("sendCrashReport","sendCrashReport=="+str);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //String str= HttpTools.submitPostData("http://192.168.2.5:8080/api/up_Error",map,"UTF-8");
+                Looper.loop();
             }
-        }
+        }).start();
+
     }
 
     /**
@@ -373,7 +398,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
         public void run() {
             try {
                 synchronized (this.lock) {
-                    sendCrashReportsToServer(mContext);
+                    //sendCrashReportsToServer(mContext);
                 }
             } catch (Exception e) {
                 Log.e(TAG, "SendReports error.", e);

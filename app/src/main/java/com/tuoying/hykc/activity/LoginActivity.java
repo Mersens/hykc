@@ -366,6 +366,8 @@ public class LoginActivity extends BaseActivity {
                         GetInvoicesResponse getInvoicesResponse=(GetInvoicesResponse) o;
                         List<Invoice> list=getInvoicesResponse.getDriverInvoices();
                         for (Invoice invoice:list){
+                            String s=invoice.getInvoiceReceiverName()+";"+invoice.getTaxAmount();
+                            Log.e("Invoice==",s);
                             confirmInvoice(invoice);
                         }
                     }
@@ -373,23 +375,23 @@ public class LoginActivity extends BaseActivity {
 
                 @Override
                 public void onFailure(String s, String s1) {
-
+                    Log.e("Invoice onFailure",s+s1);
                 }
             });
         }
-
     }
 
     private void confirmInvoice(Invoice invoice){
         MDPLocationCollectionManager.confirmInvoice(getApplicationContext(), invoice.getEnterpriseCode(), invoice.getDriverInvoiceCode(), new OnResultListener() {
             @Override
             public void onSuccess() {
+                Log.e("confirmInvoice success","onSuccess");
 
             }
 
             @Override
             public void onFailure(String s, String s1) {
-
+                Log.e("confirmInvoiceFailure","onFailure");
             }
         });
     }

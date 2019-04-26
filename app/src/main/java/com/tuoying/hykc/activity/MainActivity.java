@@ -391,7 +391,6 @@ public class MainActivity extends BaseActivity
     }
 
 
-
     private void initViews() {
         mLayoutHY = findViewById(R.id.layout_hy);
         mLayoutYD = findViewById(R.id.layout_yd);
@@ -831,7 +830,7 @@ public class MainActivity extends BaseActivity
                         map.put("time",getNowtime());
                         map.put("rowid","");
                         upLoadUserLog(map);
-                        Log.e("getRzInfo main", msg);
+                        Log.e("register main", msg);
                         doRegisterAlct(alct,msg,id);
                         if(TextUtils.isEmpty(msg)){
                             return;
@@ -1013,13 +1012,15 @@ public class MainActivity extends BaseActivity
                         GetInvoicesResponse getInvoicesResponse=(GetInvoicesResponse) o;
                         List<Invoice> list=getInvoicesResponse.getDriverInvoices();
                         for (Invoice invoice:list){
+                            String s=invoice.getInvoiceReceiverName()+";"+invoice.getTaxAmount();
+                            Log.e("Invoice==",s);
                             confirmInvoice(invoice);
                         }
                     }
                 }
                 @Override
                 public void onFailure(String s, String s1) {
-
+                    Log.e("Invoice onFailure",s+s1);
                 }
             });
         }
@@ -1030,12 +1031,12 @@ public class MainActivity extends BaseActivity
         MDPLocationCollectionManager.confirmInvoice(getApplicationContext(), invoice.getEnterpriseCode(), invoice.getDriverInvoiceCode(), new OnResultListener() {
             @Override
             public void onSuccess() {
-
+                Log.e("confirmInvoicesuccess","onSuccess");
             }
 
             @Override
             public void onFailure(String s, String s1) {
-
+                Log.e("confirmInvoiceFailure","onFailure");
             }
         });
     }

@@ -1,9 +1,12 @@
 package com.tuoying.hykc.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -35,6 +38,8 @@ public class HttpTools {
             httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             //设置请求体的长度
             httpURLConnection.setRequestProperty("Content-Length", String.valueOf(data.length));
+            httpURLConnection.setRequestProperty("Connection", "keep-alive");
+
             //获得输出流，向服务器写入数据
             OutputStream outputStream = httpURLConnection.getOutputStream();
             outputStream.write(data);
@@ -61,7 +66,7 @@ public class HttpTools {
             for(Map.Entry<String, String> entry : params.entrySet()) {
                 stringBuffer.append(entry.getKey())
                         .append("=")
-                        .append(URLEncoder.encode(entry.getValue(), encode))
+                        .append(entry.getValue())
                         .append("&");
             }
             stringBuffer.deleteCharAt(stringBuffer.length() - 1);    //删除最后的一个"&"
@@ -69,6 +74,71 @@ public class HttpTools {
             e.printStackTrace();
         }
         return stringBuffer;
+    }
+    public static String sendPost(String url, String body) throws IOException {
+        OutputStreamWriter out = null;
+        BufferedReader reader = null;
+        String response = "";
+        String result = null;
+        try {
+            URL httpUrl = null; // HTTP URL类 用这个类来创建连接
+            // 创建URL
+            httpUrl = new URL(url);
+            // 建立连接
+            HttpURLConnection conn = (HttpURLConnection) httpUrl.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setUseCaches(false); // 禁止缓存
+            conn.setInstanceFollowRedirects(true);    //自动执行HTTP重定向
+            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            conn.setRequestProperty("Connection", "keep-alive");
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.connect();
+            // POST请求
+            out = new OutputStreamWriter(conn.getOutputStream(),"utf-8");
+            out.write(body);
+            out.flush();
+            // 读取响应
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
+            String lines;
+            while ((lines = reader.readLine()) != null) {
+                lines = new String(lines.getBytes(), "utf-8");
+                response += lines;
+            }
+
+            reader.close();
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                InputStreamReader in = new InputStreamReader(
+                        conn.getInputStream()); // 获得读取的内容
+                BufferedReader buffer = new BufferedReader(in); // 获取输入流对象
+                String inputLine = null;
+                while ((inputLine = buffer.readLine()) != null) {
+                    result += inputLine + "\n";
+                }
+                in.close();    //关闭字符输入流
+            }
+            // 断开连接
+            conn.disconnect();
+
+        } catch (Exception e) {
+            System.out.println("发送 POST 请求出现异常！" + e);
+            e.printStackTrace();
+        }
+        // 使用finally块来关闭输出流、输入流
+        finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        System.out.println(result);
+        return response;
     }
 
     /*

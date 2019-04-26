@@ -1,5 +1,6 @@
 package com.tuoying.hykc.db;
 
+import com.tuoying.hykc.entity.BugMsgEntity;
 import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.MsgEntity;
 import com.tuoying.hykc.entity.User;
@@ -49,5 +50,18 @@ public interface DBDao {
     public void delLocInfo(String rowid);
 
     public void updateLocInfo(LocationEntity locationEntity, String rowid);
+
     public void addLocInfo(LocationEntity locationEntity);
+
+    //查询bug信息
+    public List<BugMsgEntity> findBugMsgByUserId(String userid);
+
+    //添加bug信息
+    public void addBugMsg(BugMsgEntity entity);
+
+    //删除Bug信息
+    public void delBugMsgByUserId(String userid);
+
+
+
 }
