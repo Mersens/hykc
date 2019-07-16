@@ -11,8 +11,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +84,8 @@ public class LoginActivity extends BaseActivity {
             super.handleMessage(msg);
         }
     };
+    private RelativeLayout mLayoutXY;
+    private CheckBox checkBox;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -150,11 +155,28 @@ public class LoginActivity extends BaseActivity {
                 doLogin();
             }
         });
+        mLayoutXY=findViewById(R.id.layout_xy);
+        checkBox=findViewById(R.id.checkBox);
+        mLayoutXY.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doCheckXY();
+            }
+        });
+    }
+
+    private void doCheckXY() {
+        Intent intentFind = new Intent(LoginActivity.this, AgreementActivity.class);
+        startActivity(intentFind);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
 
     }
 
     private void doLogin() {
-
+        if(!checkBox.isChecked()){
+            Toast.makeText(this, "请阅读和接受货运快车服务协议！", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String tel = mEditPhone.getText().toString().trim();
         String psd = mEditPsd.getText().toString().trim();
         if (TextUtils.isEmpty(tel)) {
@@ -189,6 +211,7 @@ public class LoginActivity extends BaseActivity {
                     @Override
                     public void onError(String msg) {
                         loadingDialogFragment.dismiss();
+                        Log.e("login onError",msg);
                         Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
                     }
                 }));

@@ -35,6 +35,7 @@ import com.tuoying.hykc.activity.BaseActivity;
 import com.tuoying.hykc.activity.GoodsListDetailActivity;
 import com.tuoying.hykc.activity.LoginActivity;
 import com.tuoying.hykc.activity.MainActivity;
+import com.tuoying.hykc.activity.MyTrailerDetailsActivity;
 import com.tuoying.hykc.activity.OrderActivity;
 import com.tuoying.hykc.activity.UpLoadImgActivity;
 import com.tuoying.hykc.adapter.GoodsListAdapter;
@@ -47,6 +48,7 @@ import com.tuoying.hykc.entity.GoodsEntity;
 import com.tuoying.hykc.entity.LocEntity;
 import com.tuoying.hykc.entity.LocationEntity;
 import com.tuoying.hykc.entity.User;
+import com.tuoying.hykc.service.ServiceStore;
 import com.tuoying.hykc.utils.DateUtils;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
@@ -63,6 +65,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -77,6 +80,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLoadMoreListener, WWCAdapter.OnItemButtonClickListener {
 
@@ -99,29 +107,29 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     private boolean isPickUp = false;
     private long allon1;
     private long allon2;
-    private boolean onPouse=false;
-    public MyLocationListenner myListener =new  MyLocationListenner();
+    private boolean onPouse = false;
+    public MyLocationListenner myListener = new MyLocationListenner();
     private LocationClient mLocClient;
-    private boolean isStopLocation=false;
+    private boolean isStopLocation = false;
     private static final int NFCTIPSDISMISS = 1;
     final LoadingDialogFragment nfcTipsFragment = LoadingDialogFragment.getInstance("正在检测NFCID");
-    public Handler handler=new Handler(new Handler.Callback() {
+    public Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            if(msg.what == NFCTIPSDISMISS ){
-                if(nfcTipsFragment!=null){
+            if (msg.what == NFCTIPSDISMISS) {
+                if (nfcTipsFragment != null) {
                     nfcTipsFragment.dismissAllowingStateLoss();
                 }
             }
             return true;
         }
     });
-    private String nfcid="";
+    private String nfcid = "";
     private ExitDialogFragment nfcDialogFragment;
-    private int pickUpCount=0;
-    private int unLoadCount=0;
-    private int signCount=0;
-    private int podCount=0;
+    private int pickUpCount = 0;
+    private int unLoadCount = 0;
+    private int signCount = 0;
+    private int podCount = 0;
 
 
     public static WWCFragment getInstance() {
@@ -133,6 +141,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         super.onAttach(context);
         mActivityReference = new WeakReference<>((MainActivity) context);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -160,9 +169,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
 
-    private void showGetNfcMsg(String msg){
-       final ExitDialogFragment exitDialogFragment=ExitDialogFragment.getInstance(msg);
-       exitDialogFragment.show(getChildFragmentManager(),"showGetNfcMsg");
+    private void showGetNfcMsg(String msg) {
+        final ExitDialogFragment exitDialogFragment = ExitDialogFragment.getInstance(msg);
+        exitDialogFragment.show(getChildFragmentManager(), "showGetNfcMsg");
         exitDialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
@@ -190,8 +199,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     @Override
     public void onResume() {
-        onPouse=false;
-        if(adapter!=null){
+        onPouse = false;
+        if (adapter != null) {
             list.clear();
             adapter.setList(list);
         }
@@ -236,22 +245,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                                 if (v.equals("刷新")) {
                                     isRefrush = true;
                                     list.clear();
-                                    if(adapter!=null){
+                                    if (adapter != null) {
                                         adapter.setList(list);
                                     }
                                     initDatas();
                                 }
-                            }else if(type.equals("nfc")){
-                                nfcid=v;
-                                if(TextUtils.isEmpty(nfcid)){
+                            } else if (type.equals("nfc")) {
+                                nfcid = v;
+                                if (TextUtils.isEmpty(nfcid)) {
                                     Toast.makeText(getActivity(), "NFCID获取失败，请重新获取！", Toast.LENGTH_SHORT).show();
-                                }else {
+                                } else {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             showGetNfcMsg("NFCId获取成功,请重新操作!");
                                         }
-                                    },1500);
+                                    }, 1500);
 
                                 }
 
@@ -268,8 +277,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         option.setCoorType("bd09ll"); // 设置坐标类型
         option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
         option.setIsNeedLocationDescribe(true);//可选，设置是否需要地址描述
-        int t=(int) (2.5*60*1000);
-       // int t=3000;
+        int t = (int) (2.5 * 60 * 1000);
+        // int t=3000;
         option.setScanSpan(t);
         mLocClient.setLocOption(option);
     }
@@ -300,10 +309,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             mLayoutNoMsg.setVisibility(View.VISIBLE);
                             return;
                         }
-                        if(mSwipeToLoadLayout.isRefreshing()){
+                        if (mSwipeToLoadLayout.isRefreshing()) {
                             mSwipeToLoadLayout.setRefreshing(false);
                         }
-                        if(mSwipeToLoadLayout.isLoadingMore()){
+                        if (mSwipeToLoadLayout.isLoadingMore()) {
                             mSwipeToLoadLayout.setLoadingMore(false);
                         }
                         String str = msg.replaceAll("\r", "").replaceAll("\n", "");
@@ -341,11 +350,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     @Override
     public void onPause() {
-        onPouse=true;
-        isRefrush=false;
-
+        onPouse = true;
+        isRefrush = false;
         super.onPause();
-
     }
 
     @Override
@@ -373,20 +380,21 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
                 break;
             case 2:
-              //  doPs(entity);
-               checkStatu(entity);
+                //  doPs(entity);
+                checkStatu(entity);
                 break;
             case 3:
                 calculateTime(entity);
                 break;
             case 12:
-                final ValidationCodeFragment validationCodeFragment=ValidationCodeFragment.getInstance("确定取消运单？");
-                validationCodeFragment.showF(getChildFragmentManager(),"cancelOrderDialog");
+                final ValidationCodeFragment validationCodeFragment = ValidationCodeFragment.getInstance("确定取消运单？");
+                validationCodeFragment.showF(getChildFragmentManager(), "cancelOrderDialog");
                 validationCodeFragment.setOnValidationComplListener(new ValidationCodeFragment.OnValidationComplListener() {
                     @Override
                     public void onClickCancel() {
                         validationCodeFragment.dismissAllowingStateLoss();
                     }
+
                     @Override
                     public void onClickOk() {
                         validationCodeFragment.dismissAllowingStateLoss();
@@ -405,8 +413,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 break;
         }
     }
-    private void checkStatu(final GoodsEntity entity){
-       // doPs(entity);
+
+    private void checkStatu(final GoodsEntity entity) {
+        // doPs(entity);
         Map<String, String> map = new HashMap<>();
         map.put("rowid", entity.getRowid());
         System.out.println("mox+++" + entity.toString());
@@ -418,20 +427,20 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
-                        msg=msg.trim();
-                        Log.e("checkStatu","checkStatu==="+msg);
-                        if("0".equals(msg)){
+                        msg = msg.trim();
+                        Log.e("checkStatu", "checkStatu===" + msg);
+                        if ("0".equals(msg)) {
                             doPs(entity);
-                        }else if("1".equals(msg)){
+                        } else if ("1".equals(msg)) {
                             confirmTips("运单同步中,请等待！");
 
-                        }else if("2".equals(msg)){
+                        } else if ("2".equals(msg)) {
                             confirmTips("运单同步中,请等待！");
-                        }
-                        else if("3".equals(msg)){
+                        } else if ("3".equals(msg)) {
                             confirmTips("正在重新同步,请稍后!");
                         }
                     }
+
                     @Override
                     public void onError(String msg) {
                         final MainActivity activity = mActivityReference.get();
@@ -454,21 +463,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-               // confirmTips("配送时间过短!");
-                Map<String,String> map=new HashMap<>();
-                map.put("step","16");
-                map.put("tel",user.getUserId());
-                map.put("msg","送货时间小于30分钟，输入验证码即可送货");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                // confirmTips("配送时间过短!");
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "16");
+                map.put("tel", user.getUserId());
+                map.put("msg", "送货时间小于30分钟，输入验证码即可送货");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
-                final ValidationCodeFragment validationCodeFragment=ValidationCodeFragment.getInstance("配送时间过短,确定送达？");
-                validationCodeFragment.showF(getChildFragmentManager(),"pstimelow");
+                final ValidationCodeFragment validationCodeFragment = ValidationCodeFragment.getInstance("配送时间过短,确定送达？");
+                validationCodeFragment.showF(getChildFragmentManager(), "pstimelow");
                 validationCodeFragment.setOnValidationComplListener(new ValidationCodeFragment.OnValidationComplListener() {
                     @Override
                     public void onClickCancel() {
                         validationCodeFragment.dismissAllowingStateLoss();
                     }
+
                     @Override
                     public void onClickOk() {
                         validationCodeFragment.dismissAllowingStateLoss();
@@ -476,25 +486,25 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     }
                 });
 
-            }else {
-                double d= getPointsDistances(entity.getLat_from(),entity.getLon_from(),entity.getLat_to(),entity.getLon_to());
-                Log.e("getPointsDistances","getPointsDistances==="+d);
-                int needTime=(int)((d/100)*60);//实际运输需要的大致时间(分钟)
-                if(i<needTime){
+            } else {
+                double d = getPointsDistances(entity.getLat_from(), entity.getLon_from(), entity.getLat_to(), entity.getLon_to());
+                Log.e("getPointsDistances", "getPointsDistances===" + d);
+                int needTime = (int) ((d / 100) * 60);//实际运输需要的大致时间(分钟)
+                if (i < needTime) {
                     //step:17
                     //tel:157****0385
                     //msg:登录获取用户信息成功
                     //time:2018-12-18:11:11:10
                     //rowid:
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","17");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","理论时间过短，输入验证码即可送货");
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
+                    Map<String, String> map = new HashMap<>();
+                    map.put("step", "17");
+                    map.put("tel", user.getUserId());
+                    map.put("msg", "理论时间过短，输入验证码即可送货");
+                    map.put("time", getNowtime());
+                    map.put("rowid", entity.getRowid());
                     upLoadUserLog(map);
-                    final ValidationCodeFragment validationCodeFragment=ValidationCodeFragment.getInstance("配送时间过短,确定送达？");
-                    validationCodeFragment.showF(getChildFragmentManager(),"timelow");
+                    final ValidationCodeFragment validationCodeFragment = ValidationCodeFragment.getInstance("配送时间过短,确定送达？");
+                    validationCodeFragment.showF(getChildFragmentManager(), "timelow");
                     validationCodeFragment.setOnValidationComplListener(new ValidationCodeFragment.OnValidationComplListener() {
                         @Override
                         public void onClickCancel() {
@@ -507,22 +517,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             doSd(entity);
                         }
                     });
-                }else {
+                } else {
                     doSd(entity);
                 }
             }
-        }else {
+        } else {
             //step:15
             //tel:157****0385
             //msg:登录获取用户信息成功
             //time:2018-12-18:11:11:10
             //rowid:
-            Map<String,String> map=new HashMap<>();
-            map.put("step","15");
-            map.put("tel",user.getUserId());
-            map.put("msg","JdTime为空，未执行卸货操作");
-            map.put("time",getNowtime());
-            map.put("rowid",entity.getRowid());
+            Map<String, String> map = new HashMap<>();
+            map.put("step", "15");
+            map.put("tel", user.getUserId());
+            map.put("msg", "JdTime为空，未执行卸货操作");
+            map.put("time", getNowtime());
+            map.put("rowid", entity.getRowid());
             upLoadUserLog(map);
 
         }
@@ -551,7 +561,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
-                       loadingDialogFragment.dismissAllowingStateLoss();
+                        loadingDialogFragment.dismissAllowingStateLoss();
                         final MainActivity activity = mActivityReference.get();
                         if (activity == null) {
                             return;
@@ -565,7 +575,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             } else {
                                 String error = jsonObject.getString("message");
                                 mSwipeToLoadLayout.setRefreshing(true);
-                               loadingDialogFragment.dismissAllowingStateLoss();
+                                loadingDialogFragment.dismissAllowingStateLoss();
                                 Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
                                 Log.e("create_request onError", msg);
                             }
@@ -626,7 +636,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
-                       loadingDialogFragment.dismissAllowingStateLoss();
+                        loadingDialogFragment.dismissAllowingStateLoss();
                         final MainActivity activity = mActivityReference.get();
                         if (activity == null) {
                             return;
@@ -673,6 +683,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             public void onClickCancel() {
                 dialog.dismissAllowingStateLoss();
             }
+
             @Override
             public void onClickOk() {
                 dialog.dismissAllowingStateLoss();
@@ -681,9 +692,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
 
     }
+
     private void doUnlodCheckNfc(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity) {
         //doPickUp(shipmentCode, enterpriseCode,entity);
-        allon1=DateUtils.getTimeMillis();
+        allon1 = DateUtils.getTimeMillis();
         Log.e("entity111==", "entity1111==" + entity.toString());
         MDPLocationCollectionManager.checkNfc(getActivity(), shipmentCode, enterpriseCode, nfcid, new OnResultListener() {
             @Override
@@ -693,15 +705,15 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                Map<String,String> map=new HashMap<>();
-                map.put("step","11");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联卸货doCheckNfc执行成功");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "11");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联卸货doCheckNfc执行成功");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
                 Log.e("doCheckNfc onSuccess", "onSuccess----");
-                doUnLoad( entity,entity.getName(),shipmentCode, enterpriseCode);
+                doUnLoad(entity, entity.getName(), shipmentCode, enterpriseCode);
             }
 
             @Override
@@ -712,26 +724,27 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //time:2018-12-18:11:11:10
                 //rowid:
                 // doPickUp(shipmentCode, enterpriseCode, entity);
-                Map<String,String> map=new HashMap<>();
-                map.put("step","12");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联卸货doCheckNfc执行失败，失败原因："+"s="+s+":s1="+s1);
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
-                String param="NFCID="+nfcid+";shipmentCode="+shipmentCode+"; enterpriseCode="
-                        +enterpriseCode+";货源信息="+entity.toString();
-                map.put("param",param);
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "12");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联卸货doCheckNfc执行失败，失败原因：" + "s=" + s + ":s1=" + s1);
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
+                String param = "NFCID=" + nfcid + ";shipmentCode=" + shipmentCode + "; enterpriseCode="
+                        + enterpriseCode + ";货源信息=" + entity.toString();
+                map.put("param", param);
                 upLoadUserLog(map);
                 Log.e("doCheckNfc", "onFailure----" + s + s1);
                 doUploadErrorMsg(shipmentCode, s, s1);
-                unLoadcheckNFCAgainMsg("checkNfc失败！"+"\n"+"是否重新扫描？",entity,shipmentCode,enterpriseCode);
+                unLoadcheckNFCAgainMsg("checkNfc失败！" + "\n" + "是否重新扫描？", entity, shipmentCode, enterpriseCode);
             }
         });
 
     }
-    private void unLoadcheckNFCAgainMsg(String msg,final GoodsEntity entity,final String shipmentCode, final String enterpriseCode){
-        final ExitDialogFragment dialog=ExitDialogFragment.getInstance(msg);
-        dialog.show(getChildFragmentManager(),"checkNFCAgainMsg1");
+
+    private void unLoadcheckNFCAgainMsg(String msg, final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
+        final ExitDialogFragment dialog = ExitDialogFragment.getInstance(msg);
+        dialog.show(getChildFragmentManager(), "checkNFCAgainMsg1");
         dialog.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
@@ -740,15 +753,18 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //doUnLoad(entity,entity.getName(),shipmentCode,enterpriseCode);
                 doUnLoadToService(entity);
             }
+
             @Override
             public void onClickOk() {
                 dialog.dismissAllowingStateLoss();
-                nfcTipsFragment.showF(getChildFragmentManager(),"nfcTipsFragment8");
-                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS,5000);
+                nfcTipsFragment.showF(getChildFragmentManager(), "nfcTipsFragment8");
+                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS, 5000);
             }
         });
     }
+
     private void doSd(final GoodsEntity entity) {
+        submitOrderEtcInfo(entity,2);
         final MainActivity activity = mActivityReference.get();
         if (activity == null) {
             return;
@@ -760,25 +776,25 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             //msg:登录获取用户信息成功
             //time:2018-12-18:11:11:10
             //rowid:
-            if(TextUtils.isEmpty(nfcid)){
+            if (TextUtils.isEmpty(nfcid)) {
                 doUnLoad(entity, entity.getName(), entity.getRowid(), entity.getAlctCode());
-            }else {
+            } else {
                 doUnlodCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
             }
-        }else {
+        } else {
             //step:19
             //tel:157****0385
             //msg:登录获取用户信息成功
             //time:2018-12-18:11:11:10
             //rowid:
-            Map<String,String> map=new HashMap<>();
-            map.put("step","19");
-            map.put("tel",user.getUserId());
-            map.put("msg","用户未税登，不执行卸货操作");
-            map.put("time",getNowtime());
-            map.put("rowid",entity.getRowid());
-            String param="货源信息="+entity.toString();
-            map.put("param",param);
+            Map<String, String> map = new HashMap<>();
+            map.put("step", "19");
+            map.put("tel", user.getUserId());
+            map.put("msg", "用户未税登，不执行卸货操作");
+            map.put("time", getNowtime());
+            map.put("rowid", entity.getRowid());
+            String param = "货源信息=" + entity.toString();
+            map.put("param", param);
             upLoadUserLog(map);
             Toast.makeText(activity, "用户未税登！", Toast.LENGTH_SHORT).show();
             doUnLoadToService(entity);
@@ -787,7 +803,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     private void analysisJson(String msgStr) {
         boolean isOfwlgsinfo = false;
-        if(user==null){
+        if (user == null) {
             return;
         }
         if (TextUtils.isEmpty(user.getOfwlgsinfo())) {
@@ -824,22 +840,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 String tj = object.getString("data:hwtj");
                 entity.setVolume(tj);
 
-                if(object.has("data:req_length")){
-                    String req_length=object.getString("data:req_length");
+                if (object.has("data:req_length")) {
+                    String req_length = object.getString("data:req_length");
                     entity.setReq_length(req_length);
                 }
-                if(object.has("data:pd_ext")){
-                    String pd_ext=object.getString("data:pd_ext");
+                if (object.has("data:pd_ext")) {
+                    String pd_ext = object.getString("data:pd_ext");
                     entity.setPd_ext(pd_ext);
 
                 }
 
-                if(object.has("data:task_id")){
-                    String task_id=object.getString("data:task_id");
+                if (object.has("data:task_id")) {
+                    String task_id = object.getString("data:task_id");
                     entity.setTask_id(task_id);
 
                 }
-                if(object.has("data:driverPrice")){
+                if (object.has("data:driverPrice")) {
                     String driverPrice = object.getString("data:driverPrice");
                     entity.setDriverPrice(driverPrice);
                 }
@@ -881,6 +897,21 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     entity.setMoxid(moxid);
                     System.out.println("mox---" + entity.toString());
                 }
+
+                if(object.has("data:yd_cph")){
+                    entity.setYd_cph(object.getString("data:yd_cph"));
+
+                }
+                if(object.has("data:to_addr")){
+                    entity.setTo_addr(object.getString("data:to_addr"));
+
+                }
+                if(object.has("data:from_addr")){
+                    entity.setFrom_addr(object.getString("data:from_addr"));
+
+                }
+
+
                 String time = object.getString("data:create_time");
                 entity.setTime(time);
                 String shrName = object.getString("data:shr");
@@ -905,9 +936,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 if (object.has("data:yd_1_time")) {
                     entity.setJdTime(object.getString("data:yd_1_time"));
                 }
-                if(object.has("data:pdwlgs")){
+                if (object.has("data:pdwlgs")) {
                     entity.setPdwlgs(object.getString("data:pdwlgs"));
-                }else {
+                } else {
                     entity.setPdwlgs("-1");
                 }
                 mList.add(entity);
@@ -916,18 +947,18 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             if (activity == null) {
                 return;
             }
-            if(onPouse){
+            if (onPouse) {
                 return;
             }
             if (isRefrush) {
                 list.clear();
-                if(adapter!=null){
+                if (adapter != null) {
                     adapter.setList(list);
                     adapter.notifyDataSetChanged();
                 }
             }
             list.addAll(mList);
-            if(adapter!=null){
+            if (adapter != null) {
                 adapter.setList(list);
                 adapter.notifyDataSetChanged();
 
@@ -960,7 +991,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
 
-    private void doAlctUnLoad(final GoodsEntity entity, final String hwmc, final String shipmentCode, final String enterpriseCode){
+    private void doAlctUnLoad(final GoodsEntity entity, final String hwmc, final String shipmentCode, final String enterpriseCode) {
         MDPLocationCollectionManager.unload(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), new OnResultListener() {
             public void onSuccess() {
                 //step:20
@@ -968,13 +999,13 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                unLoadCount=0;
-                Map<String,String> map=new HashMap<>();
-                map.put("step","20");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联unload执行成功，开始执行签收sign");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                unLoadCount = 0;
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "20");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联unload执行成功，开始执行签收sign");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
                 Log.e("doUnLoad onSuccess", "onSuccess----");
                 // doPickUp(shipmentCode,enterpriseCode);
@@ -984,51 +1015,51 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
             @Override
             public void onFailure(String s, String s1) {
-                if(s1.contains("NFC")){
-                    showUnLoadNfcView("请将手机靠近NFC设备获取ID",entity);
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","14");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","安联unload执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
-                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                    map.put("param",param);
+                if (s1.contains("NFC")) {
+                    showUnLoadNfcView("请将手机靠近NFC设备获取ID", entity);
+                    Map<String, String> map = new HashMap<>();
+                    map.put("step", "14");
+                    map.put("tel", user.getUserId());
+                    map.put("msg", "安联unload执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                    map.put("time", getNowtime());
+                    map.put("rowid", entity.getRowid());
+                    String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                    map.put("param", param);
                     upLoadUserLog(map);
-                }else {
+                } else {
                     //step:14
                     //tel:157****0385
                     //msg:登录获取用户信息成功
                     //time:2018-12-18:11:11:10
                     //rowid:
-                    if(s1.contains("身份验证已过期")){
-                        if(unLoadCount<3){
-                            doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
-                            unLoadCount=unLoadCount+1;
-                        }else {
-                            unLoadCount=0;
-                            Map<String,String> map=new HashMap<>();
-                            map.put("step","14");
-                            map.put("tel",user.getUserId());
-                            map.put("msg","安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                            map.put("time",getNowtime());
-                            map.put("rowid",entity.getRowid());
-                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                            map.put("param",param);
+                    if (s1.contains("身份验证已过期")) {
+                        if (unLoadCount < 3) {
+                            doAlctUnLoad(entity, hwmc, shipmentCode, enterpriseCode);
+                            unLoadCount = unLoadCount + 1;
+                        } else {
+                            unLoadCount = 0;
+                            Map<String, String> map = new HashMap<>();
+                            map.put("step", "14");
+                            map.put("tel", user.getUserId());
+                            map.put("msg", "安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                            map.put("time", getNowtime());
+                            map.put("rowid", entity.getRowid());
+                            String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                            map.put("param", param);
                             upLoadUserLog(map);
                             Log.e("doPickUp", "onFailure----" + s + s1);
                             doUploadErrorMsg(shipmentCode, s, s1);
                             doUnLoadToService(entity);
                         }
-                    }else {
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","14");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
-                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                        map.put("param",param);
+                    } else {
+                        Map<String, String> map = new HashMap<>();
+                        map.put("step", "14");
+                        map.put("tel", user.getUserId());
+                        map.put("msg", "安联unload执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                        map.put("time", getNowtime());
+                        map.put("rowid", entity.getRowid());
+                        String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                        map.put("param", param);
                         upLoadUserLog(map);
                         Log.e("doPickUp", "onFailure----" + s + s1);
                         doUploadErrorMsg(shipmentCode, s, s1);
@@ -1044,29 +1075,32 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
             @Override
             public void onSuccess(ShipmentStatusEnum status) {
-                Log.e("doUnLoad ShipmentStatus","ShipmentStatus=="+status.getValue());
-                switch (status){
+                Log.e("doUnLoad ShipmentStatus", "ShipmentStatus==" + status.getValue());
+                switch (status) {
                     case PICKUPED://运单提货状态
-                        doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
+                        doAlctUnLoad(entity, hwmc, shipmentCode, enterpriseCode);
                         break;
                     case UNLOADED://运单到货状态
-                        doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                        doAlctSign(entity, shipmentCode, enterpriseCode, hwmc);
                         break;
                     case SIGNED://运单签收状态
-                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        doAlctPod(entity, shipmentCode, enterpriseCode);
+                        break;
+                    default:
+                        doAlctUnLoad(entity, hwmc, shipmentCode, enterpriseCode);
                         break;
                 }
             }
 
             @Override
             public void onError() {
-                Log.e("doUnLoad ShipmentStatus","onError==");
-                doAlctUnLoad(entity,hwmc,shipmentCode,enterpriseCode);
+                Log.e("doUnLoad ShipmentStatus", "onError==");
+                doAlctUnLoad(entity, hwmc, shipmentCode, enterpriseCode);
             }
         });
     }
 
-    private void doAlctSign(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode, final String hwmc){
+    private void doAlctSign(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode, final String hwmc) {
         MDPLocationCollectionManager.sign(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), getGoodsList(hwmc)
                 , new OnResultListener() {
                     @Override
@@ -1076,13 +1110,13 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
-                        signCount=0;
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","22");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联sign执行成功，开始执行回单pod");
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
+                        signCount = 0;
+                        Map<String, String> map = new HashMap<>();
+                        map.put("step", "22");
+                        map.put("tel", user.getUserId());
+                        map.put("msg", "安联sign执行成功，开始执行回单pod");
+                        map.put("time", getNowtime());
+                        map.put("rowid", entity.getRowid());
                         upLoadUserLog(map);
                         Log.e("doSign onSuccess", "onSuccess----");
                         pod(entity, shipmentCode, enterpriseCode);
@@ -1098,35 +1132,35 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         //msg:登录获取用户信息成功
                         //time:2018-12-18:11:11:10
                         //rowid:
-                        if(s1.contains("身份验证已过期")){
-                            if(signCount<3){
-                                doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
-                                signCount=signCount+1;
-                            }else {
-                                signCount=0;
-                                Map<String,String> map=new HashMap<>();
-                                map.put("step","23");
-                                map.put("tel",user.getUserId());
-                                map.put("msg","安联sign执行失败，失败原因："+"s="+s+":s1="+s1+"");
-                                map.put("time",getNowtime());
-                                map.put("rowid",entity.getRowid());
-                                String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                                map.put("param",param);
+                        if (s1.contains("身份验证已过期")) {
+                            if (signCount < 3) {
+                                doAlctSign(entity, shipmentCode, enterpriseCode, hwmc);
+                                signCount = signCount + 1;
+                            } else {
+                                signCount = 0;
+                                Map<String, String> map = new HashMap<>();
+                                map.put("step", "23");
+                                map.put("tel", user.getUserId());
+                                map.put("msg", "安联sign执行失败，失败原因：" + "s=" + s + ":s1=" + s1 + "");
+                                map.put("time", getNowtime());
+                                map.put("rowid", entity.getRowid());
+                                String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                                map.put("param", param);
                                 upLoadUserLog(map);
                                 Log.e("doSign", "onFailure----" + s + s1);
                                 doUploadErrorMsg(shipmentCode, s, s1);
                                 getLocation(entity.getRowid(), entity, shipmentCode, enterpriseCode);
 
                             }
-                        }else {
-                            Map<String,String> map=new HashMap<>();
-                            map.put("step","23");
-                            map.put("tel",user.getUserId());
-                            map.put("msg","安联sign执行失败，失败原因："+"s="+s+":s1="+s1+"");
-                            map.put("time",getNowtime());
-                            map.put("rowid",entity.getRowid());
-                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                            map.put("param",param);
+                        } else {
+                            Map<String, String> map = new HashMap<>();
+                            map.put("step", "23");
+                            map.put("tel", user.getUserId());
+                            map.put("msg", "安联sign执行失败，失败原因：" + "s=" + s + ":s1=" + s1 + "");
+                            map.put("time", getNowtime());
+                            map.put("rowid", entity.getRowid());
+                            String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                            map.put("param", param);
                             upLoadUserLog(map);
                             Log.e("doSign", "onFailure----" + s + s1);
                             doUploadErrorMsg(shipmentCode, s, s1);
@@ -1141,26 +1175,29 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
             @Override
             public void onSuccess(ShipmentStatusEnum status) {
-                Log.e("doSign ShipmentStatus","ShipmentStatus=="+status.getValue());
-                switch (status){
+                Log.e("doSign ShipmentStatus", "ShipmentStatus==" + status.getValue());
+                switch (status) {
                     case UNLOADED://运单到货状态
-                        doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                        doAlctSign(entity, shipmentCode, enterpriseCode, hwmc);
                         break;
                     case SIGNED://运单签收状态
-                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        doAlctPod(entity, shipmentCode, enterpriseCode);
+                        break;
+                    default:
+                        doAlctSign(entity, shipmentCode, enterpriseCode, hwmc);
                         break;
                 }
             }
 
             @Override
             public void onError() {
-                Log.e("doSign ShipmentStatus","onError==");
-                doAlctSign(entity,shipmentCode,enterpriseCode,hwmc);
+                Log.e("doSign ShipmentStatus", "onError==");
+                doAlctSign(entity, shipmentCode, enterpriseCode, hwmc);
             }
         });
     }
 
-    private void doAlctPod(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode){
+    private void doAlctPod(final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
         MDPLocationCollectionManager.pod(getActivity(), shipmentCode, enterpriseCode, getLocation(entity, false), new OnResultListener() {
             @Override
             public void onSuccess() {
@@ -1169,17 +1206,17 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                podCount=0;
-                Map<String,String> map=new HashMap<>();
-                map.put("step","24");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联pod执行成功，开始跳转到上传卸货照、回单照页面");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                podCount = 0;
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "24");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联pod执行成功，开始跳转到上传卸货照、回单照页面");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
-                allon2=DateUtils.getTimeMillis();
-                long l=DateUtils.getBetwnTime(allon2,allon1);
-                Log.e("sdal_time","sdal_time=="+l);
+                allon2 = DateUtils.getTimeMillis();
+                long l = DateUtils.getBetwnTime(allon2, allon1);
+                Log.e("sdal_time", "sdal_time==" + l);
                 Log.e("pod onSuccess", "onSuccess----");
                 Intent intent = new Intent(getActivity(), UpLoadImgActivity.class);
                 intent.putExtra("entity", entity);
@@ -1194,34 +1231,34 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                if(s1.contains("身份验证已过期")){
-                    if(podCount<3){
-                        doAlctPod(entity,shipmentCode,enterpriseCode);
-                        podCount=podCount+1;
-                    }else {
-                        podCount=0;
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","25");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联pod执行失败，失败原因："+"s="+s+":s1="+s1+" 未跳转到上传卸货照、回单照页面");
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
-                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                        map.put("param",param);
+                if (s1.contains("身份验证已过期")) {
+                    if (podCount < 3) {
+                        doAlctPod(entity, shipmentCode, enterpriseCode);
+                        podCount = podCount + 1;
+                    } else {
+                        podCount = 0;
+                        Map<String, String> map = new HashMap<>();
+                        map.put("step", "25");
+                        map.put("tel", user.getUserId());
+                        map.put("msg", "安联pod执行失败，失败原因：" + "s=" + s + ":s1=" + s1 + " 未跳转到上传卸货照、回单照页面");
+                        map.put("time", getNowtime());
+                        map.put("rowid", entity.getRowid());
+                        String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                        map.put("param", param);
                         upLoadUserLog(map);
                         Log.e("doSign", "onFailure----" + s + s1);
                         doUploadErrorMsg(shipmentCode, s, s1);
                     }
 
-                }else {
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","25");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","安联pod执行失败，失败原因："+"s="+s+":s1="+s1+" 未跳转到上传卸货照、回单照页面");
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
-                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                    map.put("param",param);
+                } else {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("step", "25");
+                    map.put("tel", user.getUserId());
+                    map.put("msg", "安联pod执行失败，失败原因：" + "s=" + s + ":s1=" + s1 + " 未跳转到上传卸货照、回单照页面");
+                    map.put("time", getNowtime());
+                    map.put("rowid", entity.getRowid());
+                    String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                    map.put("param", param);
                     upLoadUserLog(map);
                     Log.e("doSign", "onFailure----" + s + s1);
                     doUploadErrorMsg(shipmentCode, s, s1);
@@ -1236,18 +1273,21 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
             @Override
             public void onSuccess(ShipmentStatusEnum status) {
-                Log.e("pod ShipmentStatus","ShipmentStatus=="+status.getValue());
-                switch (status){
+                Log.e("pod ShipmentStatus", "ShipmentStatus==" + status.getValue());
+                switch (status) {
                     case SIGNED://运单签收状态
-                        doAlctPod(entity,shipmentCode,enterpriseCode);
+                        doAlctPod(entity, shipmentCode, enterpriseCode);
+                        break;
+                    default:
+                        doAlctPod(entity, shipmentCode, enterpriseCode);
                         break;
                 }
             }
 
             @Override
             public void onError() {
-                Log.e("pod ShipmentStatus","onError==");
-                doAlctPod(entity,shipmentCode,enterpriseCode);
+                Log.e("pod ShipmentStatus", "onError==");
+                doAlctPod(entity, shipmentCode, enterpriseCode);
             }
         });
 
@@ -1288,10 +1328,59 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         return location;
 
     }
+    public void submitOrderEtcInfo(GoodsEntity entity,int t){
+        Map<String,String> map=new HashMap<>();
+        map.put("alctCode",entity.getAlctCode());
+        map.put("num",entity.getSid());
+        map.put("plateNum",entity.getYd_cph());
+        map.put("plateColor","1");
+        map.put("rowid",entity.getRowid());
+        map.put("startTime",DateUtils.getTimeWishT(new Date()));
+        map.put("sourceAddr",entity.getFrom_addr());
+        map.put("destAdder",entity.getTo_addr());
+        Date date=DateUtils.getNextDay(new Date(),3);
+        map.put("predictEndTime",DateUtils.getTimeWishT(date));
+        map.put("fee",entity.getZyf());
+        map.put("titleType","2");
+        map.put("type","0");
+        map.put("statuType",t+"");
+        Gson gson=new Gson();
+        String params=gson.toJson(map);
+        Log.e("params","params=="+params);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.ETC_URL).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=null;
+        if(t==1){
+            call = serviceStore.submitOrderEctInfoStart(map);
+        }else {
+            call = serviceStore.submitOrderEctInfoEnd(map);
+        }
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.e("onResponse","onResponse=="+str);
+
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+    }
 
 
     private void doPs(final GoodsEntity entity) {
-        pickUpCount=0;
+        submitOrderEtcInfo(entity,1);
+        pickUpCount = 0;
         String sdmsg = SharePreferenceUtil.getInstance(getActivity()).getSDMsg();
         // dopickup(entity.getMoxid(), true+"");
         if ("0".equals(sdmsg)) {
@@ -1301,59 +1390,59 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             //time:2018-12-18:11:11:10
             //rowid:
 
-             if(TextUtils.isEmpty(nfcid)){
-                Map<String,String> map=new HashMap<>();
-                 map.put("step","9");
-                 map.put("tel",user.getUserId());
-                 map.put("msg","用户已税登,开始执行提货pickup");
-                 map.put("time",getNowtime());
-                 map.put("rowid",entity.getRowid());
-                 upLoadUserLog(map);
-                 doPickUp(entity.getRowid(), entity.getAlctCode(), entity);
+            if (TextUtils.isEmpty(nfcid)) {
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "9");
+                map.put("tel", user.getUserId());
+                map.put("msg", "用户已税登,开始执行提货pickup");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
+                upLoadUserLog(map);
+                doPickUp(entity.getRowid(), entity.getAlctCode(), entity);
 
-             }else {
-                 Map<String,String> map=new HashMap<>();
-                 map.put("step","9");
-                 map.put("tel",user.getUserId());
-                 map.put("msg","用户已税登,开始执行提货checkNfc");
-                 map.put("time",getNowtime());
-                 map.put("rowid",entity.getRowid());
-                 upLoadUserLog(map);
-                 doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
-             }
-             //doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
-           // doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
-        }else{
+            } else {
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "9");
+                map.put("tel", user.getUserId());
+                map.put("msg", "用户已税登,开始执行提货checkNfc");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
+                upLoadUserLog(map);
+                doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
+            }
+            //doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
+            // doCheckNfc(entity.getRowid(), entity.getAlctCode(), entity);
+        } else {
             //step:10
             //tel:157****0385
             //msg:登录获取用户信息成功
             //time:2018-12-18:11:11:10
             //rowid:
-            Map<String,String> map=new HashMap<>();
-            map.put("step","10");
-            map.put("tel",user.getUserId());
-            map.put("msg","用户未税登");
-            map.put("time",getNowtime());
-            map.put("rowid",entity.getRowid());
-            map.put("param",entity.toString());
+            Map<String, String> map = new HashMap<>();
+            map.put("step", "10");
+            map.put("tel", user.getUserId());
+            map.put("msg", "用户未税登");
+            map.put("time", getNowtime());
+            map.put("rowid", entity.getRowid());
+            map.put("param", entity.toString());
             upLoadUserLog(map);
             changeOrderStatu(entity);
         }
 
     }
 
-    private void doUnLoadToService(final GoodsEntity entity){
-        String req=entity.getReq_length();
-        if(!TextUtils.isEmpty(req)){
-            if("4.2米".equals(req)){
-                if (mLocClient!=null){
+    private void doUnLoadToService(final GoodsEntity entity) {
+        String req = entity.getReq_length();
+        if (!TextUtils.isEmpty(req)) {
+            if ("4.2米".equals(req)) {
+                if (mLocClient != null) {
                     myListener.setRid(null);
                     mLocClient.stop();
                 }
             }
         }
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
-        loadingDialogFragment.showF(getChildFragmentManager(),"sdDialogFragment");
+        loadingDialogFragment.showF(getChildFragmentManager(), "sdDialogFragment");
         Map<String, String> map = new HashMap<>();
         map.put("mobile", user.getUserId());
         map.put("app", Constants.AppId);
@@ -1373,15 +1462,15 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         if (activity == null) {
                             return;
                         }
-                        if(dao!=null){
+                        if (dao != null) {
                             dao.delLocInfo(entity.getRowid());
                         }
 
-                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                        if (loadingDialogFragment != null && loadingDialogFragment.isAdded()) {
                             loadingDialogFragment.dismissAllowingStateLoss();
                         }
 
-                        long sdl2=DateUtils.getTimeMillis();
+                        long sdl2 = DateUtils.getTimeMillis();
                         String str = msg.replaceAll("\r", "").replaceAll("\n", "");
                         try {
                             JSONObject jsonObject = new JSONObject(str);
@@ -1395,7 +1484,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
                                 }*/
                             } else {
-                                if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                                if (loadingDialogFragment != null && loadingDialogFragment.isAdded()) {
                                     loadingDialogFragment.dismissAllowingStateLoss();
                                 }
                                 String error = jsonObject.getString("message");
@@ -1416,7 +1505,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         if (activity == null) {
                             return;
                         }
-                        if(loadingDialogFragment!=null && loadingDialogFragment.isAdded()){
+                        if (loadingDialogFragment != null && loadingDialogFragment.isAdded()) {
                             loadingDialogFragment.dismissAllowingStateLoss();
                         }
                         Toast.makeText(activity, "送达失败！", Toast.LENGTH_SHORT).show();
@@ -1428,7 +1517,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     private void doCheckNfc(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity) {
         //doPickUp(shipmentCode, enterpriseCode,entity);
-        allon1=DateUtils.getTimeMillis();
+        allon1 = DateUtils.getTimeMillis();
         Log.e("entity111==", "entity1111==" + entity.toString());
         MDPLocationCollectionManager.checkNfc(getActivity(), shipmentCode, enterpriseCode, nfcid, new OnResultListener() {
             @Override
@@ -1438,12 +1527,12 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                Map<String,String> map=new HashMap<>();
-                map.put("step","11");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联doCheckNfc执行成功");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "11");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联doCheckNfc执行成功");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
                 Log.e("doCheckNfc onSuccess", "onSuccess----");
                 doPickUp(shipmentCode, enterpriseCode, entity);
@@ -1456,27 +1545,27 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-               // doPickUp(shipmentCode, enterpriseCode, entity);
-                Map<String,String> map=new HashMap<>();
-                map.put("step","12");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联doCheckNfc执行失败，失败原因："+"s="+s+":s1="+s1);
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
-                String param="NFCID="+nfcid+";shipmentCode="+shipmentCode+"; enterpriseCode="
-                        +enterpriseCode+";货源信息="+entity.toString();
-                map.put("param",param);
+                // doPickUp(shipmentCode, enterpriseCode, entity);
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "12");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联doCheckNfc执行失败，失败原因：" + "s=" + s + ":s1=" + s1);
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
+                String param = "NFCID=" + nfcid + ";shipmentCode=" + shipmentCode + "; enterpriseCode="
+                        + enterpriseCode + ";货源信息=" + entity.toString();
+                map.put("param", param);
                 upLoadUserLog(map);
                 Log.e("doCheckNfc", "onFailure----" + s + s1);
                 doUploadErrorMsg(shipmentCode, s, s1);
-                checkNFCAgainMsg("checkNfc失败！"+"\n"+"是否重新扫描？",entity);
+                checkNFCAgainMsg("checkNfc失败！" + "\n" + "是否重新扫描？", entity);
             }
         });
     }
 
-    private void checkNFCAgainMsg(String msg,final GoodsEntity entity){
-       final ExitDialogFragment dialog=ExitDialogFragment.getInstance(msg);
-        dialog.show(getChildFragmentManager(),"checkNFCAgainMsg");
+    private void checkNFCAgainMsg(String msg, final GoodsEntity entity) {
+        final ExitDialogFragment dialog = ExitDialogFragment.getInstance(msg);
+        dialog.show(getChildFragmentManager(), "checkNFCAgainMsg");
         dialog.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
@@ -1489,14 +1578,14 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             @Override
             public void onClickOk() {
                 dialog.dismissAllowingStateLoss();
-                nfcTipsFragment.showF(getChildFragmentManager(),"nfcTipsFragment0");
-                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS,5000);
+                nfcTipsFragment.showF(getChildFragmentManager(), "nfcTipsFragment0");
+                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS, 5000);
             }
         });
     }
 
 
-    private void doAlctPickUp(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity){
+    private void doAlctPickUp(final String shipmentCode, final String enterpriseCode, final GoodsEntity entity) {
         final MainActivity activity = mActivityReference.get();
         if (activity == null) {
             return;
@@ -1511,87 +1600,87 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 //msg:登录获取用户信息成功
                 //time:2018-12-18:11:11:10
                 //rowid:
-                pickUpCount=0;
+                pickUpCount = 0;
                 changeOrderStatu(entity);
-                Map<String,String> map=new HashMap<>();
-                map.put("step","13");
-                map.put("tel",user.getUserId());
-                map.put("msg","安联pickup执行成功，提货成功");
-                map.put("time",getNowtime());
-                map.put("rowid",entity.getRowid());
+                Map<String, String> map = new HashMap<>();
+                map.put("step", "13");
+                map.put("tel", user.getUserId());
+                map.put("msg", "安联pickup执行成功，提货成功");
+                map.put("time", getNowtime());
+                map.put("rowid", entity.getRowid());
                 upLoadUserLog(map);
-                allon2=DateUtils.getTimeMillis();
-                long l=DateUtils.getBetwnTime(allon2,allon1);
-                Log.e("PSal_TimeMillis==","psalTimeMillis=="+l);
+                allon2 = DateUtils.getTimeMillis();
+                long l = DateUtils.getBetwnTime(allon2, allon1);
+                Log.e("PSal_TimeMillis==", "psalTimeMillis==" + l);
                 Log.e("doPickUp", "onSuccess----");
                 isPickUp = true;
-                StringBuffer sbf=new StringBuffer();
+                StringBuffer sbf = new StringBuffer();
                 sbf.append("安联pickup执行成功，提货成功");
-                dopickup(entity.getRowid(), true + "",sbf.toString());
+                dopickup(entity.getRowid(), true + "", sbf.toString());
             }
 
             @Override
             public void onFailure(String s, String s1) {
-                if(s1.contains("NFC")){
-                    showPickUpNfcView("请将手机靠近NFC设备获取ID",entity);
-                    Map<String,String> map=new HashMap<>();
-                    map.put("step","14");
-                    map.put("tel",user.getUserId());
-                    map.put("msg","安联pickup执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    map.put("time",getNowtime());
-                    map.put("rowid",entity.getRowid());
-                    String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                    map.put("param",param);
+                if (s1.contains("NFC")) {
+                    showPickUpNfcView("请将手机靠近NFC设备获取ID", entity);
+                    Map<String, String> map = new HashMap<>();
+                    map.put("step", "14");
+                    map.put("tel", user.getUserId());
+                    map.put("msg", "安联pickup执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                    map.put("time", getNowtime());
+                    map.put("rowid", entity.getRowid());
+                    String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                    map.put("param", param);
                     upLoadUserLog(map);
-                    StringBuffer sbf=new StringBuffer();
-                    sbf.append("安联pickup执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                    dopickup(entity.getRowid(), false + "",sbf.toString());
-                }else {
+                    StringBuffer sbf = new StringBuffer();
+                    sbf.append("安联pickup执行失败，失败信息包含NFC,提示用户开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                    dopickup(entity.getRowid(), false + "", sbf.toString());
+                } else {
                     //step:14
                     //tel:157****0385
                     //msg:登录获取用户信息成功
                     //time:2018-12-18:11:11:10
                     //rowid:
-                    if(s1.contains("身份验证已过期")){
-                        if(pickUpCount<3){
-                            doAlctPickUp(shipmentCode,enterpriseCode,entity);
-                            pickUpCount=pickUpCount+1;
-                        }else {
-                            pickUpCount=0;
-                            Map<String,String> map=new HashMap<>();
-                            map.put("step","14");
-                            map.put("tel",user.getUserId());
-                            map.put("msg","安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                            map.put("time",getNowtime());
-                            map.put("rowid",entity.getRowid());
-                            String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                            map.put("param",param);
+                    if (s1.contains("身份验证已过期")) {
+                        if (pickUpCount < 3) {
+                            doAlctPickUp(shipmentCode, enterpriseCode, entity);
+                            pickUpCount = pickUpCount + 1;
+                        } else {
+                            pickUpCount = 0;
+                            Map<String, String> map = new HashMap<>();
+                            map.put("step", "14");
+                            map.put("tel", user.getUserId());
+                            map.put("msg", "安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                            map.put("time", getNowtime());
+                            map.put("rowid", entity.getRowid());
+                            String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                            map.put("param", param);
                             upLoadUserLog(map);
                             Log.e("doPickUp", "onFailure----" + s + s1);
                             doUploadErrorMsg(shipmentCode, s, s1);
                             isPickUp = true;
                             changeOrderStatu(entity);
-                            StringBuffer sbf=new StringBuffer();
-                            sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                            dopickup(entity.getRowid(), false + "",sbf.toString());
+                            StringBuffer sbf = new StringBuffer();
+                            sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                            dopickup(entity.getRowid(), false + "", sbf.toString());
                         }
-                    }else {
-                        Map<String,String> map=new HashMap<>();
-                        map.put("step","14");
-                        map.put("tel",user.getUserId());
-                        map.put("msg","安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                        map.put("time",getNowtime());
-                        map.put("rowid",entity.getRowid());
-                        String param="shipmentCode="+shipmentCode+"; enterpriseCode="+enterpriseCode+";货源信息="+entity.toString();
-                        map.put("param",param);
+                    } else {
+                        Map<String, String> map = new HashMap<>();
+                        map.put("step", "14");
+                        map.put("tel", user.getUserId());
+                        map.put("msg", "安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                        map.put("time", getNowtime());
+                        map.put("rowid", entity.getRowid());
+                        String param = "shipmentCode=" + shipmentCode + "; enterpriseCode=" + enterpriseCode + ";货源信息=" + entity.toString();
+                        map.put("param", param);
                         upLoadUserLog(map);
                         Log.e("doPickUp", "onFailure----" + s + s1);
                         doUploadErrorMsg(shipmentCode, s, s1);
                         isPickUp = true;
                         changeOrderStatu(entity);
-                        StringBuffer sbf=new StringBuffer();
-                        sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因："+"s="+s+":s1="+s1);
-                        dopickup(entity.getRowid(), false + "",sbf.toString());
+                        StringBuffer sbf = new StringBuffer();
+                        sbf.append("安联pickup执行失败，失败信息未包含NFC,不开启NFC检测,失败原因：" + "s=" + s + ":s1=" + s1);
+                        dopickup(entity.getRowid(), false + "", sbf.toString());
                     }
 
                 }
@@ -1604,26 +1693,26 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         getShipmentStatus(shipmentCode, enterpriseCode, new OnShipmentStatusListener() {
             @Override
             public void onSuccess(ShipmentStatusEnum status) {
-                Log.e("pickup ShipmentStatus","ShipmentStatus=="+status.getValue());
-                switch (status){
+                Log.e("pickup ShipmentStatus", "ShipmentStatus==" + status.getValue());
+                switch (status) {
                     case CONFIRMED://运单已确认状态
-                        doAlctPickUp(shipmentCode,enterpriseCode,entity);
+                        doAlctPickUp(shipmentCode, enterpriseCode, entity);
                         break;
                 }
             }
 
             @Override
             public void onError() {
-                Log.e("pickup ShipmentStatus","onError");
-                doAlctPickUp(shipmentCode,enterpriseCode,entity);
+                Log.e("pickup ShipmentStatus", "onError");
+                doAlctPickUp(shipmentCode, enterpriseCode, entity);
             }
         });
 
     }
 
-    private void showPickUpNfcView(String msg,final GoodsEntity entity){
-        nfcDialogFragment=ExitDialogFragment.getInstance(msg);
-        nfcDialogFragment.show(getChildFragmentManager(),"showNfcView");
+    private void showPickUpNfcView(String msg, final GoodsEntity entity) {
+        nfcDialogFragment = ExitDialogFragment.getInstance(msg);
+        nfcDialogFragment.show(getChildFragmentManager(), "showNfcView");
         nfcDialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
@@ -1635,16 +1724,16 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             @Override
             public void onClickOk() {
                 nfcDialogFragment.dismissAllowingStateLoss();
-                nfcTipsFragment.showF(getChildFragmentManager(),"nfcTipsFragment");
-                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS,5000);
+                nfcTipsFragment.showF(getChildFragmentManager(), "nfcTipsFragment");
+                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS, 5000);
 
             }
         });
     }
 
-    private void showUnLoadNfcView(String msg,final GoodsEntity entity){
-        nfcDialogFragment=ExitDialogFragment.getInstance(msg);
-        nfcDialogFragment.show(getChildFragmentManager(),"showNfcView");
+    private void showUnLoadNfcView(String msg, final GoodsEntity entity) {
+        nfcDialogFragment = ExitDialogFragment.getInstance(msg);
+        nfcDialogFragment.show(getChildFragmentManager(), "showNfcView");
         nfcDialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
             @Override
             public void onClickCancel() {
@@ -1656,12 +1745,13 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             @Override
             public void onClickOk() {
                 nfcDialogFragment.dismissAllowingStateLoss();
-                nfcTipsFragment.showF(getChildFragmentManager(),"nfcTipsFragment");
-                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS,5000);
+                nfcTipsFragment.showF(getChildFragmentManager(), "nfcTipsFragment");
+                handler.sendEmptyMessageDelayed(NFCTIPSDISMISS, 5000);
 
             }
         });
     }
+
     private String getNowtime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String time = sdf.format(new Date());
@@ -1697,9 +1787,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     private void doPayMoney(String price, double bl, final GoodsEntity entity) {
 
-        Log.e("doPayMoney==",entity.toString());
+        Log.e("doPayMoney==", entity.toString());
         System.out.println(entity.toString());
-        final PayMoneyDialog dialog = PayMoneyDialog.getInstance(price, bl, entity.getSid(), user.getUserName(),entity);
+        final PayMoneyDialog dialog = PayMoneyDialog.getInstance(price, bl, entity.getSid(), user.getUserName(), entity);
         dialog.show(getChildFragmentManager(), "paymoneydialog");
         dialog.setOnOrderListener(new PayMoneyDialog.OnOrderListener() {
             @Override
@@ -1761,7 +1851,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                                 submit_order(orderno, tokenid, entity, loadingDialogFragment);
                             } else {
                                 String error = jsonObject.getString("message");
-                               loadingDialogFragment.dismissAllowingStateLoss();
+                                loadingDialogFragment.dismissAllowingStateLoss();
                                 Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
                                 Log.e("create_request onError", msg);
                             }
@@ -1777,7 +1867,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             return;
                         }
                         mSwipeToLoadLayout.setRefreshing(true);
-                       loadingDialogFragment.dismissAllowingStateLoss();
+                        loadingDialogFragment.dismissAllowingStateLoss();
                         Toast.makeText(activity, "支付失败！", Toast.LENGTH_SHORT).show();
                         Log.e("create_request onError", msg);
                     }
@@ -1803,7 +1893,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                     @Override
                     public void onSuccess(String msg) {
                         Log.e("submit_order", "==" + msg);
-                       loadingDialogFragment.dismissAllowingStateLoss();
+                        loadingDialogFragment.dismissAllowingStateLoss();
                         final MainActivity activity = mActivityReference.get();
                         if (activity == null) {
                             return;
@@ -1817,7 +1907,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                                 mSwipeToLoadLayout.setRefreshing(true);
                             } else {
                                 mSwipeToLoadLayout.setRefreshing(true);
-                               loadingDialogFragment.dismissAllowingStateLoss();
+                                loadingDialogFragment.dismissAllowingStateLoss();
                                 String error = jsonObject.getString("message");
                                 Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
                                 Log.e("create_request onError", msg);
@@ -1835,19 +1925,19 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         }
                         Log.e("submit_order onError", "==" + msg);
                         mSwipeToLoadLayout.setRefreshing(true);
-                       loadingDialogFragment.dismissAllowingStateLoss();
+                        loadingDialogFragment.dismissAllowingStateLoss();
                         Toast.makeText(activity, "支付失败！", Toast.LENGTH_SHORT).show();
                         Log.e("create_request onError", msg);
                     }
                 }));
     }
 
-    private void dopickup(String id, String orderType,String msg) {
+    private void dopickup(String id, String orderType, String msg) {
         Log.e("moxid==", "moxid==" + id);
         Map<String, String> map = new HashMap<>();
         map.put("rowid", id);
         map.put("orderType", orderType);
-        map.put("msg",msg);
+        map.put("msg", msg);
         RequestManager.getInstance()
                 .mServiceStore
                 .pickup(map)
@@ -1876,18 +1966,18 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     }
 
-    private void changeOrderStatu(final GoodsEntity entity){
-        String req=entity.getReq_length();
-        if(!TextUtils.isEmpty(req)){
-            if("4.2米".equals(req)){
-                if (mLocClient!=null){
+    private void changeOrderStatu(final GoodsEntity entity) {
+        String req = entity.getReq_length();
+        if (!TextUtils.isEmpty(req)) {
+            if ("4.2米".equals(req)) {
+                if (mLocClient != null) {
                     myListener.setRid(entity.getRowid());
                     mLocClient.start();
                 }
             }
         }
 
-        final long startMillis=DateUtils.getTimeMillis();
+        final long startMillis = DateUtils.getTimeMillis();
         final LoadingDialogFragment loadingDialogFragment = LoadingDialogFragment.getInstance();
         loadingDialogFragment.showF(getChildFragmentManager(), "psdialog");
         Map<String, String> map = new HashMap<>();
@@ -1906,11 +1996,11 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
                     @Override
                     public void onSuccess(String msg) {
-                        long endMillis=DateUtils.getTimeMillis();
-                        long l=DateUtils.getBetwnTime(endMillis,startMillis);
-                        Log.e("PS_TimeMillis==","psTimeMillis=="+l);
+                        long endMillis = DateUtils.getTimeMillis();
+                        long l = DateUtils.getBetwnTime(endMillis, startMillis);
+                        Log.e("PS_TimeMillis==", "psTimeMillis==" + l);
                         Log.e("mox===", entity.toString());
-                        if(loadingDialogFragment!=null){
+                        if (loadingDialogFragment != null) {
                             loadingDialogFragment.dismissAllowingStateLoss();
 
                         }
@@ -1933,7 +2023,7 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             } else {
                                 String error = jsonObject.getString("message");
                                 mSwipeToLoadLayout.setRefreshing(true);
-                                if(loadingDialogFragment!=null){
+                                if (loadingDialogFragment != null) {
                                     loadingDialogFragment.dismissAllowingStateLoss();
 
                                 }
@@ -1961,21 +2051,21 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
 
-    private double  getPointsDistances(String lat1,String lon1,String lat2,String lon2){
-        double distance=0;
-        double dLat1=Double.parseDouble(lat1);
-        double dLon1=Double.parseDouble(lon1);
-        double dLat2=Double.parseDouble(lat2);
-        double dLon2=Double.parseDouble(lon2);
+    private double getPointsDistances(String lat1, String lon1, String lat2, String lon2) {
+        double distance = 0;
+        double dLat1 = Double.parseDouble(lat1);
+        double dLon1 = Double.parseDouble(lon1);
+        double dLat2 = Double.parseDouble(lat2);
+        double dLon2 = Double.parseDouble(lon2);
         LatLng p1LL = new LatLng(dLat1, dLon1);
         LatLng p2LL = new LatLng(dLat2, dLon2);
-        distance=DistanceUtil.getDistance(p1LL, p2LL)/1000;
-        String str=lat1+","+lon1+","+lat2+","+lon2;
-        Log.e("distance",str);
+        distance = DistanceUtil.getDistance(p1LL, p2LL) / 1000;
+        String str = lat1 + "," + lon1 + "," + lat2 + "," + lon2;
+        Log.e("distance", str);
         return (double) Math.round(distance * 100) / 100;
     }
 
-    private void upLoadUserLog(Map<String, String> params){
+    private void upLoadUserLog(Map<String, String> params) {
         RequestManager.getInstance()
                 .mServiceStore
                 .uplog(params)
@@ -1996,22 +2086,22 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
     }
 
     private void getLocation(final String id, final GoodsEntity entity, final String shipmentCode, final String enterpriseCode) {
-        String reg=entity.getReq_length();
+        String reg = entity.getReq_length();
         Map<String, String> map = new HashMap<>();
         map.put("rowid", id);
-        if(TextUtils.isEmpty(reg)){
+        if (TextUtils.isEmpty(reg)) {
             map.put("type", "0");
-        }else{
-            if("4.2米".equals(reg)){
-                LocationEntity locationEntity=dao.findLocInfoById(id);
-                Log.e("location","location==="+locationEntity.getLocation().toString());
+        } else {
+            if ("4.2米".equals(reg)) {
+                LocationEntity locationEntity = dao.findLocInfoById(id);
+                Log.e("location", "location===" + locationEntity.getLocation().toString());
                 map.put("type", "1");
-                if(locationEntity!=null){
+                if (locationEntity != null) {
                     map.put("location", locationEntity.getLocation().toString());
-                }else {
+                } else {
                     map.put("location", "");
                 }
-            }else {
+            } else {
                 map.put("type", "0");
             }
         }
@@ -2033,10 +2123,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                             JSONObject object = new JSONObject(str);
                             boolean isSuccess = object.getBoolean("success");
                             if (isSuccess) {
-                                if(dao!=null){
+                                if (dao != null) {
                                     dao.delLocInfo(id);
                                 }
-                                String successMsg=object.getString("msg");
+                                String successMsg = object.getString("msg");
                                 Toast.makeText(activity, successMsg, Toast.LENGTH_SHORT).show();
                             } else {
                                 /*String errorMsg = object.getString("msg");
@@ -2070,67 +2160,68 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     public class MyLocationListenner implements BDLocationListener {
         private String rid;
+
         public void setRid(String rid) {
             this.rid = rid;
         }
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            if(bdLocation==null){
+            if (bdLocation == null) {
                 return;
             }
-            Log.e("bdLocation","bdLocation recived");
+            Log.e("bdLocation", "bdLocation recived");
             final MainActivity activity = mActivityReference.get();
             if (activity == null) {
                 return;
             }
 
-            if(dao!=null && !TextUtils.isEmpty(rid)){
-                String loc=bdLocation.getAddrStr();
-                String lat=bdLocation.getLatitude()+"";
-                String lon=bdLocation.getLongitude()+"";
-                String time=changeTtime(bdLocation.getTime());
-                if(dao.findLocInfoIsExist(rid)){
+            if (dao != null && !TextUtils.isEmpty(rid)) {
+                String loc = bdLocation.getAddrStr();
+                String lat = bdLocation.getLatitude() + "";
+                String lon = bdLocation.getLongitude() + "";
+                String time = changeTtime(bdLocation.getTime());
+                if (dao.findLocInfoIsExist(rid)) {
                     //存在更新
-                    LocationEntity entity=dao.findLocInfoById(rid);
-                    String str=entity.getLocation();
+                    LocationEntity entity = dao.findLocInfoById(rid);
+                    String str = entity.getLocation();
                     try {
-                        if(!TextUtils.isEmpty(str)){
-                            JSONArray array=new JSONArray(str);
-                            Gson gson=new Gson();
-                            LocEntity locEntity=new LocEntity();
+                        if (!TextUtils.isEmpty(str)) {
+                            JSONArray array = new JSONArray(str);
+                            Gson gson = new Gson();
+                            LocEntity locEntity = new LocEntity();
                             locEntity.setTime(time);
                             locEntity.setLongitude(lon);
                             locEntity.setLatitude(lat);
                             locEntity.setLocation(loc);
                             entity.setRowid(rid);
-                            JSONObject object=new JSONObject(gson.toJson(locEntity));
+                            JSONObject object = new JSONObject(gson.toJson(locEntity));
                             array.put(object);
                             entity.setLocation(array.toString());
-                            dao.updateLocInfo(entity,rid);
-                            Log.e("updateLocInfo","updateLocInfo==="+entity.getLocation());
+                            dao.updateLocInfo(entity, rid);
+                            Log.e("updateLocInfo", "updateLocInfo===" + entity.getLocation());
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-                }else {
+                } else {
                     //不存在添加
-                    Gson gson=new Gson();
-                    LocEntity locEntity=new LocEntity();
+                    Gson gson = new Gson();
+                    LocEntity locEntity = new LocEntity();
                     locEntity.setTime(time);
                     locEntity.setLongitude(lon);
                     locEntity.setLatitude(lat);
                     locEntity.setLocation(loc);
-                    LocationEntity entity=new LocationEntity();
-                    JSONArray array=new JSONArray();
+                    LocationEntity entity = new LocationEntity();
+                    JSONArray array = new JSONArray();
                     entity.setRowid(rid);
                     try {
-                        JSONObject object=new JSONObject(gson.toJson(locEntity));
-                    array.put(object);
-                    entity.setLocation(array.toString());
-                    dao.addLocInfo(entity);
-                    Log.e("addLocInfo","addLocInfo==="+entity.getLocation());
+                        JSONObject object = new JSONObject(gson.toJson(locEntity));
+                        array.put(object);
+                        entity.setLocation(array.toString());
+                        dao.addLocInfo(entity);
+                        Log.e("addLocInfo", "addLocInfo===" + entity.getLocation());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -2138,7 +2229,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
             }
         }
     }
-    private void getShipmentStatus(String shipmentCode,String enterpriseCode,final OnShipmentStatusListener shipmentStatusListener){
+
+    private void getShipmentStatus(String shipmentCode, String enterpriseCode, final OnShipmentStatusListener shipmentStatusListener) {
         final MainActivity activity = mActivityReference.get();
         if (activity == null) {
             return;
@@ -2146,24 +2238,26 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         MDPLocationCollectionManager.getShipmentStatus(activity, shipmentCode, enterpriseCode, new OnDownloadResultListener() {
             @Override
             public void onSuccess(Object o) {
-                if(o instanceof ShipmentStatusEnum){
-                    ShipmentStatusEnum shipmentStatusEnum=(ShipmentStatusEnum)o;
-                    if(shipmentStatusListener!=null){
+                if (o instanceof ShipmentStatusEnum) {
+                    ShipmentStatusEnum shipmentStatusEnum = (ShipmentStatusEnum) o;
+                    if (shipmentStatusListener != null) {
                         shipmentStatusListener.onSuccess(shipmentStatusEnum);
                     }
                 }
             }
+
             @Override
             public void onFailure(String s, String s1) {
-                if(shipmentStatusListener!=null){
+                if (shipmentStatusListener != null) {
                     shipmentStatusListener.onError();
                 }
             }
         });
     }
 
-    private interface OnShipmentStatusListener{
+    private interface OnShipmentStatusListener {
         void onSuccess(ShipmentStatusEnum status);
+
         void onError();
     }
 

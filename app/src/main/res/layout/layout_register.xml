@@ -172,13 +172,45 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:background="@color/gray_line" />
+        <RelativeLayout
+            android:id="@+id/layout_xy"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginLeft="27dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="27dp">
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checkbox_selector_circle"
+                android:button="@null"
+                android:checked="true" />
 
+            <TextView
+                android:id="@+id/tv_xy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@+id/checkBox"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="2"
+                android:text="我已阅读并同意《货运快车用户协议》"
+                android:textColor="@color/actionbar_color"
+                android:textSize="12sp"
+                />
+
+        </RelativeLayout>
         <Button
             android:id="@+id/btn_register"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginLeft="24dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="45dp"
             android:layout_marginRight="24dp"
             android:background="@drawable/btn_cz_bg"
             android:text="注册"

@@ -127,5 +127,4 @@ public class RequestManager {
 
         void onError(String error);
     }
-
 }

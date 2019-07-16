@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-ur-rPK\\values-ur-rPK.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-ur-rPK\\values-ur-rPK.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-ur-rPK\\values-ur-rPK.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-ur-rPK\\values-ur-rPK.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -16,10 +16,10 @@
             ]
         },
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-ur-rPK\\values-ur-rPK.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-ur-rPK\\values-ur-rPK.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-ur-rPK\\values-ur-rPK.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-ur-rPK\\values-ur-rPK.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

@@ -41,6 +41,34 @@ public class GoodsEntity implements Serializable {
     private boolean isGuiding = false;
     private String task_id;
     private String driverPrice;
+    private String yd_cph;
+    private String to_addr;
+    private String from_addr;
+    public String getYd_cph() {
+        return yd_cph;
+    }
+
+    public void setYd_cph(String yd_cph) {
+        this.yd_cph = yd_cph;
+    }
+
+    public String getTo_addr() {
+        return to_addr;
+    }
+
+    public void setTo_addr(String to_addr) {
+        this.to_addr = to_addr;
+    }
+
+    public String getFrom_addr() {
+        return from_addr;
+    }
+
+    public void setFrom_addr(String from_addr) {
+        this.from_addr = from_addr;
+    }
+
+
 
     private String pd_ext;
 

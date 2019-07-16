@@ -88,8 +88,9 @@ public class RzTextActivity extends BaseActivity {
     private Spinner mCPLXSpinner;
     private Spinner mCLFLSpinner;
     private String ppItems[] = null;
-    private String cxItems[] = null;
+
     private String cdItems[] = null;
+    private String cxItems[] = null;
     private String cplxItems[] = null;
     private String clflItems[] = null;
     private RelativeLayout layout_idCard_start;
@@ -553,17 +554,7 @@ public class RzTextActivity extends BaseActivity {
 
     }
 
-    private int getlicenseCXPos(String name){
-        int pos=0;
-        for(int i=0;i<cxItems.length;i++){
-            if(cxItems[i].equals(name)){
-                pos=i;
-                break;
-            }
-        }
-        return pos;
 
-    }
 
     private int getlicenseCDPos(String name){
         int pos=0;
@@ -588,7 +579,17 @@ public class RzTextActivity extends BaseActivity {
         return pos;
 
     }
+    private int getlicenseCXPos(String name){
+        int pos=0;
+        for(int i=0;i<cxItems.length;i++){
+            if(cxItems[i].equals(name)){
+                pos=i;
+                break;
+            }
+        }
+        return pos;
 
+    }
     private int getlicenseCLFLPos(String name){
         int pos=0;
         for(int i=0;i<clflItems.length;i++){

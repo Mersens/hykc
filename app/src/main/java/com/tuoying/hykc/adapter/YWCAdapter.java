@@ -61,6 +61,7 @@ public class YWCAdapter extends BaseAdapter {
             holder.mEndAddress = view.findViewById(R.id.tv_end);
             holder.fhrName = view.findViewById(R.id.tv_hz);
             holder.mTextJDTime=view.findViewById(R.id.tv_jd_time);
+            holder.button=view.findViewById(R.id.btn);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
@@ -95,7 +96,15 @@ public class YWCAdapter extends BaseAdapter {
                 }
             }
         });
-
+        holder.button.setText("拍照");
+        holder.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(listener!=null){
+                    listener.onButtonClick(v,i,entity,1001);
+                }
+            }
+        });
         return view;
     }
 
@@ -122,6 +131,7 @@ public class YWCAdapter extends BaseAdapter {
         public TextView mTime;
         public CardView mView;
         public TextView mTextJDTime;
+        public Button button;
     }
 
 }

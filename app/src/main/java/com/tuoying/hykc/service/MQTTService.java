@@ -35,8 +35,6 @@ public class MQTTService extends Service {
         mqtturl = SharePreferenceUtil.getInstance(this).getMqttUrl();
         if (!TextUtils.isEmpty(mqtturl)) {
             client = new MyMqttClient(mqtturl, rowid, "hykcmqttclient", new MqttListener());
-
-
         }
     }
 

@@ -3,6 +3,7 @@ package com.tuoying.hykc.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
@@ -69,6 +70,18 @@ public class DateUtils {
         }
         return days;
 
+    }
+    public static Date getNextDay(Date date ,int d) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, d);
+        date = calendar.getTime();
+        return date;
+    }
+
+    public static String getTimeWishT(Date date){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        return format.format(date);
     }
 
     public static long getTimeMillis(){

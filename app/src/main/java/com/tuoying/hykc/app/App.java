@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.alct.mdp.MDPLocationCollectionManager;
 import com.tuoying.hykc.processprotection.PlayerMusicService;
+import com.tuoying.hykc.utils.DeviceHelper;
 
 
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class App extends Application {
     }
 
     private void initALCT(Context context) {
+
         if (context.getPackageName().equals(getCurrentProcessName(context))) {
             MDPLocationCollectionManager.initialize(this, Constants.ALCT_URL);
             MDPLocationCollectionManager.initServiceProcessProguard(context); // 保活代码
@@ -123,7 +125,7 @@ public class App extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            //System.exit(0);
+            System.exit(0);
         }
     }
 
@@ -131,5 +133,11 @@ public class App extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        Log.e("onTerminate","onTerminate==");
     }
 }

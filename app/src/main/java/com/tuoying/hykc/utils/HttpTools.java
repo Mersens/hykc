@@ -38,7 +38,6 @@ public class HttpTools {
             httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             //设置请求体的长度
             httpURLConnection.setRequestProperty("Content-Length", String.valueOf(data.length));
-            httpURLConnection.setRequestProperty("Connection", "keep-alive");
 
             //获得输出流，向服务器写入数据
             OutputStream outputStream = httpURLConnection.getOutputStream();
@@ -66,7 +65,7 @@ public class HttpTools {
             for(Map.Entry<String, String> entry : params.entrySet()) {
                 stringBuffer.append(entry.getKey())
                         .append("=")
-                        .append(entry.getValue())
+                        .append(URLEncoder.encode(entry.getValue(), encode))
                         .append("&");
             }
             stringBuffer.deleteCharAt(stringBuffer.length() - 1);    //删除最后的一个"&"

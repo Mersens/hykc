@@ -14,7 +14,7 @@ import com.tuoying.hykc.entity.User;
  * Created by zzu on 2016/4/6.
  */
 public class DBHelper extends SQLiteOpenHelper {
-    private static final int VERSION = 12;
+    private static final int VERSION = 14;
     private static final String NAME = "CITY_FREIGHT.db";
     private static final String SQL_LOGIN_HISTORY_CREAT = "create table "+ User.TABLE_NAME+"(_id integer primary key autoincrement,"
             +User.USERID+" text ,"+User.USERNAME+" text, "+User.PSD+" text, "+User.TOKEN+" text,"+User.RZ+" text, "+User.OFWLGSINFO+" text)";

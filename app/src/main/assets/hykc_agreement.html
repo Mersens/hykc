@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--<link rel="stylesheet" href="index.css" />-->
+	</head>
+	<style>
+		/*!
+ * =====================================================
+ * Mui v3.7.2 (http://dev.dcloud.net.cn/mui)
+ * =====================================================
+ */
+
+
+/*! normalize.css v3.0.1 | MIT License | git.io/normalize */
+
+html {font-family: sans-serif;-webkit-text-size-adjust: 100%}
+body {
+	margin: 0
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+	display: block
+}
+
+audio,
+canvas,
+progress,
+video {
+	display: inline-block;
+	vertical-align: baseline
+}
+
+audio:not([controls]) {
+	display: none;
+	height: 0
+}
+
+[hidden],
+template {
+	display: none
+}
+
+a {
+	background: 0 0
+}
+
+/*a:active,
+a:hover {
+	outline: 0
+}*/
+
+abbr[title] {
+	border-bottom: 1px dotted
+}
+
+b,
+strong {
+	font-weight: 700
+}
+
+dfn {
+	font-style: italic
+}
+
+h1 {
+	margin: .67em 0
+}
+
+mark {
+	color: #000;
+	background: #ff0
+}
+
+small {
+	font-size: 80%
+}
+
+sub,
+sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+	vertical-align: baseline
+}
+
+sup {
+	top: -.5em
+}
+
+sub {
+	bottom: -.25em
+}
+
+img {
+	border: 0
+}
+
+svg:not(:root) {
+	overflow: hidden
+}
+
+figure {
+	margin: 1em 40px
+}
+
+hr {
+	box-sizing: content-box;
+	height: 0
+}
+
+pre {
+	overflow: auto
+}
+
+code,
+kbd,
+pre,
+samp {
+	font-family: monospace, monospace;
+	font-size: 1em
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+	font: inherit;
+	margin: 0;
+	color: inherit
+}
+
+button {
+	overflow: visible
+}
+
+button,
+select {
+	text-transform: none
+}
+
+button,
+html input[type=button],
+input[type=reset],
+input[type=submit] {
+	cursor: pointer;
+	-webkit-appearance: button
+}
+
+button[disabled],
+html input[disabled] {
+	cursor: default
+}
+
+input {
+	line-height: normal
+}
+
+input[type=checkbox],
+input[type=radio] {
+	box-sizing: border-box;
+	padding: 0
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	height: auto
+}
+
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration {
+	-webkit-appearance: none
+}
+
+fieldset {
+	margin: 0 2px;
+	padding: .35em .625em .75em;
+	border: 1px solid silver
+}
+
+legend {
+	padding: 0;
+	border: 0
+}
+
+textarea {
+	overflow: auto
+}
+
+optgroup {
+	font-weight: 700
+}
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse
+}
+
+td,
+th {
+	padding: 0
+}
+
+* {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-user-select: none;
+	outline: 0;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent
+}
+
+body {
+	font-family: 'Helvetica Neue', Helvetica, sans-serif;
+	font-size: 17px;
+	line-height: 21px;
+	color: #000;
+	background-color: #efeff4;
+	-webkit-overflow-scrolling: touch
+}
+
+a {
+	text-decoration: none;
+	color: #007aff
+}
+
+/*a:active {
+	color: #0062cc
+}*/
+
+.
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	line-height: 1;
+	margin-top: 5px;
+	margin-bottom: 5px
+}
+
+.mui-h1,
+h1 {
+	font-size: 36px
+}
+
+.mui-h2,
+h2 {
+	font-size: 30px
+}
+
+.mui-h3,
+h3 {
+	font-size: 24px
+}
+
+.mui-h4,
+h4 {
+	font-size: 18px
+}
+
+.mui-h5,
+h5 {
+	font-size: 14px;
+	font-weight: 400;
+	color: #8f8f94
+}
+
+
+h6 {
+	font-size: 12px;
+	font-weight: 400;
+	color: #8f8f94
+}
+
+p {
+	font-size: 14px;
+	margin-top: 0;
+	margin-bottom: 10px;
+	color: #8f8f94
+}
+
+
+@-webkit-keyframes spinner-spin {
+	0% {
+		-webkit-transform: rotate(0deg)
+	}
+	8.33333333% {
+		-webkit-transform: rotate(30deg)
+	}
+	16.66666667% {
+		-webkit-transform: rotate(60deg)
+	}
+	25% {
+		-webkit-transform: rotate(90deg)
+	}
+	33.33333333% {
+		-webkit-transform: rotate(120deg)
+	}
+	41.66666667% {
+		-webkit-transform: rotate(150deg)
+	}
+	50% {
+		-webkit-transform: rotate(180deg)
+	}
+	58.33333333% {
+		-webkit-transform: rotate(210deg)
+	}
+	66.66666667% {
+		-webkit-transform: rotate(240deg)
+	}
+	75% {
+		-webkit-transform: rotate(270deg)
+	}
+	83.33333333% {
+		-webkit-transform: rotate(300deg)
+	}
+	91.66666667% {
+		-webkit-transform: rotate(330deg)
+	}
+	100% {
+		-webkit-transform: rotate(360deg)
+	}
+}
+
+@keyframes spinner-spin {
+	0% {
+		transform: rotate(0deg)
+	}
+	8.33333333% {
+		transform: rotate(30deg)
+	}
+	16.66666667% {
+		transform: rotate(60deg)
+	}
+	25% {
+		transform: rotate(90deg)
+	}
+	33.33333333% {
+		transform: rotate(120deg)
+	}
+	41.66666667% {
+		transform: rotate(150deg)
+	}
+	50% {
+		transform: rotate(180deg)
+	}
+	58.33333333% {
+		transform: rotate(210deg)
+	}
+	66.66666667% {
+		transform: rotate(240deg)
+	}
+	75% {
+		transform: rotate(270deg)
+	}
+	83.33333333% {
+		transform: rotate(300deg)
+	}
+	91.66666667% {
+		transform: rotate(330deg)
+	}
+	100% {
+		transform: rotate(360deg)
+	}
+}
+
+button,
+input[type=button],
+input[type=reset],
+input[type=submit] {
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42;
+	position: relative;
+	display: inline-block;
+	margin-bottom: 0;
+	padding: 6px 12px;
+	cursor: pointer;
+	-webkit-transition: all;
+	transition: all;
+	-webkit-transition-timing-function: linear;
+	transition-timing-function: linear;
+	-webkit-transition-duration: .2s;
+	transition-duration: .2s;
+	text-align: center;
+	vertical-align: top;
+	white-space: nowrap;
+	color: #333;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+	background-color: #fff;
+	background-clip: padding-box
+}
+
+
+
+input,
+select,
+textarea {
+	font-family: 'Helvetica Neue', Helvetica, sans-serif;
+	font-size: 17px;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+	-webkit-tap-highlight-color: transparent;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-user-modify: read-write-plaintext-only
+}
+
+input[type=color],
+input[type=date],
+input[type=datetime-local],
+input[type=datetime],
+input[type=email],
+input[type=month],
+input[type=number],
+input[type=password],
+input[type=search],
+input[type=tel],
+input[type=text],
+input[type=time],
+input[type=url],
+input[type=week],
+select,
+textarea {
+	line-height: 21px;
+	width: 100%;
+	height: 40px;
+	margin-bottom: 15px;
+	padding: 10px 15px;
+	-webkit-user-select: text;
+	border: 1px solid rgba(0, 0, 0, .2);
+	border-radius: 3px;
+	outline: 0;
+	background-color: #fff;
+	-webkit-appearance: none
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	margin: 0;
+	-webkit-appearance: none
+}
+
+input[type=search] {
+	font-size: 16px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 34px;
+	text-align: center;
+	border: 0;
+	border-radius: 6px;
+	background-color: rgba(0, 0, 0, .1)
+}
+
+input[type=search]:focus {
+	text-align: left
+}
+
+textarea {
+	height: auto;
+	resize: none
+}
+
+select {
+	font-size: 14px;
+	height: auto;
+	margin-top: 1px;
+	border: 0!important;
+	background-color: #fff
+}
+
+select:focus {
+	-webkit-user-modify: read-only
+}
+
+
+
+@-webkit-keyframes mui-progressbar-in {
+	from {
+		-webkit-transform: scaleY(0);
+		opacity: 0
+	}
+	to {
+		-webkit-transform: scaleY(1);
+		opacity: 1
+	}
+}
+
+@keyframes mui-progressbar-in {
+	from {
+		transform: scaleY(0);
+		opacity: 0
+	}
+	to {
+		transform: scaleY(1);
+		opacity: 1
+	}
+}
+
+@-webkit-keyframes mui-progressbar-out {
+	from {
+		-webkit-transform: scaleY(1);
+		opacity: 1
+	}
+	to {
+		-webkit-transform: scaleY(0);
+		opacity: 0
+	}
+}
+
+@keyframes mui-progressbar-out {
+	from {
+		transform: scaleY(1);
+		opacity: 1
+	}
+	to {
+		transform: scaleY(0);
+		opacity: 0
+	}
+}
+
+@-webkit-keyframes mui-progressbar-infinite {
+	0% {
+		-webkit-transform: translate3d(-50%, 0, 0) scaleX(.5)
+	}
+	100% {
+		-webkit-transform: translate3d(100%, 0, 0) scaleX(.5)
+	}
+}
+
+@keyframes mui-progressbar-infinite {
+	0% {
+		transform: translate3d(-50%, 0, 0) scaleX(.5)
+	}
+	100% {
+		transform: translate3d(100%, 0, 0) scaleX(.5)
+	}
+}
+
+body{background-color: #FFFFFF;}
+.content_box{
+	background-color: #FFFFFF;
+	padding-top: 20px;
+	 padding: 15px;
+}
+.guize_header{padding-left:25px; margin-top: 10px;}
+.guize_headerBtn{display: inline-block; font-weight: normal; padding: 8px 20px; border-radius: 30px;color: #FFFFFF; background-color: #FF4444;font-size: 14px;}
+.guize_content{color: #232321; text-indent: 2rem; line-height: 26px; color: #555555;}
+.text-center{text-align: center;}
+.fs14{font-size: 14px; margin: 8px 0;}
+.fs12{font-size: 12px;}
+	</style>
+	<body>
+		<div class="content_box">
+			<h4 class="guize_header text-center">
+				<strong class="">货运快车用户协议</strong>
+			</h4>
+			<div class="fs14">
+				第一条 特别提示
+			</div>
+			<div class=" fs12 guize_content">
+				1、河南脱颖实业有限公司（以下简称“脱颖实业”）在此特别提醒您（用户）在注册成为用户之前，请认真阅读本《货运快车用户协议》（以下简称“协议”），确保您充分理解本协议中各条款。请您审慎阅读并选择接受或不接受本协议。除非您接受本协议所有条款，否则您无权注册、登录或使用本协议所涉服务。您的注册、登录、使用等行为将视为对本协议的接受，并同意接受本协议各项条款的约束。 
+			</div>
+			<div class=" fs12 guize_content">
+				2、本协议约定货运快车手机用户关于“货运快车”软件服务（以下简称“服务”）的权利义务。“用户”是指注册、 登录、使用本服务的个人。本协议可由货运快车手机APP随时更新， 更新后的协议条款一旦公布即代替原来的协议条款，恕不再另行通知，用户可在本APP中查阅最新版协议条款。在“货运快车”修改协议条款后，如果用户不接受修改后的条款，请立即停止使用“货运快车”提供的服务，用户继续使用“货运快车”提供的服务将被视为接受修改后的协议。
+			</div>
+			<div class="fs14">
+				第二条 账号注册 
+			</div>
+			<div class=" fs12 guize_content">
+				1、用户在使用本服务前需要注册一个“货运快车”账号。“货运快车”账号是使用手机号码绑定注册， 请用户使用尚未与“货运快车”账号绑定的手机号码，以及未被货运快车根据本协议封禁的手机号码注册“货运快车”账号。 货运快车可以根据用户需求或产品需要对账号注册和绑定的方式进行变更，而无须事先通知用户。
+			</div>
+			<div class=" fs12 guize_content">2、如果注册申请者有被货运快车封禁的先例或涉嫌虚假注册及滥用他人名义注册，及其他不能得到许可的理由，货运快车将拒绝其注册申请。</div>
+			<div class=" fs12 guize_content">3、注册成功后，用户可以通过“货运快车”软件中“个人信息”界面浏览或更改本人的个人信息。 
+</div>
+			<div class=" fs12 guize_content">4、用户注册时所填写的个人信息如有变动，用户需通过“个人信息”界面及时更改。 用户因未及时更改造成的损失脱颖实业概不负责。
+			</div>
+			<div class="fs14">
+				第三条 用户个人隐私信息保护 
+			</div>
+			<div class=" fs12 guize_content">
+				1、您向脱颖实业提供的信息，为了向您提供更好的用户服务，脱颖实业会在您自愿选择服务或提供信息的情况下系统自动存储注册信息。请您在注册时及时、详尽及准确的提供个人资料，并不断更新注册资料。所有原始键入的资料将引用为注册资料。 
+</div>
+			<div class=" fs12 guize_content">2、如果因注册信息不真实而引起的问题，由您自行承担相应的后果。请您不要将您的帐号、密码转让或出借予他人使用。如您发现任何非法使用会员帐号或安全漏洞的情况，应立即与脱颖实业公司联系。 
+</div>
+			<div class=" fs12 guize_content">3、脱颖实业非常重视信息安全，脱颖实业成立了专责团队，研发和应用多种安全技术和程序等，通过这些严格措施努力保护您的信息不被未经授权的访问、使用或泄漏。
+</div>
+			<div class=" fs12 guize_content">4、互联网上不排除因黑客行为或用户的保管疏忽导致帐号、密码遭他人非法使用，此类情况与脱颖实业公司无关。
+			</div>
+			<div class="fs14">
+				第四条 服务内容
+			</div>
+			<div class=" fs12 guize_content">
+				<div class=" fs12" >1、本服务的具体内容由脱颖实业公司根据实际情况提供，包括但不限于：</div>
+				<div class=" fs12 guize_content">(1) 与用户分享提供货源信息； </div>
+				<div class=" fs12 guize_content">(2) 用户可以购买与脱颖实业合作供应商所提供的商品及服务；</div>
+			</div>
+			<div class=" fs12 guize_content">2、用户可以浏览“货运快车”手机APP了解脱颖实业提供的服务内容。 
+</div>
+			<div class=" fs12 guize_content">3、在遵守相关法律法规前提下，根据合作广告主的要求，脱颖实业有权决定用户在“货运快车”软件界面上看到的广告内容。
+			</div>
+			<div class="fs14">
+				第五条 使用规则 
+			</div>
+			<div class=" fs12 guize_content">
+				1、用户在本服务中或通过本服务所传送、发布的任何内容并不反映或代表，也不得被视为反映或代表沙师弟的观点、立场或政策，脱颖实业对此不承担任何责任。
+			</div>
+			<div class=" fs12 guize_content">
+				<div class=" fs12" >2、用户不得利用“货运快车”账号或本服务进行如下行为：</div>
+				<div class=" fs12 guize_content">(1) 提交、发布虚假信息，或盗用他人头像或资料，冒充、利用他人名义的；</div>
+				<div class=" fs12 guize_content">
+(2) 强制、诱导其他用户关注、点击链接页面或分享信息的； </div>
+				<div class=" fs12 guize_content">
+(3) 虚构事实、隐瞒真相以误导、欺骗他人的； </div>
+				<div class=" fs12 guize_content">
+(4) 利用技术手段批量建立虚假账号的；</div>
+				<div class=" fs12 guize_content"> 
+(5) 利用“货运快车”账号或本服务从事任何违法犯罪活动的； </div>
+				<div class=" fs12 guize_content">
+(6) 制作、发布与以上行为相关的方法、工具，或对此类方法、工具进行运营或传播，无论这些行为是否为商业目的；</div>
+				<div class=" fs12 guize_content"> 
+(7) 其他违反法律法规规定、侵犯其他用户合法权益、干扰“货运快车”正常运营或脱颖实业未明示授权的行为。</div>
+
+			</div>
+			<div class=" fs12 guize_content">
+				3、用户须对利用“货运快车”账号或本服务传送信息的真实性、合法性、无害性、准确性、有效性等全权负责，与用户所传播的信息相关的任何法律责任由用户自行承担，与脱颖实业无关。 如因此给脱颖实业或第三方造成损害的，用户应当依法予以赔偿。 
+</div>
+			<div class=" fs12 guize_content">
+			4、脱颖实业提供的服务中可能包括广告，用户同意在使用过程中显示脱颖实业和第三方供应商、合作伙伴提供的广告。除法律法规明确规定外，用户应自行对依该广告信息进行的交易负责， 对用户因依该广告信息进行的交易或前述广告商提供的内容而遭受的损失或损害，脱颖实业不承担任何责任。
+			</div>
+			<div class="fs14">
+				第六条、其他 
+			</div>
+			<div class=" fs12 guize_content">
+				1、本协议的订立、执行和解释及争议的解决均应适用中华人民共和国法律。</div>
+			<div class=" fs12 guize_content"> 
+2、如双方就本协议内容或其执行发生任何争议，双方应尽量友好协商解决；协商不成时，任何一方均可向脱颖实业所在地的人民法院提起诉讼。</div>
+			<div class=" fs12 guize_content"> 
+3、脱颖实业未行使或执行本服务协议任何权利或规定，不构成对前述权利或权利之放弃。 </div>
+			<div class=" fs12 guize_content">
+4、如本协议中的任何条款无论因何种原因完全或部分无效或不具有执行力，本协议的其余条款仍应有效并且有约束力。 </div>
+			<div class=" fs12 guize_content">
+5、本协议的版权由脱颖实业所有，脱颖实业保留一切解释和修改的权力。
+			</div>
+		</div>
+	</body>
+</html>

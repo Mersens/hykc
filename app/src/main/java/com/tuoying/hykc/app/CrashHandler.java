@@ -11,11 +11,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.j256.ormlite.dao.Dao;
 import com.tuoying.hykc.activity.MainActivity;
-import com.tuoying.hykc.db.DBDao;
-import com.tuoying.hykc.db.DBDaoImpl;
-import com.tuoying.hykc.entity.BugMsgEntity;
 import com.tuoying.hykc.utils.DateUtils;
 import com.tuoying.hykc.utils.HttpTools;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
@@ -35,12 +31,10 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeSet;
 
 /**
  * UncaughtExceptionHandler：线程未捕获异常控制器是用来处理未捕获异常的。

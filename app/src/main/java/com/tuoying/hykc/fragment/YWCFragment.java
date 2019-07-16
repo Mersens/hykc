@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.activity.GoodsListDetailActivity;
 import com.tuoying.hykc.activity.MainActivity;
+import com.tuoying.hykc.activity.UpLoadImgActivity;
 import com.tuoying.hykc.adapter.DPJAdapter;
 import com.tuoying.hykc.adapter.YWCAdapter;
 import com.tuoying.hykc.app.Constants;
@@ -369,6 +370,11 @@ public class YWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 
     @Override
     public void onButtonClick(View view, int index, GoodsEntity entity, int type) {
-
+        if(type==1001){
+            Intent intent = new Intent(getActivity(), UpLoadImgActivity.class);
+            intent.putExtra("entity", entity);
+            startActivity(intent);
+            getActivity().overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        }
     }
 }

@@ -9,8 +9,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +47,8 @@ public class RegisterActivity extends BaseActivity {
     private EditText mEdCode;
     private EditText mEditPass;
     private TextView mGetCode;
+    private RelativeLayout mLayoutXY;
+    private CheckBox checkBox;
     Handler mCodeHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == RegisterCodeTimer.IN_RUNNING) {// 正在倒计时
@@ -89,6 +94,20 @@ public class RegisterActivity extends BaseActivity {
         mEditPass = (EditText) findViewById(R.id.editPass);
         mGetCode = (TextView) findViewById(R.id.tv_getCode);
         mBtnRegister = (Button) findViewById(R.id.btn_register);
+        mLayoutXY=findViewById(R.id.layout_xy);
+        checkBox=findViewById(R.id.checkBox);
+        mLayoutXY.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doCheckXY();
+            }
+        });
+    }
+
+    private void doCheckXY() {
+        Intent intentFind = new Intent(RegisterActivity.this, AgreementActivity.class);
+        startActivity(intentFind);
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     private void initEvent() {
@@ -112,6 +131,10 @@ public class RegisterActivity extends BaseActivity {
     }
 
     private void doRegister() {
+        if(!checkBox.isChecked()){
+            Toast.makeText(this, "请阅读和接受货运快车服务协议！", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String telnum = mEditPhone.getText().toString().trim();
         String psd = mEditPass.getText().toString().trim();
         String code = mEdCode.getText().toString().trim();

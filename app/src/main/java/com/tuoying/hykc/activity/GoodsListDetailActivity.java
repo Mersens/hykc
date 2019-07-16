@@ -311,11 +311,12 @@ public class GoodsListDetailActivity extends BaseActivity {
             mTextTj.setText(tj);
             String fromeCity = object.getString("from_city");
             String fromeCounty = object.getString("from_county");
-            mTextStart.setText(fromeCity + " " + fromeCounty);
+            String form_addr=object.getString("from_addr");
+            mTextStart.setText(form_addr);
             String end = object.getString("to_addr");
             String toCity=object.getString("to_city");
             String toCounty = object.getString("to_county");
-            mTextEnd.setText(toCity+" "+toCounty);
+            mTextEnd.setText(end);
             String bz = object.getString("bz");
             mTextBz.setText(bz);
             String shrxm = object.getString("shr");

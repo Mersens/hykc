@@ -32,6 +32,7 @@ import com.tuoying.hykc.activity.RzTextActivity;
 import com.tuoying.hykc.activity.SCActivity;
 import com.tuoying.hykc.activity.SYBZActivity;
 import com.tuoying.hykc.activity.SettingActivity;
+import com.tuoying.hykc.activity.TrailerInfoActivity;
 import com.tuoying.hykc.app.App;
 import com.tuoying.hykc.app.Constants;
 import com.tuoying.hykc.db.DBDao;
@@ -78,6 +79,7 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
     private RelativeLayout mLayoutSC;
     private RelativeLayout mLayoutFW;
     private RelativeLayout mLayoutBX;
+    private RelativeLayout mLayoutCar;
     public static OthersFragment getInstance() {
         return new OthersFragment();
     }
@@ -146,7 +148,7 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
         mLayoutSC.setOnClickListener(this);
         mLayoutFW.setOnClickListener(this);
         mLayoutBX.setOnClickListener(this);
-
+        mLayoutCar.setOnClickListener(this);
         mTextRZ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,7 +219,7 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
         mLayoutSC=view.findViewById(R.id.layout_sc);
         mLayoutFW=view.findViewById(R.id.layout_fw);
         mLayoutBX=view.findViewById(R.id.layout_bx);
-
+        mLayoutCar=view.findViewById(R.id.layout_car);
     }
 
     private void getRzInfo(final User user, final String id) {
@@ -351,7 +353,9 @@ public class OthersFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.layout_bx:
                 mIntent=new Intent(activity,BXActivity.class);
-
+                break;
+            case R.id.layout_car:
+                mIntent=new Intent(activity,TrailerInfoActivity.class);
                 break;
         }
         if(mIntent!=null){

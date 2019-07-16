@@ -3,14 +3,11 @@ package com.tuoying.hykc.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.ArrayMap;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -24,11 +21,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
-import com.lzy.imagepicker.ui.ImagePreviewDelActivity;
 import com.lzy.imagepicker.view.CropImageView;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.app.Constants;
@@ -38,13 +33,10 @@ import com.tuoying.hykc.entity.EventEntity;
 import com.tuoying.hykc.entity.RZEntity;
 import com.tuoying.hykc.entity.User;
 import com.tuoying.hykc.utils.GlideImageLoader;
-import com.tuoying.hykc.utils.HttpTools;
-import com.tuoying.hykc.utils.PictureUtils;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.RxBus;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
-import com.tuoying.hykc.utils.UploadUtils;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 import com.tuoying.hykc.view.SelectDialog;
 
@@ -53,18 +45,11 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 

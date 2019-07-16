@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-h720dp-v13\\values-h720dp-v13.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-h720dp-v13\\values-h720dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -16,10 +16,10 @@
             ]
         },
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-h720dp-v13\\values-h720dp-v13.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-h720dp-v13\\values-h720dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-h720dp-v13\\values-h720dp-v13.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

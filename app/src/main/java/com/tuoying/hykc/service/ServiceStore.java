@@ -5,7 +5,9 @@ import com.tuoying.hykc.app.Constants;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -163,6 +165,34 @@ public interface ServiceStore {
     @FormUrlEncoded
     @POST("showdata/alct/updata_yd_upalctimg.jsp")
     Observable<ResponseBody> updata_yd_upalctimg(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("app/selectTrailerInfo")
+    Call<ResponseBody> selectTrailerInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("app/addTrailerInfo")
+    Call<ResponseBody> addTrailerInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("app/delTrailerInfo")
+    Call<ResponseBody> delTrailerInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("app/getDirverInfo")
+    Call<ResponseBody> getDirverInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("app/selectCarInfoByDriverId")
+    Call<ResponseBody> selectCarInfoByDriverId(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("etc/start/")
+    Call<ResponseBody> submitOrderEctInfoStart(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("etc/end/")
+    Call<ResponseBody> submitOrderEctInfoEnd(@FieldMap Map<String, String> params);
 
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);

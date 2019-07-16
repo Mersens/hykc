@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-v11\\values-v11.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\values-v11\\values-v11.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-v11\\values-v11.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-v11\\values-v11.xml",
                     "from": {
                         "startLines": "2,8,14,20,26,32,38,39,43,47,48,52,56,57,61,66,71,76,78,80,81,82,135,189",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -17,10 +17,10 @@
             ]
         },
         {
-            "outputFile": "D:\\hykc_loc\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-v11\\values-v11.xml",
+            "outputFile": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\incremental\\mergeReleaseResources\\merged.dir\\values-v11\\values-v11.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Administrator\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\2de6b0242a19c9fa128645983a05e15b\\res\\values-v11\\values-v11.xml",
+                    "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\values-v11\\values-v11.xml",
                     "from": {
                         "startLines": "2,8,14,20,26,32,38,39,43,47,48,52,56,57,61,66,71,76,78,80,81,82,135,189",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",

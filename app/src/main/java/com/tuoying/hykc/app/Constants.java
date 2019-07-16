@@ -11,6 +11,9 @@ import java.io.File;
 public class Constants {
     public static final String WEBSERVICE_URL = "http://tuoying.huoyunkuaiche.com/";
     //public static final String WEBSERVICE_URL="http://ewytek.cn/";
+    public static final String TRAILERINFO_URL = "http://39.105.210.202:8080/";
+    public static final String ETC_URL = "http://39.105.210.202:63688/";
+    //public static final String TRAILERINFO_URL = "http://192.168.1.44:8080/";
     public static final String APPUPDATEURL=WEBSERVICE_URL+"searchversion.jsp?app=driver";
     public static final String MQTT_URL = "tcp://59.110.159.178:1883";
     public static final String YDIp="http://122.114.76.37:8080";
@@ -26,7 +29,7 @@ public class Constants {
     public static final String CYZGZ = "CYZGZ";//从业资格证
     public static final int LOC_RADIUS = 3000;
     public static final String PAYTYPE_WX = "wx";
-    public static final String VERSIONTIME = "2019.04.02";
+    public static final String VERSIONTIME = "2019.07.16";
     public static final String PICTUREFILE = Environment.getExternalStorageDirectory().toString() + File.separator +
             "hykctemp";
     public static final String UPLOADE_URL = WEBSERVICE_URL + "files/image_upload_new.jsp";

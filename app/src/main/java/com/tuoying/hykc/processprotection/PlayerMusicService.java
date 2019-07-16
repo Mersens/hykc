@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.tuoying.hykc.R;
 
@@ -32,6 +33,7 @@ public class PlayerMusicService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("onStartCommand","onStartCommand");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -48,6 +50,7 @@ public class PlayerMusicService extends Service {
 
             if (mMediaPlayer != null) {
                 mMediaPlayer.setLooping(true);
+                Log.d("PlayerMusicService","开启后台播放音乐");
                 mMediaPlayer.start();
             }
         }
@@ -55,6 +58,7 @@ public class PlayerMusicService extends Service {
 
 
     private void stopPlayMusic() {
+        Log.d("PlayerMusicService","关闭后台播放音乐");
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
             mMediaPlayer.stop();
         }
@@ -66,6 +70,7 @@ public class PlayerMusicService extends Service {
         stopPlayMusic();
         // 重启
         if (!normalExit) {
+            Log.e("PlayerMusicService","重新启动PlayerMusic服务！");
             Intent intent = new Intent(getApplicationContext(), PlayerMusicService.class);
             startService(intent);
         }

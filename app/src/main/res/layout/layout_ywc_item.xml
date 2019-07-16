@@ -369,19 +369,22 @@
                     android:id="@+id/btn"
                     android:layout_width="70dp"
                     android:layout_height="30dp"
-                    android:layout_centerInParent="true"
+                    android:layout_centerHorizontal="true"
                     android:background="@drawable/btn_cz_bg"
-                    android:text="未评价"
+                    android:text="拍照"
                     android:textColor="@color/base_color_text_white"
                     android:textSize="@dimen/text_size_medium"
-                    android:visibility="gone"
+                    android:layout_below="@+id/img_pj"
+
                     />
                 <ImageView
                     android:id="@+id/img_pj"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:layout_centerInParent="true"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_centerHorizontal="true"
                     android:scaleType="centerCrop"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="16dp"
                     android:src="@mipmap/icon_ywc"
 
                     />

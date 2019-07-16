@@ -67,6 +67,7 @@ import com.tuoying.hykc.fragment.SettingFragment;
 import com.tuoying.hykc.service.MQTTService;
 import com.tuoying.hykc.utils.APKVersionCodeUtils;
 import com.tuoying.hykc.utils.DateUtils;
+import com.tuoying.hykc.utils.DeviceHelper;
 import com.tuoying.hykc.utils.NfcDao;
 import com.tuoying.hykc.utils.NotificationUtils;
 import com.tuoying.hykc.utils.Questions;
@@ -145,6 +146,7 @@ public class MainActivity extends BaseActivity
         nfcDao= new NfcDao(this);
         getPersimmions();
         init();
+
     }
 
     @TargetApi(23)

@@ -39,7 +39,6 @@ import com.lzy.imagepicker.view.CropImageView;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.adapter.ImagePickerAdapter;
 import com.tuoying.hykc.adapter.OthersImgAdapter;
-import com.tuoying.hykc.app.App;
 import com.tuoying.hykc.app.Constants;
 import com.tuoying.hykc.db.DBDao;
 import com.tuoying.hykc.db.DBDaoImpl;
@@ -278,12 +277,12 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     }
 
     private void  setBtnStatu(){
-        if(isSuccessHDZ && isSuccessXHZ && isAnlHDZ && isAnlXHZ){
+/*        if(isSuccessHDZ && isSuccessXHZ && isAnlHDZ && isAnlXHZ){
             mBtnOk.setClickable(false);
             mBtnOk.setEnabled(false);
             mBtnOk.setBackgroundResource(R.drawable.btn_no_click_bg);
 
-        }
+        }*/
 
     }
 
@@ -838,6 +837,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     private void setImg() {
         List<String> names = new ArrayList<>();
         names.add("拍照");
+       // names.add("相册");
         showDialog(new SelectDialog.SelectDialogListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
