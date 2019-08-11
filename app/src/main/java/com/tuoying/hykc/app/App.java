@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.multidex.MultiDex;
 import android.util.Log;
@@ -71,7 +72,12 @@ public class App extends Application {
         if (context.getPackageName().equals(getCurrentProcessName(context))) {
             MDPLocationCollectionManager.initialize(this, Constants.ALCT_URL);
             MDPLocationCollectionManager.initServiceProcessProguard(context); // 保活代码
-            context.startService(new Intent(context, PlayerMusicService.class)); // 保活代码
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(new Intent(context, PlayerMusicService.class)); // 保活代码
+            }else {
+                context.startService(new Intent(context, PlayerMusicService.class)); // 保活代码
+
+            }
         }
     }
 

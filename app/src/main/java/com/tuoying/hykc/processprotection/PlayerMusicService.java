@@ -1,10 +1,13 @@
 package com.tuoying.hykc.processprotection;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.tuoying.hykc.R;
@@ -23,9 +26,9 @@ public class PlayerMusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        startForeground();
         normalExit = false;
         mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.silent);
-
         if (mMediaPlayer != null) {
             mMediaPlayer.setLooping(true);
         }
@@ -74,5 +77,20 @@ public class PlayerMusicService extends Service {
             Intent intent = new Intent(getApplicationContext(), PlayerMusicService.class);
             startService(intent);
         }
+    }
+
+    private void startForeground(){
+        String CHANNEL_ONE_ID = "com.tuoying.hykc";
+        String CHANNEL_ONE_NAME = "货运快车";
+        NotificationChannel notificationChannel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationChannel = new NotificationChannel(CHANNEL_ONE_ID,
+                    CHANNEL_ONE_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            assert manager != null;
+            manager.createNotificationChannel(notificationChannel);
+            startForeground(1, new NotificationCompat.Builder(this, CHANNEL_ONE_ID).build());
+        }
+
     }
 }

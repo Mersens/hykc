@@ -13,6 +13,9 @@ public class Constants {
     //public static final String WEBSERVICE_URL="http://ewytek.cn/";
     public static final String TRAILERINFO_URL = "http://39.105.210.202:8080/";
     public static final String ETC_URL = "http://39.105.210.202:63688/";
+    public static final String BESTSIGN_URL_TEST="http://192.168.1.37:8080/";
+    public static final String BESTSIGN_URL="";
+    public static final String OIL_URL_TEST="http://192.168.1.37:8080/";
     //public static final String TRAILERINFO_URL = "http://192.168.1.44:8080/";
     public static final String APPUPDATEURL=WEBSERVICE_URL+"searchversion.jsp?app=driver";
     public static final String MQTT_URL = "tcp://59.110.159.178:1883";

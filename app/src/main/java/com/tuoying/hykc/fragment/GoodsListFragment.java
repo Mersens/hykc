@@ -377,8 +377,7 @@ public class GoodsListFragment extends BaseFragment implements View.OnClickListe
         map.put("app", Constants.AppId);
         map.put("line", str);
         map.put("excludes", "");
-
-        Log.e("prams", str);
+        Log.e("prams", map.toString());
         RequestManager.getInstance()
                 .mServiceStore
                 .query_sources(map)
@@ -593,6 +592,7 @@ public class GoodsListFragment extends BaseFragment implements View.OnClickListe
         map.put("mobile", user.getUserId());
         map.put("app", Constants.AppId);
         map.put("rowid", entity.getRowid());
+        Log.e("doOrder",map.toString());
         RequestManager.getInstance()
                 .mServiceStore
                 .create_yd(map)

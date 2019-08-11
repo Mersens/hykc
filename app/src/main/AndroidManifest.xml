@@ -117,6 +117,25 @@
 
             />
         <activity
+            android:name=".activity.OilListActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/app_name"
+
+            />
+        <activity
+            android:name=".activity.OilActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/app_name"
+            />
+        <activity
+            android:name=".activity.OilMapActyivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/app_name"
+            />
+        <activity
             android:name=".activity.AddTrailerInfoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar"

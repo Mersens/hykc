@@ -866,6 +866,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 }
                 String hzxm = object.getString("data:fhr");
                 entity.setHzxm(hzxm);
+                if(object.has("data:fhrdh")){
+                    entity.setFhrdh(object.getString("data:fhrdh"));
+                }
                 String zyf = object.getString("data:yf");
                 entity.setZyf(zyf);
                 if (object.has("data:alctid")) {
@@ -1337,10 +1340,12 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         map.put("rowid",entity.getRowid());
         map.put("startTime",DateUtils.getTimeWishT(new Date()));
         map.put("sourceAddr",entity.getFrom_addr());
-        map.put("destAdder",entity.getTo_addr());
+        map.put("destAddr",entity.getTo_addr());
         Date date=DateUtils.getNextDay(new Date(),3);
         map.put("predictEndTime",DateUtils.getTimeWishT(date));
-        map.put("fee",entity.getZyf());
+        double d=Double.valueOf(entity.getZyf());
+        long b=(long)(d*100);
+        map.put("fee",b+"");
         map.put("titleType","2");
         map.put("type","0");
         map.put("statuType",t+"");

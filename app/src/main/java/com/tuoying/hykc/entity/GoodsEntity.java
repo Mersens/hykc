@@ -12,6 +12,7 @@ public class GoodsEntity implements Serializable {
     private String volume;
     private String bz;
     private String hzxm;
+
     private String zyf;
     private String bl;
     private String time;
@@ -44,6 +45,16 @@ public class GoodsEntity implements Serializable {
     private String yd_cph;
     private String to_addr;
     private String from_addr;
+
+    public String getFhrdh() {
+        return fhrdh;
+    }
+
+    public void setFhrdh(String fhrdh) {
+        this.fhrdh = fhrdh;
+    }
+
+    private String fhrdh;
     public String getYd_cph() {
         return yd_cph;
     }

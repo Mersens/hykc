@@ -194,6 +194,22 @@ public interface ServiceStore {
     @POST("etc/end/")
     Call<ResponseBody> submitOrderEctInfoEnd(@FieldMap Map<String, String> params);
 
+    @FormUrlEncoded
+    @POST("bestsign/autoSignAgre/")
+    Call<ResponseBody> autoSignAgre(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("oil/queryDriverMoney/")
+    Call<ResponseBody> queryDriverMoney(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("oil/getPayCode/")
+    Call<ResponseBody> getPayCode(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("oil/getStationAndFuels/")
+    Call<ResponseBody> getStationAndFuels(@FieldMap Map<String, String> params);
+
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

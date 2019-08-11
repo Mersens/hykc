@@ -146,6 +146,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
             case IMAGE_ITEM_ADD:
                 List<String> names = new ArrayList<>();
                 names.add("拍照");
+                //names.add("相册");
                 showDialog(new SelectDialog.SelectDialogListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -685,18 +686,26 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
 
     private Image getImage(String buffer,String imgName){
         Image img=new Image();
-        img.setBaiduLatitude(mCurrentLat);
-        img.setBaiduLongitude(mCurrentLon);
+        img.setBaiduLatitude(getLocation(entity.getLat_to()));
+        img.setBaiduLongitude(getLocation(entity.getLon_to()));
         img.setFileExt("jpg");
         img.setFileData("data:image/jpeg;base64,"+buffer);
         img.setImageTakenDate(getNowtime());
         img.setFileName(imgName);
-        img.setLocation(address);
+        img.setLocation(entity.getTo_addr());
         Log.e(imgName+"address==","address="+address+",mCurrentLat="+mCurrentLat+",mCurrentLon="+mCurrentLon);
         return img;
 
     }
+    private double getLocation(String loc){
+        double d=0;
+        try {
+            d=Double.parseDouble(loc);
+        }catch (Exception e){
 
+        }
+        return d;
+    }
     //卸货照
     private void uploadUnloadImage(String uploadBuffer) {
         if(entity==null){
@@ -837,7 +846,7 @@ public class UpLoadImgActivity extends BaseActivity implements ImagePickerAdapte
     private void setImg() {
         List<String> names = new ArrayList<>();
         names.add("拍照");
-       // names.add("相册");
+        //names.add("相册");
         showDialog(new SelectDialog.SelectDialogListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
