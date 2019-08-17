@@ -299,7 +299,6 @@ public class PayMoneyDialog extends DialogFragment {
 
             buffer.deleteCharAt(buffer.length() - 1);
         }
-
         return buffer.toString();
     }
     private void initDatas() {

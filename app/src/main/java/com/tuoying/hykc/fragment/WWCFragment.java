@@ -36,6 +36,7 @@ import com.tuoying.hykc.activity.GoodsListDetailActivity;
 import com.tuoying.hykc.activity.LoginActivity;
 import com.tuoying.hykc.activity.MainActivity;
 import com.tuoying.hykc.activity.MyTrailerDetailsActivity;
+import com.tuoying.hykc.activity.OilActivity;
 import com.tuoying.hykc.activity.OrderActivity;
 import com.tuoying.hykc.activity.UpLoadImgActivity;
 import com.tuoying.hykc.adapter.GoodsListAdapter;
@@ -54,6 +55,7 @@ import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.RxBus;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
+import com.tuoying.hykc.utils.WbCoudFaceManager;
 import com.tuoying.hykc.view.ExitDialogFragment;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 import com.tuoying.hykc.view.PayMoneyDialog;
@@ -377,10 +379,12 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
         }
         switch (type) {
             case 1:
-                doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                selectUDriverIsFaceTest(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                //doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
                 break;
             case 2:
                 //  doPs(entity);
+                //selectUDriverIsFaceTest("",1,entity);
                 checkStatu(entity);
                 break;
             case 3:
@@ -413,6 +417,234 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 break;
         }
     }
+
+    private void selectUDriverIsFaceTest(final String zyf,final double bl,final GoodsEntity entity){
+        Map<String,String> map=new HashMap<>();
+        map.put("account",userid);
+        map.put("statu",1+"");
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=serviceStore.selectUDriverIsFaceTest(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                        JSONObject object=new JSONObject(str);
+                        boolean success=object.getBoolean("success");
+                        if(success){
+                            //已校验
+                            doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                        }else {
+                            //未校验
+                            showFaceView(zyf,bl,entity);
+                        }
+                    }else {
+                        Toast.makeText(getActivity(), "用户信息查询失败！", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("selectUDriverIsFaceTest","selectUDriverIsFaceTest=="+str);
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+
+    }
+
+    private void showFaceView(final String zyf,final double bl,final GoodsEntity entity){
+        final ExitDialogFragment dialogFragment=ExitDialogFragment.getInstance("请进行刷脸认证！");
+        dialogFragment.show(getChildFragmentManager(),"showFaceView");
+        dialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+            @Override
+            public void onClickCancel() {
+                dialogFragment.dismissAllowingStateLoss();
+            }
+
+            @Override
+            public void onClickOk() {
+                dialogFragment.dismissAllowingStateLoss();
+                getUserInfo(zyf,bl,entity);
+            }
+        });
+    }
+
+    private void getUserInfo(final String zyf,final double bl,final GoodsEntity entity){
+        if (!TextUtils.isEmpty(userid)) {
+            User user = dao.findUserInfoById(userid);
+            if (user != null) {
+                getRzInfo(user,zyf,bl,entity);
+            }
+        }
+    }
+
+    private void getRzInfo(final User user,final String zyf,final double bl,final GoodsEntity entity){
+        final LoadingDialogFragment faceLoading=LoadingDialogFragment.getInstance();
+        faceLoading.showF(getChildFragmentManager(),"faceLoading");
+        RequestManager.getInstance()
+                .mServiceStore
+                .findMyRz(user.getToken(), user.getUserId(), Constants.AppId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        boolean isSuccess = false;
+                        try {Log.e("getRzInfo onSuccess", msg);
+                            String xm = null;
+                            String sfzh = null;
+                            JSONObject jsonObject = new JSONObject(msg.replaceAll("\r", "").replaceAll("\n", ""));
+                            if (jsonObject.has("rz#xm")) {
+                                xm = jsonObject.getString("rz#xm");
+                            } else {
+                                xm = "";
+                            }
+                            if (jsonObject.has("rz#sfzh")) {
+                                sfzh = jsonObject.getString("rz#sfzh");
+                            } else {
+                                sfzh = "";
+                            }
+                            idcardFaceVerify(xm,sfzh,zyf,bl,entity,faceLoading);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            faceLoading.dismissAllowingStateLoss();
+                        }
+                    }
+
+                    @Override
+                    public void onError(String msg) {
+                        Log.e("getRzInfo error", msg);
+                        faceLoading.dismissAllowingStateLoss();
+                    }
+                }));
+
+    }
+
+    public void idcardFaceVerify(final String name,final String id,final String zyf,
+                                 final double bl,final GoodsEntity entity,
+                                 final LoadingDialogFragment faceLoading){
+        Map<String,String> map=new HashMap<>();
+        map.put("account",userid);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=serviceStore.idcardFaceVerify(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                faceLoading.dismissAllowingStateLoss();
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                        JSONObject object=new JSONObject(str);
+                        boolean success=object.getBoolean("success");
+                        if(success){
+                            JSONObject jsonObject=new JSONObject(object.getString("msg"));
+                            Log.e("idcardFaceVerify","idcardFaceVerify=="+jsonObject.toString());
+                            initFaceTest(jsonObject,name,id,zyf,bl,entity);
+
+                        }else {
+                            String error=object.getString("msg");
+                            Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(getActivity(), "用户信息查询失败！", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("idcardFaceVerify","idcardFaceVerify=="+str);
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                faceLoading.dismissAllowingStateLoss();
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+    }
+
+    private void initFaceTest(JSONObject jsonObject,final String name,final String id,
+                              final String zyf,final double bl,
+                              final GoodsEntity entity) throws JSONException {
+        String orderNo=jsonObject.getString("orderNo");
+        String webankUserid=jsonObject.getString("webankUserId");
+        String randomStr=jsonObject.getString("randomStr");
+        String faceAuthSign=jsonObject.getString("faceAuthSign");
+        WbCoudFaceManager wbCoudFaceManager=new WbCoudFaceManager(webankUserid,
+                randomStr,
+                orderNo,
+                Constants.FACE_APPID,
+                id,
+                name,
+                faceAuthSign,getActivity());
+        wbCoudFaceManager.setOnFaceListener(new WbCoudFaceManager.OnFaceListener() {
+            @Override
+            public void onSucccess() {
+                Log.e("wbCoudFaceManager","initFaceTest==onSucccess");
+                //支付
+                // 添加信息
+                addDriverSignInfo(userid,name,id,entity);
+            }
+            @Override
+            public void onFail(String msg) {
+                Toast.makeText(getActivity(), "认证失败"+msg, Toast.LENGTH_SHORT).show();
+                Log.e("wbCoudFaceManager","initFaceTest=="+msg);
+
+            }
+        });
+        wbCoudFaceManager.execute();
+    }
+
+    private void addDriverSignInfo(String account,String name,String identity,final GoodsEntity entity){
+        Map<String,String> map=new HashMap<>();
+        map.put("account",account);
+        map.put("name",name);
+        map.put("identity",identity);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=serviceStore.addDriverSignInfo(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                        JSONObject object=new JSONObject(str);
+                        boolean success=object.getBoolean("success");
+                        if(success){
+                            doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                        }else {
+                            Toast.makeText(getActivity(), "认证失败", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }else {
+                        Toast.makeText(getActivity(), "认证失败", Toast.LENGTH_SHORT).show();
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("idcardFaceVerify","idcardFaceVerify=="+str);
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getActivity(), "认证失败", Toast.LENGTH_SHORT).show();
+
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+
+    }
+
 
     private void checkStatu(final GoodsEntity entity) {
         // doPs(entity);
@@ -1486,7 +1718,6 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
 /*                                String sdmsg = SharePreferenceUtil.getInstance(activity).getSDMsg();
                                 if ("0".equals(sdmsg)) {
                                     doUnLoad(entity, entity.getName(), entity.getRowid(), entity.getAlctCode());
-
                                 }*/
                             } else {
                                 if (loadingDialogFragment != null && loadingDialogFragment.isAdded()) {

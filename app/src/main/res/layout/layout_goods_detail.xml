@@ -578,6 +578,36 @@
                             android:layout_centerVertical="true"
                             android:textSize="14sp" />
                     </RelativeLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/color_line_text" />
+                    <RelativeLayout
+                        android:id="@+id/layout_agre"
+                        android:layout_height="48dp"
+                        android:layout_width="match_parent"
+                        android:visibility="gone"
+                        >
+                        <TextView
+                            android:id="@+id/tv_agre"
+                            android:text="查看合同"
+                            android:textColor="@color/actionbar_color"
+                            android:textSize="16sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            />
+                        <ImageView
+                            android:layout_height="24dp"
+                            android:layout_width="24dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@+id/tv_agre"
+                            android:src="@drawable/ic_action_file"
+                            />
+
+                    </RelativeLayout>
+
                     <Button
                         android:id="@+id/btn_more"
                         android:layout_width="match_parent"

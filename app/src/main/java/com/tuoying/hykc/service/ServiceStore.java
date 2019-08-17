@@ -210,6 +210,22 @@ public interface ServiceStore {
     @POST("oil/getStationAndFuels/")
     Call<ResponseBody> getStationAndFuels(@FieldMap Map<String, String> params);
 
+    @FormUrlEncoded
+    @POST("bestsign/selectUDriverIsFaceTest/")
+    Call<ResponseBody> selectUDriverIsFaceTest(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("bestsign/idcardFaceVerify/")
+    Call<ResponseBody> idcardFaceVerify(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("bestsign/addDriverSignInfo/")
+    Call<ResponseBody> addDriverSignInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("bestsign/checkAgreByRowid/")
+    Call<ResponseBody> checkAgreByRowid(@FieldMap Map<String, String> params);
+
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

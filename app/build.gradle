@@ -15,6 +15,10 @@ android {
                 includeCompileClasspath = true
             }
         }
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi-v7a'//, 'armeabi', 'arm64-v8a' //, 'x86', 'x86_64'
+        }
     }
     sourceSets {
         main {
@@ -31,12 +35,19 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'webank-KYC-demo-proguard-rules.pro'
             signingConfig signingConfigs.signConfig
         }
         debug{
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'webank-KYC-demo-proguard-rules.pro'
             signingConfig signingConfigs.signConfig // 配置debug包的签名
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs' //this way we can find the .aar file in libs folder
         }
     }
     dexOptions {
@@ -93,5 +104,8 @@ dependencies {
     implementation 'com.lzy.widget:imagepicker:0.6.1'
     compile files('libs/mdp_sdk.jar')
     implementation 'com.google.zxing:core:3.3.0'
+    compile(name: 'WbCloudFaceActionLiveSdk-v1.6.11-9a832ae', ext: 'aar')
+    //2. 云公共库 SDK
+    compile(name: 'WbCloudNormal-v3.0.34-00c2cbc', ext: 'aar')
 
 }

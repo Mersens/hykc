@@ -21,6 +21,7 @@ import com.tuoying.hykc.db.DBDaoImpl;
 import com.tuoying.hykc.entity.EventEntity;
 import com.tuoying.hykc.entity.GoodsEntity;
 import com.tuoying.hykc.entity.User;
+import com.tuoying.hykc.service.ServiceStore;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.RxBus;
@@ -37,6 +38,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class GoodsListDetailActivity extends BaseActivity {
     private Toolbar mToolbar;
@@ -73,6 +79,8 @@ public class GoodsListDetailActivity extends BaseActivity {
     private Button mBtnMore;
     private RelativeLayout layout_pd;
     private TextView mTextPD_Bz;
+    private String argeUrl=null;
+    private RelativeLayout layoutAgre;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -135,6 +143,7 @@ public class GoodsListDetailActivity extends BaseActivity {
         mTextHSHC=findViewById(R.id.tv_hshc);
         mTextJSYFBZ=findViewById(R.id.tv_jsyfbz);
         mTextSid=findViewById(R.id.tv_sid);
+        layoutAgre=findViewById(R.id.layout_agre);
         if(type==100){
             mBtnOrder.setText("接单");
             mBtnOrder.setVisibility(View.VISIBLE);
@@ -161,6 +170,21 @@ public class GoodsListDetailActivity extends BaseActivity {
                 if(!TextUtils.isEmpty(taskid) && !TextUtils.isEmpty(yd_driver)){
                     showMoreView(taskid,yd_driver,entity.getWeight(),entity.getName());
                 }
+
+            }
+        });
+        layoutAgre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(TextUtils.isEmpty(argeUrl)){
+                    Toast.makeText(GoodsListDetailActivity.this,
+                            "合同不存在！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(GoodsListDetailActivity.this, CheckAgreActivity.class);
+                intent.putExtra("url",argeUrl);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
 
             }
         });
@@ -228,6 +252,7 @@ public class GoodsListDetailActivity extends BaseActivity {
                         try {
                             JSONObject object = new JSONObject(str);
                             setInfos(object);
+                            getArgeUrl(userid,entity.getSid());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } finally {
@@ -244,6 +269,47 @@ public class GoodsListDetailActivity extends BaseActivity {
                 }));
 
     }
+
+    private void getArgeUrl(String account,String sid){
+        Map<String,String> map=new HashMap<>();
+        map.put("account",account);
+        map.put("rowid",sid);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=serviceStore.checkAgreByRowid(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                        JSONObject object=new JSONObject(str);
+                        boolean success=object.getBoolean("success");
+                        if(success){
+                            argeUrl=object.getString("message");
+                            layoutAgre.setVisibility(View.VISIBLE);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("getArgeUrl","getArgeUrl=="+str);
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+
+
+
+
+    }
+
+
+
 
     private void setInfos(JSONObject object) {
 

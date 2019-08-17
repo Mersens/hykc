@@ -84,37 +84,10 @@ public class OilListActivity extends BaseActivity {
         });
     }
     private void initDatas() {
-        String string="{\n" +
-                "\t\"code\": \"0\",\n" +
-                "\t\"message\": \"ok\",\n" +
-                "\t\"result\": [{\n" +
-                "\t\t\"stationId\": \"1\",\n" +
-                "\t\t\"stationName\": \"濮阳服务区中石化加油站（东）\",\n" +
-                "\t\t\"provinceCode\": \"410000\",\n" +
-                "\t\t\"cityCode\": \"410900\",\n" +
-                "\t\t\"areaCode\": \"410922\",\n" +
-                "\t\t\"lng\": \"115.07637045\",\n" +
-                "\t\t\"lat\": \"36.00676692\",\n" +
-                "\t\t\"address\": \"河南省濮阳市清丰县\",\n" +
-                "\t\t\"isStop\": 0,\n" +
-                "\t\t\"isHighspeed\": 1,\n" +
-                "\t\t\"fuels\": [{\n" +
-                "\t\t\t\"sf_id\": \"3\",\n" +
-                "\t\t\t\"fuel_name\": \"0# 柴油\",\n" +
-                "\t\t\t\"status\": \"1\",\n" +
-                "\t\t\t\"price\": \"616\"\n" +
-                "\n" +
-                "\t\t}]\n" +
-                "\n" +
-                "\t}]\n" +
-                "}";
-        try {
-            JSONObject object=new JSONObject(string);
-            analysisJson(object.getString("result"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(swipeRefreshLayout!=null && !swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(true);
         }
-      /*  Map<String,String> map=new HashMap<>();
+        Map<String,String> map=new HashMap<>();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.OIL_URL_TEST).build();
         ServiceStore serviceStore = retrofit.create(ServiceStore.class);
         Call<ResponseBody> call=serviceStore.getStationAndFuels(map);
@@ -133,7 +106,6 @@ public class OilListActivity extends BaseActivity {
                         int code=object.getInt("code");
                         if(code==0){
                             analysisJson(object.getString("result"));
-
                         }else {
                             String string=object.getString("message");
                             Toast.makeText(OilListActivity.this, string, Toast.LENGTH_SHORT).show();
@@ -160,12 +132,12 @@ public class OilListActivity extends BaseActivity {
                 Toast.makeText(OilListActivity.this, "信息查询失败！", Toast.LENGTH_SHORT).show();
                 mLayoutNoMsg.setVisibility(View.VISIBLE);
             }
-        });*/
-
+        });
     }
 
     //解析油站数据
     private void analysisJson(String result) throws JSONException {
+        list.clear();
         JSONArray array=new JSONArray(result);
         for (int i = 0; i < array.length(); i++) {
             Gson gson=new Gson();
@@ -179,7 +151,7 @@ public class OilListActivity extends BaseActivity {
 
     //刷新数据
     private void refreshDatas() {
-
+        initDatas();
     }
 
     @Override

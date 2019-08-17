@@ -36,8 +36,7 @@ public class OilListAdapter extends RecyclerView.Adapter<OilListAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v1=mInflater.inflate(R.layout.layout_oil_item,parent,false);
-        View v2=mInflater.inflate(R.layout.layout_fuels_item,parent,false);
-        return new ViewHolder(v1,v2);
+        return new ViewHolder(v1);
     }
 
     @Override
@@ -56,36 +55,12 @@ public class OilListAdapter extends RecyclerView.Adapter<OilListAdapter.ViewHold
                     .getColor(R.color.colorAccent));
         }
         List<FuelsEntity> fuelsEntityList=entity.getFuels();
+        holder.mLayoutFuels.removeAllViews();
         if(fuelsEntityList.size()>0){
             for (int i = 0; i <fuelsEntityList.size() ; i++) {
                 FuelsEntity fuelsEntity=fuelsEntityList.get(i);
                 Log.e("fuelsEntity",fuelsEntity.toString());
-                holder.mTextFuelName.setText(fuelsEntity.getFuel_name());
-                String strPrice=fuelsEntity.getPrice();
-                if(!TextUtils.isEmpty(strPrice) && !"null".equals(strPrice)){
-                    double price=Double.valueOf(strPrice);
-                    double d1=price/1000;
-                    holder.mTextPrice.setText(String.format("%.2f", d1)+"元");
-                }
-                String strGuidePrice=fuelsEntity.getGuide_price();
-                if(!TextUtils.isEmpty(strGuidePrice) && !"null".equals(strGuidePrice)){
-                    double guideprice=Double.valueOf(strGuidePrice);
-                    double d2=guideprice/1000;
-                    holder.mTextGuidePrice.setText(String.format("%.2f", d2)+"元");
-                }
-
-                String status=fuelsEntity.getStatus();
-                if("0".equals(status)){
-                    holder.mTextFuelStatus.setText("正常");
-                    holder.mTextFuelStatus.setTextColor(mContext.getResources()
-                            .getColor(R.color.actionbar_color));
-                }else {
-                    holder.mTextFuelStatus.setText("停用");
-                    holder.mTextFuelStatus.setTextColor(mContext.getResources()
-                            .getColor(R.color.colorAccent));
-                }
-                holder.mLayoutFuels.addView(holder.fuelview);
-
+                holder.mLayoutFuels.addView(getFuelsView(fuelsEntity));
             }
         }
 
@@ -112,17 +87,7 @@ public class OilListAdapter extends RecyclerView.Adapter<OilListAdapter.ViewHold
         public TextView mTextOilStatus;
         public LinearLayout mLayoutFuels;
 
-        public View fuelview;
-        public TextView mTextFuelName;
-        public TextView mTextPrice;
-        public TextView mTextGuidePrice;
-        public TextView mTextFuelStatus;
-
-
         public ViewHolder(View itemView) {
-            super(itemView);
-        }
-        public ViewHolder(View itemView,View fuelview) {
             super(itemView);
             cardView=itemView.findViewById(R.id.cardview);
             mTextOilName=itemView.findViewById(R.id.tv_oil_name);
@@ -130,13 +95,44 @@ public class OilListAdapter extends RecyclerView.Adapter<OilListAdapter.ViewHold
             mTextOilStatus=itemView.findViewById(R.id.tv_oil_status);
             mLayoutFuels=itemView.findViewById(R.id.layout_fuels);
 
-            this.fuelview=fuelview;
-            mTextFuelName=fuelview.findViewById(R.id.tv_fuels_name);
-            mTextPrice=fuelview.findViewById(R.id.tv_price);
-            mTextGuidePrice=fuelview.findViewById(R.id.tv_guide_price);
-            mTextFuelStatus=fuelview.findViewById(R.id.tv_fuel_status);
         }
+
     }
+
+
+    private View getFuelsView(FuelsEntity fuelsEntity){
+        View fuelview=mInflater.inflate(R.layout.layout_fuels_item,null);
+        TextView mTextFuelName=fuelview.findViewById(R.id.tv_fuels_name);
+        TextView mTextPrice=fuelview.findViewById(R.id.tv_price);
+        TextView mTextGuidePrice=fuelview.findViewById(R.id.tv_guide_price);
+        TextView mTextFuelStatus=fuelview.findViewById(R.id.tv_fuel_status);
+        mTextFuelName.setText(fuelsEntity.getFuel_name());
+        String strPrice=fuelsEntity.getPrice();
+        if(!TextUtils.isEmpty(strPrice) && !"null".equals(strPrice)){
+            double price=Double.valueOf(strPrice);
+            double d1=price/1000;
+            mTextPrice.setText(String.format("%.2f", d1)+"元");
+        }
+        String strGuidePrice=fuelsEntity.getGuide_price();
+        if(!TextUtils.isEmpty(strGuidePrice) && !"null".equals(strGuidePrice)){
+            double guideprice=Double.valueOf(strGuidePrice);
+            double d2=guideprice/1000;
+            mTextGuidePrice.setText(String.format("%.2f", d2)+"元");
+        }
+
+        String status=fuelsEntity.getStatus();
+        if("0".equals(status)){
+           mTextFuelStatus.setText("正常");
+            mTextFuelStatus.setTextColor(mContext.getResources()
+                    .getColor(R.color.actionbar_color));
+        }else {
+            mTextFuelStatus.setText("停用");
+            mTextFuelStatus.setTextColor(mContext.getResources()
+                    .getColor(R.color.colorAccent));
+        }
+        return fuelview;
+    }
+
 
     public void setOnItemBtnClickListener(OnItemBtnClickListener listener){
         this.listener=listener;

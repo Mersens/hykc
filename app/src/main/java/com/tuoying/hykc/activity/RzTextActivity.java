@@ -39,6 +39,7 @@ import com.tuoying.hykc.db.DBDao;
 import com.tuoying.hykc.db.DBDaoImpl;
 import com.tuoying.hykc.entity.RZEntity;
 import com.tuoying.hykc.entity.User;
+import com.tuoying.hykc.service.ServiceStore;
 import com.tuoying.hykc.utils.CarInfoUtils;
 import com.tuoying.hykc.utils.DateUtils;
 import com.tuoying.hykc.utils.FileUtil;
@@ -47,6 +48,7 @@ import com.tuoying.hykc.utils.RecognizeService;
 import com.tuoying.hykc.utils.RequestManager;
 import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
+import com.tuoying.hykc.utils.WbCoudFaceManager;
 import com.tuoying.hykc.view.ExitDialogFragment;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 
@@ -63,6 +65,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class RzTextActivity extends BaseActivity {
     public static final String SFZ_ZNAME = "personal1.jpg";//身份证正面
@@ -1208,13 +1215,202 @@ public class RzTextActivity extends BaseActivity {
         entity.setVehicleIdentityCode(clsbm);
         entity.setLicenseNo(jszh);
         entity.setSyr(syr);
-        Intent intent = new Intent(RzTextActivity.this, RzImgActivity.class);
-        intent.putExtra("entity", entity);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        selectUDriverIsFaceTest(entity);
+
     }
 
+   private void selectUDriverIsFaceTest(final RZEntity entity){
 
+       Map<String,String> map=new HashMap<>();
+       map.put("account",id);
+       map.put("statu",1+"");
+       Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+       ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+       Call<ResponseBody> call=serviceStore.selectUDriverIsFaceTest(map);
+       call.enqueue(new Callback<ResponseBody>() {
+           @Override
+           public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+               ResponseBody body=response.body();
+               String str= null;
+               try {
+                   if(null!=body){
+                       str = body.string();
+                       JSONObject object=new JSONObject(str);
+                       boolean success=object.getBoolean("success");
+                       if(success){
+                           //已校验
+                           Intent intent = new Intent(RzTextActivity.this, RzImgActivity.class);
+                           intent.putExtra("entity", entity);
+                           startActivity(intent);
+                           overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+
+                       }else {
+                           //未校验
+                           showFaceView(entity);
+                       }
+                   }else {
+
+                       Toast.makeText(RzTextActivity.this, "用户信息查询失败！", Toast.LENGTH_SHORT).show();
+                   }
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+               Log.e("selectUDriverIsFaceTest","selectUDriverIsFaceTest=="+str);
+           }
+           @Override
+           public void onFailure(Call<ResponseBody> call, Throwable t) {
+               Log.e("onFailure","onFailure=="+t.getMessage());
+           }
+       });
+   }
+
+    private void showFaceView(final RZEntity entity) {
+        final ExitDialogFragment dialogFragment=ExitDialogFragment.getInstance("请进行刷脸认证！");
+        dialogFragment.show(getSupportFragmentManager(),"showFaceView");
+        dialogFragment.setOnDialogClickListener(new ExitDialogFragment.OnDialogClickListener() {
+            @Override
+            public void onClickCancel() {
+                dialogFragment.dismissAllowingStateLoss();
+            }
+
+            @Override
+            public void onClickOk() {
+                dialogFragment.dismissAllowingStateLoss();
+                idcardFaceVerify(entity);
+            }
+        });
+
+
+    }
+
+    private void idcardFaceVerify(final RZEntity entity) {
+        final LoadingDialogFragment faceLoading=LoadingDialogFragment.getInstance();
+        faceLoading.showF(getSupportFragmentManager(),"faceLoading");
+        Map<String,String> map=new HashMap<>();
+        map.put("account",id);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call=serviceStore.idcardFaceVerify(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                faceLoading.dismissAllowingStateLoss();
+                ResponseBody body=response.body();
+                String str= null;
+                try {
+                    if(null!=body){
+                        str = body.string();
+                        JSONObject object=new JSONObject(str);
+                        boolean success=object.getBoolean("success");
+                        if(success){
+                            JSONObject jsonObject=new JSONObject(object.getString("msg"));
+                            Log.d("WbCoudFaceManager","获取数字签名");
+                            Log.d("WbCoudFaceManager","idcardFaceVerify=="+jsonObject.toString());
+                            initFaceTest(jsonObject,entity);
+                        }else {
+
+                            String error=object.getString("msg");
+                            Toast.makeText(RzTextActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(RzTextActivity.this, "用户信息查询失败！", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("idcardFaceVerify","idcardFaceVerify=="+str);
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                faceLoading.dismissAllowingStateLoss();
+                Log.e("onFailure","onFailure=="+t.getMessage());
+            }
+        });
+
+    }
+
+    private void initFaceTest(JSONObject jsonObject,final RZEntity entity
+                              ) throws JSONException {
+        String orderNo=jsonObject.getString("orderNo");
+        String webankUserid=jsonObject.getString("webankUserId");
+        String randomStr=jsonObject.getString("randomStr");
+        String faceAuthSign=jsonObject.getString("faceAuthSign");
+        final String name=entity.getXm();
+        final String idNo=entity.getSfzh();
+        WbCoudFaceManager wbCoudFaceManager=new WbCoudFaceManager(webankUserid,
+                randomStr,
+                orderNo,
+                Constants.FACE_APPID,
+                idNo,
+                name,
+                faceAuthSign,
+                RzTextActivity.this
+                );
+        wbCoudFaceManager.setOnFaceListener(new WbCoudFaceManager.OnFaceListener() {
+            @Override
+            public void onSucccess() {
+                Log.e("wbCoudFaceManager","initFaceTest==onSucccess");
+                addDriverSignInfo(id,name,idNo);
+
+            }
+            @Override
+            public void onFail(String msg) {
+                Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
+                Log.e("wbCoudFaceManager","initFaceTest=="+msg);
+
+            }
+        });
+        wbCoudFaceManager.execute();
+
+
+
+    }
+
+    private void addDriverSignInfo(String account,String name,String identity) {
+        Map<String, String> map = new HashMap<>();
+        map.put("account", account);
+        map.put("name", name);
+        map.put("identity", identity);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
+        ServiceStore serviceStore = retrofit.create(ServiceStore.class);
+        Call<ResponseBody> call = serviceStore.addDriverSignInfo(map);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                ResponseBody body = response.body();
+                String str = null;
+                try {
+                    if (null != body) {
+                        str = body.string();
+                        JSONObject object = new JSONObject(str);
+                        boolean success = object.getBoolean("success");
+                        if(success){
+                            Intent intent = new Intent(RzTextActivity.this, RzImgActivity.class);
+                            intent.putExtra("entity", entity);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                        }else {
+                            Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }else {
+                        Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.e("idcardFaceVerify", "idcardFaceVerify==" + str);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("onFailure", "onFailure==" + t.getMessage());
+                Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
