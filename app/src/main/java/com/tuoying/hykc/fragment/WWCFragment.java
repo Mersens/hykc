@@ -531,6 +531,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                                  final LoadingDialogFragment faceLoading){
         Map<String,String> map=new HashMap<>();
         map.put("account",userid);
+        map.put("name",name);
+        map.put("identity",id);
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
         ServiceStore serviceStore = retrofit.create(ServiceStore.class);
         Call<ResponseBody> call=serviceStore.idcardFaceVerify(map);

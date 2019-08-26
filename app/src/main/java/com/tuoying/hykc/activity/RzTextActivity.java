@@ -1220,6 +1220,8 @@ public class RzTextActivity extends BaseActivity {
     }
 
    private void selectUDriverIsFaceTest(final RZEntity entity){
+        final LoadingDialogFragment loadingDialogFragment=LoadingDialogFragment.getInstance();
+        loadingDialogFragment.showF(getSupportFragmentManager(),"IsFaceTestView");
 
        Map<String,String> map=new HashMap<>();
        map.put("account",id);
@@ -1230,6 +1232,7 @@ public class RzTextActivity extends BaseActivity {
        call.enqueue(new Callback<ResponseBody>() {
            @Override
            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+               loadingDialogFragment.dismissAllowingStateLoss();
                ResponseBody body=response.body();
                String str= null;
                try {
@@ -1259,7 +1262,9 @@ public class RzTextActivity extends BaseActivity {
            }
            @Override
            public void onFailure(Call<ResponseBody> call, Throwable t) {
+               loadingDialogFragment.dismissAllowingStateLoss();
                Log.e("onFailure","onFailure=="+t.getMessage());
+               Toast.makeText(RzTextActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
            }
        });
    }
@@ -1288,6 +1293,8 @@ public class RzTextActivity extends BaseActivity {
         faceLoading.showF(getSupportFragmentManager(),"faceLoading");
         Map<String,String> map=new HashMap<>();
         map.put("account",id);
+        map.put("name",entity.getXm());
+        map.put("identity",entity.getSfzh());
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
         ServiceStore serviceStore = retrofit.create(ServiceStore.class);
         Call<ResponseBody> call=serviceStore.idcardFaceVerify(map);

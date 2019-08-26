@@ -102,7 +102,6 @@ public class CheckAgreActivity extends BaseActivity {
         // 如果此设置是允许，则 setAllowFileAccessFromFileURLs 不起做用
         webSettings.setAllowUniversalAccessFromFileURLs(false);
         webView.loadUrl(url);
-
     }
 
     @Override

@@ -157,7 +157,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp">
+                android:layout_marginRight="16dp"
+                android:visibility="gone"
+                >
 
                 <ImageView
                     android:id="@+id/img_oil"
@@ -192,6 +194,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:visibility="gone"
                 android:background="@color/color_line_text"
                 />
             <RelativeLayout

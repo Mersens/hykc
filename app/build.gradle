@@ -35,13 +35,12 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'webank-KYC-demo-proguard-rules.pro'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.signConfig
         }
         debug{
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'webank-KYC-demo-proguard-rules.pro'
             signingConfig signingConfigs.signConfig // 配置debug包的签名
         }
     }
