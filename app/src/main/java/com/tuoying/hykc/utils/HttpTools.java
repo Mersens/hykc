@@ -60,14 +60,14 @@ public class HttpTools {
      * Param     :   params请求体内容，encode编码格式
      */
     public static StringBuffer getRequestData(Map<String, String> params, String encode) {
-        StringBuffer stringBuffer = new StringBuffer();        //存储封装好的请求体信息
-        try {
-            for(Map.Entry<String, String> entry : params.entrySet()) {
-                stringBuffer.append(entry.getKey())
-                        .append("=")
-                        .append(URLEncoder.encode(entry.getValue(), encode))
-                        .append("&");
-            }
+                StringBuffer stringBuffer = new StringBuffer();        //存储封装好的请求体信息
+                try {
+                    for(Map.Entry<String, String> entry : params.entrySet()) {
+                        stringBuffer.append(entry.getKey())
+                                .append("=")
+                                .append(URLEncoder.encode(entry.getValue(), encode))
+                                .append("&");
+                    }
             stringBuffer.deleteCharAt(stringBuffer.length() - 1);    //删除最后的一个"&"
         } catch (Exception e) {
             e.printStackTrace();

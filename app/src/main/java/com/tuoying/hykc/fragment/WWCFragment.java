@@ -32,6 +32,7 @@ import com.baidu.mapapi.utils.DistanceUtil;
 import com.google.gson.Gson;
 import com.tuoying.hykc.R;
 import com.tuoying.hykc.activity.BaseActivity;
+import com.tuoying.hykc.activity.CheckAgreActivity;
 import com.tuoying.hykc.activity.GoodsListDetailActivity;
 import com.tuoying.hykc.activity.LoginActivity;
 import com.tuoying.hykc.activity.MainActivity;
@@ -56,7 +57,9 @@ import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.RxBus;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
 import com.tuoying.hykc.utils.WbCoudFaceManager;
+import com.tuoying.hykc.view.EvaluateDialogFragment;
 import com.tuoying.hykc.view.ExitDialogFragment;
+import com.tuoying.hykc.view.FactTestDialog;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 import com.tuoying.hykc.view.PayMoneyDialog;
 import com.tuoying.swipelayout.OnLoadMoreListener;
@@ -388,7 +391,8 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 checkStatu(entity);
                 break;
             case 3:
-                calculateTime(entity);
+                showEvaluateView(entity);
+
                 break;
             case 12:
                 final ValidationCodeFragment validationCodeFragment = ValidationCodeFragment.getInstance("确定取消运单？");
@@ -416,6 +420,84 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 doPz(entity);
                 break;
         }
+    }
+
+
+
+    private void showEvaluateView(final GoodsEntity entity){
+        final EvaluateDialogFragment evaluateDialogFragment = EvaluateDialogFragment.getInstance();
+        evaluateDialogFragment.show(getChildFragmentManager(), "EvaluateView");
+        evaluateDialogFragment.setOnReasonDialogListener(new EvaluateDialogFragment.OnReasonDialogListener() {
+            @Override
+            public void onCloseListener() {
+                evaluateDialogFragment.dismiss();
+            }
+
+            @Override
+            public void onComplateListener(String t, String reasons) {
+                evaluateDialogFragment.dismiss();
+                upLoadEvaluateInfo( entity,t,reasons);
+            }
+        });
+    }
+
+    private void upLoadEvaluateInfo(final GoodsEntity entity, String t, String reasons) {
+        JSONObject object=new JSONObject();
+        try {
+            object.put("driver_score",t);
+            object.put("driver_appraise",reasons);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", user.getUserId());
+        map.put("app", Constants.AppId);
+        map.put("token", user.getToken());
+        map.put("rowid", entity.getRowid());
+        map.put("content", object.toString());
+
+        RequestManager.getInstance()
+                .mServiceStore
+                .save_appraise(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ResultObserver(new RequestManager.onRequestCallBack() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        final MainActivity activity = mActivityReference.get();
+                        if (activity == null) {
+                            return;
+                        }
+                        calculateTime(entity);
+                        Log.e("Evaluate onSuccess", "====" + msg);
+                        String str = msg.replaceAll("\r", "").replaceAll("\n", "");
+                        try {
+                            JSONObject object = new JSONObject(str);
+                            if (object.getBoolean("success")) {
+                                Toast.makeText(getActivity(), "评价提交成功！", Toast.LENGTH_SHORT).show();
+                            } else {
+                                String errorMsg = object.getString("message");
+                                Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } finally {
+                        }
+                    }
+                    @Override
+                    public void onError(String msg) {
+                        final MainActivity activity = mActivityReference.get();
+                        if (activity == null) {
+                            return;
+                        }
+                        calculateTime(entity);
+                        Log.e("onError", "====" + msg);
+                        Toast.makeText(activity, "提交失败！", Toast.LENGTH_SHORT).show();
+
+                    }
+                }));
+
+
     }
 
     private void selectUDriverIsFaceTest(final String zyf,final double bl,final GoodsEntity entity){
@@ -592,23 +674,43 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                 Log.e("wbCoudFaceManager","initFaceTest==onSucccess");
                 //支付
                 // 添加信息
-                addDriverSignInfo(userid,name,id,entity);
+                addDriverSignInfo(userid,name,id,entity,0,1);
             }
             @Override
             public void onFail(String msg) {
                 Toast.makeText(getActivity(), "认证失败"+msg, Toast.LENGTH_SHORT).show();
                 Log.e("wbCoudFaceManager","initFaceTest=="+msg);
-
+                showFaceTestView(userid,name,id,entity,0);
             }
         });
         wbCoudFaceManager.execute();
     }
 
-    private void addDriverSignInfo(String account,String name,String identity,final GoodsEntity entity){
+    private void showFaceTestView(final String id, final String name, final String idNo,final GoodsEntity entity,final int statu) {
+        final FactTestDialog factTestDialog=FactTestDialog.newInstance(id,name,idNo);
+        factTestDialog.show(getChildFragmentManager(),"showFaceTestView");
+        factTestDialog.setOnCheckListener(new FactTestDialog.OnCheckListener() {
+            @Override
+            public void onCheck() {
+                addDriverSignInfo(id,name,idNo,entity,1,statu);
+            }
+
+            @Override
+            public void onDismiss() {
+                factTestDialog.dismiss();
+            }
+        });
+
+    }
+
+    private void addDriverSignInfo(String account,String name,String identity,
+                                   final GoodsEntity entity,int fromStatus ,final int statu){
         Map<String,String> map=new HashMap<>();
         map.put("account",account);
         map.put("name",name);
         map.put("identity",identity);
+        map.put("fromStatus",fromStatus+"");
+        map.put("statu", statu+"");
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
         ServiceStore serviceStore = retrofit.create(ServiceStore.class);
         Call<ResponseBody> call=serviceStore.addDriverSignInfo(map);
@@ -623,7 +725,9 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         JSONObject object=new JSONObject(str);
                         boolean success=object.getBoolean("success");
                         if(success){
-                            doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                            if(statu==1){
+                                doPayMoney(entity.getZyf(), Double.parseDouble(entity.getBl()), entity);
+                            }
                         }else {
                             Toast.makeText(getActivity(), "认证失败", Toast.LENGTH_SHORT).show();
                         }
@@ -1704,12 +1808,10 @@ public class WWCFragment extends BaseFragment implements OnRefreshListener, OnLo
                         if (dao != null) {
                             dao.delLocInfo(entity.getRowid());
                         }
-
                         if (loadingDialogFragment != null && loadingDialogFragment.isAdded()) {
                             loadingDialogFragment.dismissAllowingStateLoss();
                         }
 
-                        long sdl2 = DateUtils.getTimeMillis();
                         String str = msg.replaceAll("\r", "").replaceAll("\n", "");
                         try {
                             JSONObject jsonObject = new JSONObject(str);

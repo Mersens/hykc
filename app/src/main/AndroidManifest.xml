@@ -7,7 +7,7 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.NFC" />
-
+    <uses-permission android:name="REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -49,10 +49,18 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon,android:allowBackup"
+        tools:replace="android:icon,android:allowBackup,android:label"
         android:networkSecurityConfig="@xml/network_security_config"
-
         >
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.tuoying.hykc.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <!---->
         <!--@drawable/ic_hukc_01-->
         <activity
@@ -79,13 +87,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:launchMode="singleTask"
             >
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="*/*" />
             </intent-filter>
 
@@ -140,9 +145,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/app_name"
-
             />
-
         <activity
             android:name=".activity.MyTrailerDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -157,7 +160,13 @@
             android:label="@string/app_name"
 
             />
+        <activity
+            android:name=".activity.SuggestionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/app_name"
 
+            />
         <activity
             android:name=".activity.AgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

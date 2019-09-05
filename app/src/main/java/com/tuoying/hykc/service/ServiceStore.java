@@ -226,6 +226,15 @@ public interface ServiceStore {
     @POST("bestsign/checkAgreByRowid/")
     Call<ResponseBody> checkAgreByRowid(@FieldMap Map<String, String> params);
 
+    @FormUrlEncoded
+    @POST("sugg/addSuggestionInfo/")
+    Call<ResponseBody> addSuggestionInfo(@FieldMap Map<String, String> params);
+
+    @FormUrlEncoded
+    @POST("sugg/uploadSuggImg/")
+    Call<ResponseBody> uploadSuggImg(@FieldMap Map<String, String> params);
+
+
     @GET
     Observable<ResponseBody> download(@Url String fileUrl);
 

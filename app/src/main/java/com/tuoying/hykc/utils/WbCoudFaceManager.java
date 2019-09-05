@@ -211,11 +211,9 @@ public class WbCoudFaceManager {
                                 }
                                 Log.d(TAG, "前端失败！");
                             }
-
                         }
                         //测试用代码
                         //不管刷脸成功失败，只要结束了，自带对比和活体检测都更新userId
-
                     }
                 });
             }

@@ -5,23 +5,23 @@ import android.os.Environment;
 import java.io.File;
 
 /**
- * Created by Administrator on 2018/3/21.
+ * Created by Administrator on 2018/3/     21.
  */
 
 public class Constants {
     public static final String WEBSERVICE_URL = "http://tuoying.huoyunkuaiche.com/";
     //public static final String WEBSERVICE_URL="http://ewytek.cn/";
-    public static final String TRAILERINFO_URL = "http://39.105.210.202:8080/";
-    public static final String ETC_URL = "http://39.105.210.202:63688/";
-    public static final String BESTSIGN_URL_TEST="http://39.105.210.202:63688";//http://39.105.210.202:63688
+    public static final String TRAILERINFO_URL = "http://122.114.76.7:63688/";
+    public static final String ETC_URL = "http://39.105.210.202:63688/";//122.114.76.7
+    public static final String BESTSIGN_URL_TEST="http://122.114.76.7:63688";//http://39.105.210.202:63688
     public static final String BESTSIGN_URL="";
-    public static final String OIL_URL_TEST="http://39.105.210.202:63688";
+    public static final String OIL_URL_TEST="http://122.114.76.7:63688";
+    public static final String MOX_URL="http://192.168.1.37:8080/";
     //public static final String TRAILERINFO_URL = "http://192.168.1.44:8080/";
     public static final String APPUPDATEURL=WEBSERVICE_URL+"searchversion.jsp?app=driver";
     public static final String MQTT_URL = "tcp://59.110.159.178:1883";
     public static final String YDIp="http://122.114.76.37:8080";
     public static final String AppId = "driver";
-    public static final int TIMER_DELAY = 10000;
     public static final String UPDATEAPP_LOCATION = Environment.getExternalStorageDirectory() +
             "/cityfreight/AllenVersionPath/";
     public static final String SFZ_Z = "SFZ_Z";//身份证正面
@@ -32,7 +32,7 @@ public class Constants {
     public static final String CYZGZ = "CYZGZ";//从业资格证
     public static final int LOC_RADIUS = 3000;
     public static final String PAYTYPE_WX = "wx";
-    public static final String VERSIONTIME = "2019.07.16";
+    public static final String VERSIONTIME = "2019.08.28";
     public static final String PICTUREFILE = Environment.getExternalStorageDirectory().toString() + File.separator +
             "hykctemp";
     public static final String UPLOADE_URL = WEBSERVICE_URL + "files/image_upload_new.jsp";
@@ -51,7 +51,6 @@ public class Constants {
     public static final String APPIDENTITY="660f712cdb0b11e79148246e965b4750";
     public static final String APPKEY="8a82286bdb0b11e78c190242ac120002";
     public static final String ALCT_URL="https://oapi-staging.alct56.com";*/
-
     //总公司正式
     public static String ALCT_URL = "https://oapi.alct56.com";
     public static String ENTERPRISECODE = "E0018821";

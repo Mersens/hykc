@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -40,6 +41,7 @@ import com.alct.mdp.model.Invoice;
 import com.alct.mdp.model.Location;
 import com.alct.mdp.model.MultiIdentity;
 import com.alct.mdp.response.GetInvoicesResponse;
+import com.allenliu.versionchecklib.callback.APKDownloadListener;
 import com.allenliu.versionchecklib.v2.AllenVersionChecker;
 import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
 import com.allenliu.versionchecklib.v2.builder.UIData;
@@ -68,6 +70,7 @@ import com.tuoying.hykc.service.MQTTService;
 import com.tuoying.hykc.utils.APKVersionCodeUtils;
 import com.tuoying.hykc.utils.DateUtils;
 import com.tuoying.hykc.utils.DeviceHelper;
+import com.tuoying.hykc.utils.FileUtil;
 import com.tuoying.hykc.utils.NfcDao;
 import com.tuoying.hykc.utils.NotificationUtils;
 import com.tuoying.hykc.utils.Questions;
@@ -82,6 +85,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -618,6 +622,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void checkVerson() {
+
         Map<String,String> map=new HashMap<>();
         map.put("app",Constants.AppId);
         RequestManager.getInstance()
@@ -647,7 +652,6 @@ public class MainActivity extends BaseActivity
                                 }
                                 showVersonView(content, url, isNeed);
                             }
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -663,7 +667,7 @@ public class MainActivity extends BaseActivity
         builder = AllenVersionChecker
                 .getInstance()
                 .requestVersion()
-                .setRequestUrl(Constants.APPUPDATEURL)
+                .setRequestUrl(Constants.APPUPDATEURL)//
                 .request(new RequestVersionListener() {
                     @Nullable
                     @Override
@@ -673,8 +677,6 @@ public class MainActivity extends BaseActivity
 
                     @Override
                     public void onRequestVersionFailure(String message) {
-
-
                     }
                 });
 
@@ -688,8 +690,8 @@ public class MainActivity extends BaseActivity
         }
         builder.setForceRedownload(true);
         builder.setDownloadAPKPath(Constants.UPDATEAPP_LOCATION);
-        builder.excuteMission(MainActivity.this);
 
+        builder.excuteMission(MainActivity.this);
     }
 
     private void forceUpdate() {
@@ -753,6 +755,7 @@ public class MainActivity extends BaseActivity
 
                     @Override
                     public void onError(String msg) {
+
                     }
                 }));
 

@@ -50,6 +50,7 @@ import com.tuoying.hykc.utils.ResultObserver;
 import com.tuoying.hykc.utils.SharePreferenceUtil;
 import com.tuoying.hykc.utils.WbCoudFaceManager;
 import com.tuoying.hykc.view.ExitDialogFragment;
+import com.tuoying.hykc.view.FactTestDialog;
 import com.tuoying.hykc.view.LoadingDialogFragment;
 
 import org.json.JSONException;
@@ -1241,11 +1242,11 @@ public class RzTextActivity extends BaseActivity {
                        JSONObject object=new JSONObject(str);
                        boolean success=object.getBoolean("success");
                        if(success){
-                           //已校验
-                           Intent intent = new Intent(RzTextActivity.this, RzImgActivity.class);
-                           intent.putExtra("entity", entity);
-                           startActivity(intent);
-                           overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                               //已校验
+                               Intent intent = new Intent(RzTextActivity.this, RzImgActivity.class);
+                               intent.putExtra("entity", entity);
+                               startActivity(intent);
+                               overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
 
                        }else {
                            //未校验
@@ -1357,27 +1358,45 @@ public class RzTextActivity extends BaseActivity {
             @Override
             public void onSucccess() {
                 Log.e("wbCoudFaceManager","initFaceTest==onSucccess");
-                addDriverSignInfo(id,name,idNo);
+                addDriverSignInfo(id,name,idNo,0,1);
 
             }
             @Override
             public void onFail(String msg) {
-                Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RzTextActivity.this,
+                        msg, Toast.LENGTH_SHORT).show();
                 Log.e("wbCoudFaceManager","initFaceTest=="+msg);
-
+                showFaceTestView(id,name,idNo,0);
             }
         });
         wbCoudFaceManager.execute();
+    }
 
+    private void showFaceTestView(final String id, final String name, final String idNo,final int statu) {
+        final FactTestDialog factTestDialog=FactTestDialog.newInstance(id,name,idNo);
+        factTestDialog.show(getSupportFragmentManager(),"showFaceTestView");
+        factTestDialog.setOnCheckListener(new FactTestDialog.OnCheckListener() {
+            @Override
+            public void onCheck() {
+                factTestDialog.dismiss();
+                addDriverSignInfo(id,name,idNo,1,statu);
+            }
 
+            @Override
+            public void onDismiss() {
+                factTestDialog.dismiss();
+            }
+        });
 
     }
 
-    private void addDriverSignInfo(String account,String name,String identity) {
+    private void addDriverSignInfo(String account,String name,String identity,int fromStatus ,final int statu) {
         Map<String, String> map = new HashMap<>();
         map.put("account", account);
         map.put("name", name);
         map.put("identity", identity);
+        map.put("fromStatus",fromStatus+"");
+        map.put("statu", statu+"");
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Constants.BESTSIGN_URL_TEST).build();
         ServiceStore serviceStore = retrofit.create(ServiceStore.class);
         Call<ResponseBody> call = serviceStore.addDriverSignInfo(map);
@@ -1398,7 +1417,6 @@ public class RzTextActivity extends BaseActivity {
                             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
                         }else {
                             Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();
-
                         }
                     }else {
                         Toast.makeText(RzTextActivity.this, "认证失败！", Toast.LENGTH_SHORT).show();

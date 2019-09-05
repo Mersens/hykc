@@ -44,8 +44,6 @@
 }
 #######################Demo里不能被混淆的########################################
 
-#云刷脸（动作活体）的混淆规则
--include webank-cloud-face-action-proguard-rules.pro
 
 ######################云产品依赖的第三方库 混淆规则-BEGIN###########################
 
@@ -67,4 +65,29 @@
 -printseeds seeds.txt
 #列出从 apk 中删除的代码
 -printusage unused.txt
+#云刷脸（动作活体）的混淆规则
+-include webank-cloud-face-action-proguard-rules.pro
+######################云产品依赖的第三方库 混淆规则-BEGIN###########################
+
+
+#-ignorewarnings -keep class * { public private *; }
+#-----------handle MDPSDK ---------------
+-keep class com.alct.mdp.** {*;}
+
+#-----------third part dependency---------
+# OrmLite
+-keep class com.j256.**
+-keepclassmembers class com.j256.** { *; }
+-keep enum com.j256.**
+-keepclassmembers enum com.j256.** { *; }
+-keep interfac,e com.j256.**
+-keepclassmembers interface com.j256.** { *; }
+# gson
+-keep public class com.google.** {*;}
+# httpclient
+-keep public class com.loopj.** {*;}
+-keep public class org.hamcrest.** {*;}
+-keep public class cz.msebera.** {*;}
+# permissionsdispatcher
+-keep public class permissions.dispatcher.** {*;}
 

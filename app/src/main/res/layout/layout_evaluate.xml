@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="360dp"
+        android:layout_height="380dp"
         android:background="@color/base_color_text_white"
         android:orientation="vertical">
 
@@ -21,7 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="评价"
+                android:text="服务评价"
                 android:textColor="@color/base_color_text_white"
                 android:textSize="16sp" />
 
@@ -47,6 +47,7 @@
                 android:layout_height="60dp"
                 >
                 <TextView
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
@@ -59,8 +60,11 @@
                     android:id="@+id/rating_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/name"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
                     app:starCanTouch="true"
                     app:starCount="5"
                     app:starCoverColor="#ff48b7ef"
