@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_template_big_media.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_template_big_media.xml"
+    },
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_template_big_media_narrow.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_template_big_media_narrow.xml"
+    },
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_template_big_media_narrow_custom.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_template_big_media_narrow_custom.xml"
+    },
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_media_cancel_action.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_media_cancel_action.xml"
+    },
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_media_action.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_media_action.xml"
+    },
+    {
+        "merged": "D:\\Android\\Code\\fromgit\\hykc\\ocr_ui\\build\\intermediates\\res\\merged\\release\\layout-v11\\notification_template_big_media_custom.xml",
+        "source": "C:\\Users\\Merse\\.gradle\\caches\\transforms-1\\files-1.1\\appcompat-v7-25.1.1.aar\\13a5a4387c2b0d4b50a3082779ec96aa\\res\\layout-v11\\notification_template_big_media_custom.xml"
+    }
+]
